@@ -1,0 +1,44 @@
+{
+  "name": "freefall_parser",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev-front": "vite",
+    "test-front": "tsc",
+    "tauri-dev": "tauri dev",
+    "tauri-build": "tauri build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "superjson": "^1.13.3",
+    "use-long-press": "^3.2.0",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.11",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "cssnano": "^6.0.2",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^10.1.0",
+    "postcss-font-magician": "^3.0.0",
+    "postcss-import": "^15.1.0",
+    "postcss-load-config": "^4.0.2",
+    "postcss-nested": "^6.0.1",
+    "postcss-nesting": "^12.0.2",
+    "postcss-plugin": "^1.0.0",
+    "typescript": "^5.3.3",
+    "vite": "^4.5.1",
+    "vite-tsconfig-paths": "^4.2.2"
+  },
+  "notUsed": {
+    "build-front": "tsc && vite build",
+    "preview-front": "vite preview"
+  }
+}

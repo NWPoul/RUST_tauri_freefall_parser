@@ -1,0 +1,131 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  /* font-size: 16px;
+  font-weight: 400;
+
+  color: #0f0f0f;
+  background-color: #f6f6f6; */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+    --timer-idle-color: gray;
+    --timer-running-color: #2a50db;
+    --blink-duration: 1s;
+    --body-background-color: #070707;
+    --panel-prime-color: #3851ff;
+    --panel-contrast-color: #00a0fd;
+
+    background-color: var(--body-background-color);
+}
+
+#AppServ {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.controls_wrapper {
+    padding-top: 3em;
+    display: flex;
+    background-color: inherit;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 90%;
+
+    & button:focus-visible{
+        outline: unset;
+    }
+
+    /* border: solid 1px blue; */
+}
+
+
+.mainBtnBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 17em;
+}
+
+
+.quickBtn {
+    position: relative;
+    display: block;
+    width: 95%;
+    height: 2em;
+    margin: 0.25em;
+    font-size: 2em;
+    font-weight: bold;
+    border-radius: 0.25em;
+    background-color: inherit;
+    border-color: var(--panel-contrast-color);
+    color: var(--panel-contrast-color);
+    cursor: pointer;
+}
+
+
+#pauseBtn {
+    /* margin: 1rem; */
+    margin-bottom: 2rem;
+    /* height: 7rem; */
+    /* width: 4.25em; */
+    color: var(--timer-idle-color);
+    border-color: var(--timer-idle-color);
+}
+
+
+.api_addr-btn,
+.api_flasherPort-btn {
+    padding: 0 1em;
+}
+
+.api_requested-btn {
+    color: #00ea0c;
+    .api-idle & {
+        color: var(--timer-idle-color);
+    }
+}
+
+.api_addr-option,
+.api_flasherPort-option {
+    background-color: #000000;
+    color:yellow;
+}
+
+
+
+.push-api-inputs-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 1.5em;
+}
+
+
+.slider-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.slider-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.slider-label-val{
+    color: rgb(200, 194, 194);
+}
+
+#panelBtn-wrapper {
+    display: flex;
+    padding-top: 1em;
+}

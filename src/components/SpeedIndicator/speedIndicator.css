@@ -1,0 +1,180 @@
+.SpeedIndicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    /* width: 5ch; */
+    text-align: right;
+    font-family: sans-serif;
+    font-size: 20rem;
+    font-stretch: ultra-condensed;
+
+    color: #3851ff;
+    /* z-index: -1; */
+
+    .displayPanel & {
+        top: 23rem;
+        width: 5ch;
+        height: 2em;
+    }
+}
+
+.PercentIndicator {
+    /* scale: .85 1; */
+    transform: scaleX(.85);
+    transform-origin: right;
+    /* width: 5ch; */
+    line-height: 0.9;
+    font-size: 16rem;
+    text-align: right;
+    &.errSpeed    {color: #3851ff;}
+    &.lowSpeed    {color: rgb(30, 255, 0);}
+    &.mediumSpeed {color: rgb(234, 255, 0);}
+    &.highSpeed   {color: red;}
+
+    .displayPanel & {
+        position: absolute;
+        top:  1.1em;
+        right: 0em;
+        width: 5ch;
+        line-height: 0.75;
+        font-size: 21rem;
+    }
+}
+.PercentIndicator-dec {
+    font-size: 0.5em;
+
+    .displayPanel & {
+        font-size: 10rem;
+    }
+}
+.PercentIndicator-percent {
+    display: inline-block;
+    /* scale: 0.75 0.95; */
+    transform: scale(0.75, 0.95);
+    opacity: 0.25;
+
+    .displayPanel & {
+        /* scale: 0.75 0.85; */
+        /* transform-origin: 45% 90%; */
+        transform: scale(0.75, 0.95);
+        opacity: 0.5;
+    }
+}
+
+.speedKm_wrapper {
+    display: none;
+    position: absolute;
+}
+
+
+
+
+.displayPanel .SpeedIndicator.errSpeed {
+    display: none;
+}
+
+.displayPanel .speedKm_wrapper {
+    display: flex;
+    justify-content: right;
+    position: absolute;
+    top: 0rem;
+    right: 1rem;
+    width: 5ch;
+
+    /* scale: .85 1; */
+    transform: scaleX(.85);
+    transform-origin: right;
+    z-index: -1;
+
+    box-sizing: border-box;
+    padding-right: 0.1em;
+
+    color: #3851ff;
+
+    text-align: right;
+    font-family: sans-serif;
+    font-size: 20rem;
+    font-stretch: ultra-condensed;
+
+    &.LOW-diff {
+        color: rgb(30, 255, 0);
+        path {animation: speed-diff-warning 1s infinite;}
+    }
+    &.MID-diff {
+        color: #fff200;
+        path {animation: speed-diff-warning 0.5s infinite;}
+    }
+    &.HIGH-diff {
+        color: #ff0000;
+        path {animation: speed-diff-warning 0.25s infinite;}
+    }
+
+
+    & .speedKm_units {
+        position: relative;
+        top: 1rem;
+        display: inline-block;
+        height: 17rem;
+
+        margin-left: 0.25em;
+        text-align: center;
+        opacity: 0.7;
+        font-size: 0.52em
+    }
+    & .speedKm_units-km {
+        position: relative;
+        text-decoration: underline;
+        opacity: 0.75;
+    }
+    & .speedKm_units-h {
+        position: relative;
+        top: -4rem;
+    }
+}
+
+#SpeedDiffIndicator {
+    position: absolute;
+    left: -7rem;
+    /* top: 35%; */
+    display: flex;
+
+    svg {
+        position: absolute;
+        top: 5rem;
+        width: 7rem;
+        height: 7rem;
+    }
+    path {
+        fill: currentColor;
+    }
+
+    &.DOWN-diff {
+        svg {transform: scaleY(-1);}
+    }
+}
+
+#diffActSpeed {
+    position: absolute;
+    left: 15rem;
+    width: max-content;
+    font-size: 15rem;
+    font-stretch: normal;
+    font-weight: bold;
+    opacity: 0.5;
+    /* &.UP-diff   {top:   7rem;}
+    &.DOWN-diff {bottom: 7rem;} */
+
+    .diffActSpeed-percent {
+        display: inline-block;
+        width: max-content;
+        /* scale: 0.85 1; */
+        transform: scale(0.85, 1);
+    }
+}
+
+
+@keyframes speed-diff-warning {
+    0%	 { fill: currentColor; }
+    50%	 { fill: currentColor; }
+    75%  { fill: #000000; }
+}

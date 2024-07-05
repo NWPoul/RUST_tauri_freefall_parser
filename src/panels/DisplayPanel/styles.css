@@ -1,0 +1,23 @@
+#AppTimer.displayPanel  {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    /* width: 1980px;
+    height: 1050px;
+    border: solid blue 1px;*/
+}
+
+.displayPanel #leftBlock {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 70em;
+    min-height: 40em;
+}
+.displayPanel #rightBlock {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 40em;
+}

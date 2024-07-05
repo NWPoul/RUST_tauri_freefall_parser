@@ -1,0 +1,127 @@
+.timeblocksList {
+    height: min-content;
+    min-height: 5rem;
+    width: 12rem;
+
+    margin-top: 1.8em;
+    /* margin-left: 0.4em; */
+
+    border: solid 0.3rem;
+    border-radius: 1rem;
+    border-color: var(--panel-contrast-color);
+
+    color: var(--panel-contrast-color);
+
+    text-align: center;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 2.5rem;
+    /* z-index: -1; */
+}
+.timeblocksList .tbi {
+    display: block;
+}
+.timeblocksList .tbi-header {
+    /* margin-top: -3.5rem; */
+    margin-top: -1.25em;
+}
+.timeblocksList .tbi-curnextWrapper{
+    display: block;
+    line-height: 0.75;
+}
+.timeblocksList .tbi-block{
+    /* font-size: 5rem; */
+    font-size: 2.5rem;
+    margin: 0.2em;
+}
+.timeblocksList .tbi-next{
+    color: #565b76;
+}
+.timeblocksList .tbi-loopIndicator{
+    font-style: italic;
+    color: #ffffff;
+}
+
+
+
+
+
+.displayPanel .timeblocksList {
+    position: relative;
+    top: unset;
+    left: unset;
+
+    display: flex;
+    align-items: baseline;
+    justify-content: space-around;
+
+    margin-left: auto;
+    margin-right: 2.5rem;
+
+    width: 33rem;
+    height: min-content;
+    min-height: 6rem;
+
+    font-size: 3rem;
+
+    & .tbi-next{
+        color: #b9b9b9;
+        &.tbi-next-null {
+            color: #565b76;
+        }
+    }
+
+    & .tbi-header { position: absolute; }
+    & .tbi-curnextWrapper{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+
+        & .tbi-block{ font-size: 5rem; }
+    }
+    & .tbi-loopIndicator {
+        position: absolute;
+        top: 2em;
+    }
+}
+
+
+.controls_wrapper .timeblocksList {
+    position: absolute;
+    top: -1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-around;
+    width: 37.5rem;
+    border: solid 1px;
+
+    & .tbi-block.tbi-block {
+        font-size: 4rem;
+    }
+    & .tbi-next{
+        color: #b9b9b9;
+        &.tbi-next-null {
+            color: #565b76;
+        }
+    }
+
+    & .tbi-header { position: absolute; }
+    & .tbi-curnextWrapper{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        min-width: 50%;
+
+        /* & .tbi-block{ font-size: 5rem; } */
+    }
+    & .tbi-loopIndicator {
+        position: absolute;
+        top: 5rem;
+        right: unset;
+        font-style: unset;
+        text-transform: uppercase;
+    }
+}
+
+
+

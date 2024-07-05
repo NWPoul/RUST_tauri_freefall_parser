@@ -1,0 +1,82 @@
+{
+  "build": {
+    "beforeDevCommand": "pnpm dev-front",
+    "beforeBuildCommand": "vite build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist",
+    "withGlobalTauri": false
+  },
+  "package": {
+    "productName": "FREEFALL_PARSER",
+    "version": "0.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true,
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "window": {
+        "all": true,
+        "setFullscreen": true
+      },
+      "fs": {
+        "scope": ["$RESOURCE/*"]
+      }
+    },
+    "bundle": {
+      "active": false,
+      "targets": "all",
+      "identifier": "freefall-parser",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "resources": [
+        // "D:/DEV/RUST/FS_TIMER/src-tauri/tauri.conf.json5",
+        // "D:/DEV/RUST/FS_TIMER/src/serv_window/index.html"
+      ],
+      "windows": {
+        "webviewInstallMode": {
+          //   "type": "offlineInstaller"
+          "type": "embedBootstrapper"
+        }
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      // {
+      //   "label": "CONTROL",
+      //   "fullscreen": false,
+      //   "resizable": false,
+      //   "title": "control panel",
+      //   "width": 1280,
+      //   "height": 1024
+      // },
+      // {
+      //   "label": "DISPLAY",
+      //   "fullscreen": false,
+      //   "resizable": true,
+      //   "title": "display panel",
+      //   "width": 1300,
+      //   "height": 1000
+      // },
+      {
+        "url": "src/serv_window/",
+        "label": "SERV",
+        "title": "serv panel",
+        "fullscreen": false,
+        "resizable": false,
+        "width": 300,
+        "height": 800,
+        "alwaysOnTop": true
+      }
+    ]
+  }
+}

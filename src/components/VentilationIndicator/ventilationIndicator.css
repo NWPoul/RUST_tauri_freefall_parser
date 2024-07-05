@@ -1,0 +1,80 @@
+.ventClass {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    height: 12.5rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 7rem;
+    font-family: sans-serif;
+    font-size: 2rem;
+    font-weight: bold;
+    font-stretch: ultra-condensed;
+
+    color: #3851ff;
+    /* z-index: -1; */
+
+    .vent-value {
+        font-size: 3rem;
+        font-weight: bold;
+        font-stretch: expanded;
+    }
+
+    .vent-inlet,
+    .vent-vanes {
+        width: 7.5rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        color: #3851ff;
+    }
+
+    .displayPanel & {
+        position: fixed;
+        top: 2rem;
+        left: 2rem;
+        flex-direction: column;
+        width: 27rem;
+        height: 4rem;
+        font-size: 2.5rem;
+        /* scale: 125%; */
+        transform: scale(115%);
+        transform-origin: 5rem 0;
+
+        .vent-value {
+            font-size: 4rem;
+        }
+
+        .vent-inlet,
+        .vent-vanes {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: baseline;
+            margin: 0;
+            width: 11rem;
+            color: #3851ff;
+        }
+    }
+}
+
+
+.ventIcon {
+    /* border: solid 0.25rem;
+    border-radius: 0.5rem; */
+    min-width: 3rem;
+    padding: 0.25rem;
+    /* scale: 125%; */
+    transform: scale(125%);
+    transform-origin: 0;
+    path {
+        fill: #3851ff;
+    }
+
+    .displayPanel & {
+        /* scale: 125%; */
+        transform: scale(125%);
+    }
+}
