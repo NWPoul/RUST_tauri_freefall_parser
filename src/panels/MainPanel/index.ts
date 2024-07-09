@@ -3,4 +3,4 @@
 
 import "./styles.css"
 
-export { ServPanel }                from './ServPanel'
+export { MainPanel }                from './MainPanel'

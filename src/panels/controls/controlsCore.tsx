@@ -121,7 +121,7 @@ const CONTROL_ACTIONS = {
         sendControlInputCommand(payload)
     },
 
-    toggleServPanel: () => {
+    toggleMainPanel: () => {
         const label = 'SERV'
         const config = WINDOW_CONFIG[label]
         sendTogglePanelCommand(label, config)

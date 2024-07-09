@@ -27,9 +27,9 @@ export const GET_KEYCODE_ACTIONS = (ControlsActions: T_controlActions) => {
         'Delete': () => ControlsActions.updateMessage(MESSAGES.CLEAR),
 
         'KeyC'  : () => { ControlsActions.toggleCycle() },
-        'KeyS'  : () => { ControlsActions.toggleServPanel() },
+        'KeyS'  : () => { ControlsActions.toggleMainPanel() },
         'KeyF'  : () => { ControlsActions.runFlasher() },
-        
+
 
         'ArrowUp': (e: KeyboardEvent) => {
             if (e.shiftKey || e.ctrlKey) {

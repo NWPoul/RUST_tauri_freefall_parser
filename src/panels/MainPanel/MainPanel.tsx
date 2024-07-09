@@ -25,7 +25,7 @@ import {
     RemTimeScreen,
 }                                   from 'components/ClockBlock'
 
-import { ServPanelLayout }          from './ServPanelLayout'
+import { MainPanelLayout }          from './MainPanelLayout'
 
 import {
     apiToggleTimer,
@@ -35,7 +35,7 @@ import { TogglePanelBtn }           from './TogglePanelBtn'
 
 
 
-export function ServPanel() {
+export function MainPanel() {
     useRustTimerStateUpdateEvent()
     useRustSystemStateUpdateEvent()
 
@@ -58,9 +58,9 @@ export function ServPanel() {
             >
                 <RemTimeScreen time={timerState.curRemTime}/>
             </div>
-        
 
-            <ServPanelLayout
+
+            <MainPanelLayout
                 QCTIMER_STATE={timerState}
                 SYTSTEM_STATE={sys_state}
             />
@@ -79,7 +79,7 @@ export function ServPanel() {
     );
 }
 
-export default ServPanel
+export default MainPanel
 
 // {
 //             <button type="button" onClick={() => toggleFullscreen(isFullscreen, setIsFullscreen)}>

@@ -1,16 +1,14 @@
 import {
     useWindowLabel,
     initApiStateData,
-}                            from './API/apiHelpers'
+}                         from './API/apiHelpers'
 
-import { DisplayPanel }      from './panels/DisplayPanel'
-import { ControlPanel_V1 }   from './panels/ControlPanel_V1'
+import { MainPanel }      from './panels/MainPanel'
 
 initApiStateData()
 
 const PANEL = {
-    DISPLAY  : DisplayPanel,
-    CONTROL  : ControlPanel_V1,
+    MAIN  : MainPanel,
     // SERV : ControlPanelMini,
 }
 

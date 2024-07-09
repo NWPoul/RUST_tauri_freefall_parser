@@ -53,7 +53,7 @@ function ApiAddrSelect({ sys_config }:{
 
 
 
-export function ServPanelLayout({
+export function MainPanelLayout({
     QCTIMER_STATE,
     SYTSTEM_STATE,
 }:{
@@ -64,7 +64,7 @@ export function ServPanelLayout({
 
     const className  = `controls_wrapper ${QCTIMER_STATE.isPlaying ? ' playing' : ''}`
     const sys_config = SYTSTEM_STATE.sys_config
-    
+
 
     return <div className={className}>
         <div className="mainBtnBlock">
@@ -77,7 +77,7 @@ export function ServPanelLayout({
             </button>
 
             <ApiAddrSelect sys_config={sys_config}/>
-  
+
             <FlasherPortSelect sys_config={sys_config}/>
 
             <ApiValuesInputBlock

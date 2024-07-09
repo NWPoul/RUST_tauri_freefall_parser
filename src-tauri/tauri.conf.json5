@@ -51,32 +51,15 @@
       "csp": null
     },
     "windows": [
-      // {
-      //   "label": "CONTROL",
-      //   "fullscreen": false,
-      //   "resizable": false,
-      //   "title": "control panel",
-      //   "width": 1280,
-      //   "height": 1024
-      // },
-      // {
-      //   "label": "DISPLAY",
-      //   "fullscreen": false,
-      //   "resizable": true,
-      //   "title": "display panel",
-      //   "width": 1300,
-      //   "height": 1000
-      // },
-      {
-        "url": "src/serv_window/",
-        "label": "SERV",
-        "title": "serv panel",
-        "fullscreen": false,
-        "resizable": false,
-        "width": 300,
-        "height": 800,
-        "alwaysOnTop": true
-      }
+        {
+            "label": "MAIN",
+            "title": "freefall parser",
+            "fullscreen": false,
+            "resizable": false,
+            "width": 300,
+            "height": 800,
+            "alwaysOnTop": true
+        }
     ]
   }
 }
