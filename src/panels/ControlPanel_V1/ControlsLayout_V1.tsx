@@ -58,8 +58,8 @@ export function ControlsLayoutV1({
                     ? <Menu    isMenu={isMenu} setIsMenu={setIsMenu} />
                     : <MenuBtn isMenu={isMenu} setIsMenu={setIsMenu} />
                 } */}
-                {/* isSettingsMenu={isSettingsMenu} setIsSettingsMenu = {setIsSettingsMenu}/>} */}
-                {/* {isSettingsMenu && <SettingsMenu setIsSettingsMenu = {setIsSettingsMenu} />} */}
+                {/* isConfigMenu={isConfigMenu} setIsConfigMenu = {setIsConfigMenu}/>} */}
+                {/* {isConfigMenu && <ConfigMenu setIsConfigMenu = {setIsConfigMenu} />} */}
             </div>
             <div className="messageBtnBlock">
                 <div id="messageServBtnBlock" className="messageServBtnBlock">

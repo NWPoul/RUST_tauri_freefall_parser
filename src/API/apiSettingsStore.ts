@@ -36,24 +36,24 @@ const useStore = create<T_State & T_Actions>()(logger(set => {
 }))
 
 
-function useSettingsState() {
-    const apiSettingsState = useStore(SELECTORS.allState)
-    return apiSettingsState
+function useConfigState() {
+    const apiConfigState = useStore(SELECTORS.allState)
+    return apiConfigState
 }
 
 
 
 
 export {
-    useStore  as useApiSettingsStore,
-    SELECTORS as API_SETTINGS_SELECTORS,
-    ACTIONS   as API_SETTINGS_ACTIONS,
-    useSettingsState,
+    useStore  as useApiConfigStore,
+    SELECTORS as API_CONFIG_SELECTORS,
+    ACTIONS   as API_CONFIG_ACTIONS,
+    useConfigState,
 }
 
 export type {
     T_appStateMsg,
-    T_State    as T_apiSettingsState,
-    T_StateUPD as T_apiSettingsStateUPD,
-    T_Actions  as T_apiSettingsActions,
+    T_State    as T_apiConfigState,
+    T_StateUPD as T_apiConfigStateUPD,
+    T_Actions  as T_apiConfigActions,
 }

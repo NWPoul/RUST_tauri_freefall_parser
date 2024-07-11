@@ -22,9 +22,9 @@ import {
     T_apiSystemStateUPD,
 }                                from "./apiSystemStore"
 import {
-    T_apiSettingsStateUPD,
-    T_apiSettingsState
-}                                from "./apiSettingsStore"
+    T_apiConfigStateUPD,
+    T_apiConfigState
+}                                from "./apiConfigStore"
 
 
 
@@ -47,11 +47,11 @@ type T_controlInput = {
 }
 
 
-type T_settingsInputId =
+type T_configInputId =
     | "ToggleFlesherMode"
     | "SetFlesherMode"
-type T_settingsInput = {
-    id : T_settingsInputId;
+type T_configInput = {
+    id : T_configInputId;
     val: string | number | boolean;
 }
 
@@ -66,7 +66,7 @@ type T_systemInput =
 
 type T_API_timer_stateUpdatePayload    = T_apiTimerStateUPD
 type T_API_system_stateUpdatePayload   = T_apiSystemStateUPD
-type T_API_settings_stateUpdatePayload = T_apiSettingsStateUPD
+type T_API_config_stateUpdatePayload = T_apiConfigStateUPD
 
 
 
@@ -111,19 +111,19 @@ async function API_sendSystemInput(input: T_systemInput) {
 }
 
 
-async function API_getSettingsData() {
-    let resp = await invoke("get_settings_data")
-    return resp as T_apiSettingsState
+async function API_getConfigData() {
+    let resp = await invoke("get_config_data")
+    return resp as T_apiConfigState
 }
-async function API_sendSettingsInput(input: T_settingsInput) {
+async function API_sendConfigInput(input: T_configInput) {
     let resp = await invoke(
-        "front_settings_input",
+        "front_config_input",
         {input: {
             id : input.id,
             val: input.val.toString(),
         }}
     ) as string
-    console.log('API_sendSettingslInput resp: ', resp)
+    console.log('API_sendConfiglInput resp: ', resp)
     return resp as string
 }
 
@@ -140,7 +140,7 @@ function get_API_stateUpdeteListener<T_Payload>(eventId: string) {
 const API_UPD_EVENT_LISTENERS = {
     timerState   : get_API_stateUpdeteListener<T_API_timer_stateUpdatePayload>('timer-state-update-event'),
     systemState  : get_API_stateUpdeteListener<T_API_system_stateUpdatePayload>('system-state-update-event'),
-    settingsState: get_API_stateUpdeteListener<T_API_settings_stateUpdatePayload>('settings-state-update-event'),
+    configState: get_API_stateUpdeteListener<T_API_config_stateUpdatePayload>('config-state-update-event'),
 }
 
 
@@ -185,8 +185,8 @@ export {
     API_getSystemStoreData,
     API_sendSystemInput,
 
-    API_getSettingsData,
-    API_sendSettingsInput,
+    API_getConfigData,
+    API_sendConfigInput,
 }
 
 export type {

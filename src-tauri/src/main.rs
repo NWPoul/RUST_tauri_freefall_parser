@@ -9,7 +9,8 @@ use std::{sync::OnceLock, vec};
 
 
 pub mod redux_serv;
-pub mod store_timer;
+pub mod store_app;
+pub mod store_config;
 
 mod core_timer;
 use core_timer::run_timer;
@@ -17,7 +18,8 @@ use core_timer::run_timer;
 
 static APP_HANDLE_INSTANCE: OnceLock< AppHandle > = OnceLock::new();
 
-static STORE_TIMER_INSTANCE   : OnceLock< store_timer::StoreType >    = OnceLock::new();
+static STORE_APP_INSTANCE   : OnceLock< store_app::StoreType >    = OnceLock::new();
+static STORE_CONFIG_INSTANCE: OnceLock< store_config::StoreType > = OnceLock::new();
 
 
 
@@ -69,7 +71,7 @@ macro_rules! create_get_store_data_command {
 
 
 
-create_store_subscriber!(timer_store_subscriber, "timer-state-update-event", &store_timer::State);
+create_store_subscriber!(timer_store_subscriber, "timer-state-update-event", &store_app::State);
 
 
 fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
@@ -79,10 +81,10 @@ fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         .expect("APP_HANDLE_INSTANCE initialisation error");
 
     tokio::spawn(async {
-        let timer_store_instance = STORE_TIMER_INSTANCE.get()
+        let timer_store_instance = STORE_APP_INSTANCE.get()
             .expect("static timer store instance not init");
         timer_store_instance.subscribe(timer_store_subscriber).await;
-        run_timer(timer_store_instance, store_timer::TICK_VAL).await;
+        run_timer(timer_store_instance, store_app::TICK_VAL).await;
     });
 
     Ok(())
@@ -103,52 +105,53 @@ fn open_control_window(app: AppHandle) {
 }
 
 
-create_get_store_data_command!(get_timer_store_data , STORE_TIMER_INSTANCE   , store_timer);
+create_get_store_data_command!(get_timer_store_data , STORE_APP_INSTANCE   , store_app);
+create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
 
 
 #[tauri::command]
 async fn front_control_input(input: FrontInputEventStringPayload) -> Result<String, ()> {
     dbg!("FRONT: control_input: ", &input);
-    let store_instance = STORE_TIMER_INSTANCE.get()
+    let store_instance = STORE_APP_INSTANCE.get()
         .expect("static store instance not init");
 
     let id: &str = &input.id;
 
     let resp = match id {
         "StartPause" => {
-            store_instance.dispatch(store_timer::Action::StartPause(input.val)).await;
+            store_instance.dispatch(store_app::Action::StartPause(input.val)).await;
             format!("ok {id} command:")
         },
         "Increment" => {
-            store_instance.dispatch(store_timer::Action::Increment(input.val)).await;
+            store_instance.dispatch(store_app::Action::Increment(input.val)).await;
             format!("ok {id} command:")
         },
         "StartTimeblock" => {
-            store_instance.dispatch(store_timer::Action::StartTimeblock(input.val)).await;
+            store_instance.dispatch(store_app::Action::StartTimeblock(input.val)).await;
             format!("ok {id} command:")
         },
         "StartNextTimeblock" => {
-            store_instance.dispatch(store_timer::Action::StartNextTimeblock(input.val)).await;
+            store_instance.dispatch(store_app::Action::StartNextTimeblock(input.val)).await;
             format!("ok {id} command:")
         },
         "SetNextTimeblock" => {
-            store_instance.dispatch(store_timer::Action::SetNextTimeblock(input.val)).await;
+            store_instance.dispatch(store_app::Action::SetNextTimeblock(input.val)).await;
             format!("ok {id} command:")
         },
         "RestartTimeblock" => {
-            store_instance.dispatch(store_timer::Action::RestartTimeblock(input.val)).await;
+            store_instance.dispatch(store_app::Action::RestartTimeblock(input.val)).await;
             format!("ok {id} command:")
         },
         "ClearTimeblocks" => {
-            store_instance.dispatch(store_timer::Action::ClearTimeblocks(input.val)).await;
+            store_instance.dispatch(store_app::Action::ClearTimeblocks(input.val)).await;
             format!("ok {id} command:")
         },
         "ToggleCycle" => {
-            store_instance.dispatch(store_timer::Action::ToggleCycle(input.val)).await;
+            store_instance.dispatch(store_app::Action::ToggleCycle(input.val)).await;
             format!("ok {id} command:")
         },
         "UpdateMessage" => {
-            store_instance.dispatch(store_timer::Action::UpdateMessage(input.val)).await;
+            store_instance.dispatch(store_app::Action::UpdateMessage(input.val)).await;
             format!("ok {id} command:")
         },
 
@@ -168,8 +171,9 @@ async fn front_control_input(input: FrontInputEventStringPayload) -> Result<Stri
 async fn main() {
     tauri::async_runtime::set(tokio::runtime::Handle::current());
 
-    // INIT APP_STORE & SETTINGS GLOBAL INSTANCE
-    STORE_TIMER_INSTANCE.set(store_timer::get_store()).unwrap_or(());
+    // INIT APP_STORE & CONFIG GLOBAL INSTANCE
+    STORE_APP_INSTANCE.set(store_app::get_store()).unwrap_or(());
+    STORE_CONFIG_INSTANCE.set(store_config::get_store()).unwrap_or(());
 
 
     tauri::Builder::default()
@@ -178,6 +182,7 @@ async fn main() {
             open_control_window,
 
             get_timer_store_data,
+            get_config_store_data,
             front_control_input,
          ])
         .run(tauri::generate_context!())

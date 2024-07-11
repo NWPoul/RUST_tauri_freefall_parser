@@ -12,7 +12,7 @@ import {
 
     API_getSystemStoreData,
 
-    API_sendSettingsInput,
+    API_sendConfigInput,
     API_sendSystemInput,
 
 
@@ -33,17 +33,17 @@ import {
     type T_apiSystemStateUPD,
 }                                   from './apiSystemStore'
 import {
-    API_SETTINGS_ACTIONS,
-    useApiSettingsStore,
-    type T_apiSettingsStateUPD,
-}                                   from './apiSettingsStore'
+    API_CONFIG_ACTIONS,
+    useApiConfigStore,
+    type T_apiConfigStateUPD,
+}                                   from './apiConfigStore'
 
 
 
 type T_StateUPDPayload =
     | T_apiTimerStateUPD
     | T_apiSystemStateUPD
-    | T_apiSettingsStateUPD
+    | T_apiConfigStateUPD
 
 
 
@@ -128,14 +128,14 @@ function useRustSystemStateUpdateEvent() {
     )
 }
 
-function useRustSettingsStateUpdateEvent() {
-    const updateApiSettingsState = useApiSettingsStore(API_SETTINGS_ACTIONS.stateUPD)
+function useRustConfigStateUpdateEvent() {
+    const updateApiConfigState = useApiConfigStore(API_CONFIG_ACTIONS.stateUPD)
     useEffect(
         () => {
-            const handler = _getAPIstateUpdateHandler<T_apiSettingsStateUPD>(updateApiSettingsState)
-            const unlisten = API_UPD_EVENT_LISTENERS.settingsState(handler)
+            const handler = _getAPIstateUpdateHandler<T_apiConfigStateUPD>(updateApiConfigState)
+            const unlisten = API_UPD_EVENT_LISTENERS.configState(handler)
             return () => { unlisten.then(unlistenFn => unlistenFn()) }
-        }, [updateApiSettingsState]
+        }, [updateApiConfigState]
     )
 }
 
@@ -176,11 +176,11 @@ export {
     useRustTimerStateUpdateEvent,
 
     useRustSystemStateUpdateEvent,
-    useRustSettingsStateUpdateEvent,
+    useRustConfigStateUpdateEvent,
     // createMiniPanel,
     API_togglePanel       as sendTogglePanelCommand,
     API_sendControlInput  as sendControlInputCommand,
-    API_sendSettingsInput as sendSettingsInputCommand,
+    API_sendConfigInput as sendConfigInputCommand,
     API_sendSystemInput   as sendSystemInputCommand,
 }
 
