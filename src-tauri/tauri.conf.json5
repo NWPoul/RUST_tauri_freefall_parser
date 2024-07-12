@@ -37,8 +37,8 @@
         "icons/icon.ico"
       ],
       "resources": [
-        // "D:/DEV/RUST/FS_TIMER/src-tauri/tauri.conf.json5",
-        // "D:/DEV/RUST/FS_TIMER/src/serv_window/index.html"
+        // "D:/DEV/RUST/FS_APP/src-tauri/tauri.conf.json5",
+        // "D:/DEV/RUST/FS_APP/src/serv_window/index.html"
       ],
       "windows": {
         "webviewInstallMode": {

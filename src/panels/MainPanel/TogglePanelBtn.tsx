@@ -7,7 +7,7 @@ import {
 }                                   from 'API/apiHelpers'
 
 
-// const controls   = getControls(timerState)
+// const controls   = getControls(appState)
 export function TogglePanelBtn({ label, config, text }: { label: string; config?: WindowOptions; text: string; }) {
     config ??= WINDOW_CONFIG[label as keyof typeof WINDOW_CONFIG]
     const toggleHandler = () => sendTogglePanelCommand(label, config)

@@ -1,1 +1,0 @@
-export {VentilationIndicator} from './VentilationIndicator'

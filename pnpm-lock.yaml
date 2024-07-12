@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@davstack/store':
+    specifier: ^1.4.6
+    version: 1.4.6(@types/react@18.3.3)(react@18.3.1)
   '@tauri-apps/api':
     specifier: ^1.5.3
     version: 1.6.0
@@ -22,7 +25,7 @@ dependencies:
     version: 3.2.0(react@18.3.1)
   zustand:
     specifier: ^4.4.7
-    version: 4.5.4(@types/react@18.3.3)(react@18.3.1)
+    version: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
 
 devDependencies:
   '@tauri-apps/cli':
@@ -328,6 +331,17 @@ packages:
     dependencies:
       postcss-selector-parser: 6.1.0
     dev: true
+
+  /@davstack/store@1.4.6(@types/react@18.3.3)(react@18.3.1):
+    resolution: {integrity: sha512-3P83DRJJLowgzE4wGxJhPl9H566KLlm1CmeL9tfN1wrRdlz6KE7Q1x8Sy1lzHBAPonhPwTl5CrTiJrrCEWzzOw==}
+    dependencies:
+      immer: 10.1.1
+      react-dom: 18.3.1(react@18.3.1)
+      zustand: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+    dev: false
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
@@ -1276,6 +1290,10 @@ packages:
     resolution: {integrity: sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==}
     engines: {node: '>= 4'}
     dev: true
+
+  /immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
+    dev: false
 
   /is-binary-path@2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
@@ -2238,7 +2256,7 @@ packages:
       yargs-parser: 21.1.1
     dev: true
 
-  /zustand@4.5.4(@types/react@18.3.3)(react@18.3.1):
+  /zustand@4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1):
     resolution: {integrity: sha512-/BPMyLKJPtFEvVL0E9E9BTUM63MNyhPGlvxk1XjrfWTUlV+BR8jufjsovHzrtR6YNcBEcL7cMHovL1n9xHawEg==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
@@ -2254,6 +2272,7 @@ packages:
         optional: true
     dependencies:
       '@types/react': 18.3.3
+      immer: 10.1.1
       react: 18.3.1
       use-sync-external-store: 1.2.0(react@18.3.1)
     dev: false

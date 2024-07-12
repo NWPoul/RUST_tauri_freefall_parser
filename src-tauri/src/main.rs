@@ -12,8 +12,8 @@ pub mod redux_serv;
 pub mod store_app;
 pub mod store_config;
 
-mod core_timer;
-use core_timer::run_timer;
+pub mod file_sys_serv;
+use file_sys_serv::watch_drives;
 
 
 static APP_HANDLE_INSTANCE: OnceLock< AppHandle > = OnceLock::new();
@@ -71,7 +71,7 @@ macro_rules! create_get_store_data_command {
 
 
 
-create_store_subscriber!(timer_store_subscriber, "timer-state-update-event", &store_app::State);
+create_store_subscriber!(store_app_subscriber, "app-state-update-event", &store_app::State);
 
 
 fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
@@ -81,10 +81,10 @@ fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         .expect("APP_HANDLE_INSTANCE initialisation error");
 
     tokio::spawn(async {
-        let timer_store_instance = STORE_APP_INSTANCE.get()
-            .expect("static timer store instance not init");
-        timer_store_instance.subscribe(timer_store_subscriber).await;
-        run_timer(timer_store_instance, store_app::TICK_VAL).await;
+        let store_app_instance = STORE_APP_INSTANCE.get()
+            .expect("static app store instance not init");
+        store_app_instance.subscribe(store_app_subscriber).await;
+        watch_drives(store_app_instance).await;
     });
 
     Ok(())
@@ -105,7 +105,7 @@ fn open_control_window(app: AppHandle) {
 }
 
 
-create_get_store_data_command!(get_timer_store_data , STORE_APP_INSTANCE   , store_app);
+create_get_store_data_command!(get_app_store_data , STORE_APP_INSTANCE   , store_app);
 create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
 
 
@@ -117,46 +117,47 @@ async fn front_control_input(input: FrontInputEventStringPayload) -> Result<Stri
 
     let id: &str = &input.id;
 
-    let resp = match id {
-        "StartPause" => {
-            store_instance.dispatch(store_app::Action::StartPause(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "Increment" => {
-            store_instance.dispatch(store_app::Action::Increment(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "StartTimeblock" => {
-            store_instance.dispatch(store_app::Action::StartTimeblock(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "StartNextTimeblock" => {
-            store_instance.dispatch(store_app::Action::StartNextTimeblock(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "SetNextTimeblock" => {
-            store_instance.dispatch(store_app::Action::SetNextTimeblock(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "RestartTimeblock" => {
-            store_instance.dispatch(store_app::Action::RestartTimeblock(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "ClearTimeblocks" => {
-            store_instance.dispatch(store_app::Action::ClearTimeblocks(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "ToggleCycle" => {
-            store_instance.dispatch(store_app::Action::ToggleCycle(input.val)).await;
-            format!("ok {id} command:")
-        },
-        "UpdateMessage" => {
-            store_instance.dispatch(store_app::Action::UpdateMessage(input.val)).await;
-            format!("ok {id} command:")
-        },
+    let resp = id;
+    // let resp = match id {
+    //     "StartPause" => {
+    //         store_instance.dispatch(store_app::Action::StartPause(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "Increment" => {
+    //         store_instance.dispatch(store_app::Action::Increment(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "StartTimeblock" => {
+    //         store_instance.dispatch(store_app::Action::StartTimeblock(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "StartNextTimeblock" => {
+    //         store_instance.dispatch(store_app::Action::StartNextTimeblock(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "SetNextTimeblock" => {
+    //         store_instance.dispatch(store_app::Action::SetNextTimeblock(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "RestartTimeblock" => {
+    //         store_instance.dispatch(store_app::Action::RestartTimeblock(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "ClearTimeblocks" => {
+    //         store_instance.dispatch(store_app::Action::ClearTimeblocks(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "ToggleCycle" => {
+    //         store_instance.dispatch(store_app::Action::ToggleCycle(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
+    //     "UpdateMessage" => {
+    //         store_instance.dispatch(store_app::Action::UpdateMessage(input.val)).await;
+    //         format!("ok {id} command:")
+    //     },
 
-        _ => format!("unknown command: {id}"),
-    };
+    //     _ => format!("unknown command: {id}"),
+    // };
 
     dbg!(&resp);
     Ok(format!("API response: {resp}"))
@@ -181,7 +182,7 @@ async fn main() {
         .invoke_handler(tauri::generate_handler![
             open_control_window,
 
-            get_timer_store_data,
+            get_app_store_data,
             get_config_store_data,
             front_control_input,
          ])

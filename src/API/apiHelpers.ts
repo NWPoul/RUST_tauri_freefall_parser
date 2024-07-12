@@ -7,13 +7,11 @@ import {
 
     API_UPD_EVENT_LISTENERS,
 
-    API_getTimerStoreData,
+    API_getAppStoreData,
     API_sendControlInput,
 
-    API_getSystemStoreData,
 
     API_sendConfigInput,
-    API_sendSystemInput,
 
 
     type Event,
@@ -23,15 +21,11 @@ import {
 }                                   from './api'
 
 import {
-    useApiTimerStore,
-    API_TIMER_ACTIONS,
-    type T_apiTimerStateUPD,
-}                                   from './apiTimerStore'
-import {
-    useApiSystemStore,
-    API_SYSTEM_ACTIONS,
-    type T_apiSystemStateUPD,
-}                                   from './apiSystemStore'
+    useApiAppStore,
+    API_APP_ACTIONS,
+    type T_apiAppStateUPD,
+}                                   from './apiAppStore'
+
 import {
     API_CONFIG_ACTIONS,
     useApiConfigStore,
@@ -41,8 +35,7 @@ import {
 
 
 type T_StateUPDPayload =
-    | T_apiTimerStateUPD
-    | T_apiSystemStateUPD
+    | T_apiAppStateUPD
     | T_apiConfigStateUPD
 
 
@@ -80,14 +73,9 @@ const WINDOW_CONFIG = {
 
 
 function initApiStateData() {
-    const timerState = useApiTimerStore.getState()
-    API_getTimerStoreData().then(
-        timerState.stateUPD
-    )
-
-    const systemState = useApiSystemStore.getState()
-    API_getSystemStoreData().then(
-        systemState.stateUPD
+    const appState = useApiAppStore.getState()
+    API_getAppStoreData().then(
+        appState.stateUPD
     )
 }
 
@@ -106,27 +94,18 @@ function _getAPIstateUpdateHandler<P extends T_StateUPDPayload>(
 
 
 
-function useRustTimerStateUpdateEvent() {
-    const updateApiTimerState = useApiTimerStore(API_TIMER_ACTIONS.stateUPD)
+function useRustAppStateUpdateEvent() {
+    const updateApiAppState = useApiAppStore(API_APP_ACTIONS.stateUPD)
     useEffect(
         () => {
-            const handler = _getAPIstateUpdateHandler<T_apiTimerStateUPD>(updateApiTimerState)
-            const unlisten = API_UPD_EVENT_LISTENERS.timerState(handler)
+            const handler = _getAPIstateUpdateHandler<T_apiAppStateUPD>(updateApiAppState)
+            const unlisten = API_UPD_EVENT_LISTENERS.appState(handler)
             return () => { unlisten.then(unlistenFn => unlistenFn()) }
-        }, [updateApiTimerState]
+        }, [updateApiAppState]
     )
 }
 
-function useRustSystemStateUpdateEvent() {
-    const updateApiSystemState = useApiSystemStore(API_SYSTEM_ACTIONS.stateUPD)
-    useEffect(
-        () => {
-            const handler = _getAPIstateUpdateHandler<T_apiSystemStateUPD>(updateApiSystemState)
-            const unlisten = API_UPD_EVENT_LISTENERS.systemState(handler)
-            return () => { unlisten.then(unlistenFn => unlistenFn()) }
-        }, [updateApiSystemState]
-    )
-}
+
 
 function useRustConfigStateUpdateEvent() {
     const updateApiConfigState = useApiConfigStore(API_CONFIG_ACTIONS.stateUPD)
@@ -173,40 +152,16 @@ export {
     useFullscreen,
     toggleFullscreen,
     initApiStateData,
-    useRustTimerStateUpdateEvent,
+    useRustAppStateUpdateEvent,
 
-    useRustSystemStateUpdateEvent,
     useRustConfigStateUpdateEvent,
     // createMiniPanel,
     API_togglePanel       as sendTogglePanelCommand,
     API_sendControlInput  as sendControlInputCommand,
     API_sendConfigInput as sendConfigInputCommand,
-    API_sendSystemInput   as sendSystemInputCommand,
 }
 
 export type {
     WindowOptions
 }
 
-
-
-
-// type T_stateUpdater<P extends T_UPDPayload> = (payload?: P) => void
-
-// function getRustTimerStateUpdateHook<
-//     P extends T_UPDPayload,
-//     E extends Event<P>,
-// >(
-//     stateUpdater: T_stateUpdater<P>,
-//     eventType: keyof typeof API_UPD_EVENT_LISTENERS,
-// ) {
-//     const handler = getAPIstateUpdateHandler<E>(stateUpdater)
-//     useEffect(
-//         () => {
-//             const unlisten = API_UPD_EVENT_LISTENERS[eventType](handler)
-//             const cleaner  = () => { unlisten.then(unlistenFn => unlistenFn()) }
-//             return cleaner
-//         },
-//         []
-//     )
-// }

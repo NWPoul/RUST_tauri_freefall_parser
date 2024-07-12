@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import type { T_updMessage } from 'panels/controls/messageServ'
 
 import './numpadStyles.css';
 
 
 
-export function Numpad({updMessage, onClose}:{updMessage:T_updMessage, onClose: ()=>void}) {
+export function Numpad({updMessage, onClose}:{updMessage:(msg: string) => void, onClose: ()=>void}) {
     const [value, setValue] = useState('')
 
     const handleNumberClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -28,10 +27,7 @@ export function Numpad({updMessage, onClose}:{updMessage:T_updMessage, onClose: 
     const handleSubmitClick = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation()
         e.preventDefault()
-        if (!!value) updMessage({
-            type: "",
-            text: value,
-        })
+        if (!!value) updMessage("dfghhef")
         setValue("")
         onClose()
     }

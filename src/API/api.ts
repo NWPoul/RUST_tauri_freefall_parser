@@ -14,13 +14,9 @@ import {
 
 
 import {
-    T_apiTimerState,
-    T_apiTimerStateUPD,
-}                                from "./apiTimerStore"
-import {
-    T_apiSystemState,
-    T_apiSystemStateUPD,
-}                                from "./apiSystemStore"
+    T_apiAppState,
+    T_apiAppStateUPD,
+}                                from "./apiAppStore"
 import {
     T_apiConfigStateUPD,
     T_apiConfigState
@@ -55,17 +51,8 @@ type T_configInput = {
     val: string | number | boolean;
 }
 
-type T_systemInput =
-    | { id: "SetApiStatus"  , val: {Bool   : boolean } }
-    | { id: "SetApiAddress" , val: {Text   : string  } }
-    | { id: "SetFlasherPort", val: {Text   : string  } }
-    | { id: "PushApiValues" , val: {Array16: number[]} }
-    | { id: "RunFlasher"    , val: {Text   : string  } }
 
-
-
-type T_API_timer_stateUpdatePayload    = T_apiTimerStateUPD
-type T_API_system_stateUpdatePayload   = T_apiSystemStateUPD
+type T_API_app_stateUpdatePayload    = T_apiAppStateUPD
 type T_API_config_stateUpdatePayload = T_apiConfigStateUPD
 
 
@@ -79,9 +66,9 @@ async function API_getWindowLabel() {
     return currentWindowLabel
 }
 
-async function API_getTimerStoreData() {
-    let resp = await invoke("get_timer_store_data")
-    return resp as T_apiTimerState
+async function API_getAppStoreData() {
+    let resp = await invoke("get_app_store_data")
+    return resp as T_apiAppState
 }
 async function API_sendControlInput(input: T_controlInput) {
     let resp = await invoke(
@@ -95,20 +82,6 @@ async function API_sendControlInput(input: T_controlInput) {
     return resp as string
 }
 
-
-async function API_getSystemStoreData() {
-    let resp = await invoke("get_system_store_data")
-    return resp as T_apiSystemState
-}
-async function API_sendSystemInput(input: T_systemInput) {
-    console.log('API_sendSystemlInput: ', input)
-    let resp = await invoke(
-        "front_system_input",
-        {input},
-    )
-    console.log('API_sendSystemlInput resp: ', resp)
-    return resp
-}
 
 
 async function API_getConfigData() {
@@ -138,8 +111,7 @@ function get_API_stateUpdeteListener<T_Payload>(eventId: string) {
     return (handler: EventCallback<T_Payload>) => listen<T_Payload>(eventId, handler )
 }
 const API_UPD_EVENT_LISTENERS = {
-    timerState   : get_API_stateUpdeteListener<T_API_timer_stateUpdatePayload>('timer-state-update-event'),
-    systemState  : get_API_stateUpdeteListener<T_API_system_stateUpdatePayload>('system-state-update-event'),
+    appState   : get_API_stateUpdeteListener<T_API_app_stateUpdatePayload>('app-state-update-event'),
     configState: get_API_stateUpdeteListener<T_API_config_stateUpdatePayload>('config-state-update-event'),
 }
 
@@ -179,11 +151,8 @@ export {
 
     API_UPD_EVENT_LISTENERS,
 
-    API_getTimerStoreData,
+    API_getAppStoreData,
     API_sendControlInput,
-
-    API_getSystemStoreData,
-    API_sendSystemInput,
 
     API_getConfigData,
     API_sendConfigInput,

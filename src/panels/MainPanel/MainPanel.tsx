@@ -7,28 +7,25 @@ import {
     // useFullscreen,
     // toggleFullscreen,
     // createMiniPanel,
-    sendSystemInputCommand,
-    useRustSystemStateUpdateEvent,
-    useRustTimerStateUpdateEvent,
+    // sendSystemInputCommand,
+    // useRustSystemStateUpdateEvent,
+    useRustAppStateUpdateEvent,
+    useRustConfigStateUpdateEvent,
 }                                   from 'API/apiHelpers'
 
 
 import {
-    useAppTimerState,
-}                                   from 'API/apiTimerStore'
+    useAppState,
+}                                   from 'API/apiAppStore'
 import {
-    useAppSystemState,
-}                                   from 'API/apiSystemStore'
+    configStore,
+}                                   from 'API/apiConfigStore'
 
-
-import {
-    RemTimeScreen,
-}                                   from 'components/ClockBlock'
 
 import { MainPanelLayout }          from './MainPanelLayout'
 
 import {
-    apiToggleTimer,
+    apiToggleApp,
 }                                   from './serv'
 
 import { TogglePanelBtn }           from './TogglePanelBtn'
@@ -36,15 +33,13 @@ import { TogglePanelBtn }           from './TogglePanelBtn'
 
 
 export function MainPanel() {
-    useRustTimerStateUpdateEvent()
-    useRustSystemStateUpdateEvent()
+    useRustAppStateUpdateEvent()
+    useRustConfigStateUpdateEvent()
 
-    const timerState = useAppTimerState()
-    const sys_state  = useAppSystemState()
+    const appState   = useAppState()
+    const sys_state  = configStore.use()
 
-    const className = cx( 'AppServWrapper',
-        timerState.isPlaying                || 'timer-idle',
-        sys_state.sys_config?.api_requested || 'api-idle',
+    const className = cx( 'AppServWrapper'
     )
 
 
@@ -53,16 +48,10 @@ export function MainPanel() {
             className     = {className}
             onContextMenu = {e => e.preventDefault()}
         >
-            <div id="RemTimeScreen-wrapper"
-                onClick={apiToggleTimer}
-            >
-                <RemTimeScreen time={timerState.curRemTime}/>
-            </div>
-
 
             <MainPanelLayout
-                QCTIMER_STATE={timerState}
-                SYTSTEM_STATE={sys_state}
+                APP_STATE={appState}
+                CONFIG_STATE={sys_state}
             />
 
             <div id="panelBtn-wrapper">
@@ -86,8 +75,8 @@ export default MainPanel
 //                 {` TURN FULLSCREEN ${isFullscreen ? "OFF" : "ON"}`}
 //             </button>
 //             <br />
-            // <button type="button" onClick={API_toggleTimer}>
-            //     TOGGLE TIMER
+            // <button type="button" onClick={API_toggleApp}>
+            //     TOGGLE APP
             // </button>
             // <br />
             // <button type="button" onClick={API_RestartTimeblock}>

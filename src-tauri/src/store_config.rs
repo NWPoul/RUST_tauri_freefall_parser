@@ -26,9 +26,9 @@ pub struct State {
 
 impl Default for State { fn default() -> Self {
     State{
-        srs_dir            : DEF_DIR,
-        dest_dir           : DEF_DIR,
-        ffmpeg_dir         : DEF_DIR,
+        srs_dir            : DEF_DIR.into(),
+        dest_dir           : DEF_DIR.into(),
+        ffmpeg_dir         : DEF_DIR.into(),
         output_file_postfix: DEF_FILE_POSTFIX.into(),
         dep_time_correction: DEF_DEP_TIME_CORRECTION,
         time_start_offset  : DEF_TIME_START_OFFSET,
@@ -41,7 +41,7 @@ impl Default for State { fn default() -> Self {
 
 #[derive(Debug)]
 pub enum Action {
-    UpdSrsDir(PathBuf),            
+    UpdSrsDir(PathBuf),
     UpdDestDir(PathBuf),
     UpdFfmpegDir(PathBuf),
     UpdOutputFilePostfix(String),
@@ -58,25 +58,26 @@ pub type StoreType = Store<State, Action, fn(State, Action) -> State>;
 
 #[allow(non_snake_case)]
 pub mod SELECTORS {
+    use std::path::PathBuf;
     use super::State;
     use crate::create_selector;
 
     create_selector!(); // ALLState
-    create_selector!(SrsDir,            srs_dir            , Path);
-    create_selector!(DestDir,           dest_dir           , Path);
-    create_selector!(FfmpegDir,         ffmpeg_dir         , Path);
-    create_selector!(OutputFilePostfix, output_file_postfix, Stri);
-    create_selector!(DepTimeCorrection, dep_time_correction, f64 );
-    create_selector!(TimeStartOffset,   time_start_offset  , f64 );
-    create_selector!(TimeEndOffset,     time_end_offset    , f64 );
-    create_selector!(MinAccelTrigger,   min_accel_trigger  , f64 );
-    create_selector!(NoFfmpegProcess,   no_ffmpeg_process  , bool);
+    create_selector!(SrsDir,            srs_dir            , PathBuf, clone = true);
+    create_selector!(DestDir,           dest_dir           , PathBuf, clone = true);
+    create_selector!(FfmpegDir,         ffmpeg_dir         , PathBuf, clone = true);
+    create_selector!(OutputFilePostfix, output_file_postfix, String , clone = true);
+    create_selector!(DepTimeCorrection, dep_time_correction, f64    );
+    create_selector!(TimeStartOffset,   time_start_offset  , f64    );
+    create_selector!(TimeEndOffset,     time_end_offset    , f64    );
+    create_selector!(MinAccelTrigger,   min_accel_trigger  , f64    );
+    create_selector!(NoFfmpegProcess,   no_ffmpeg_process  , bool   );
 }
 
 
 fn reducer(state: State, action: Action) -> State {
     match action {
-        Action::UpdSrsDir(payload)            => State{srs_dir             : payload, ..state},            
+        Action::UpdSrsDir(payload)            => State{srs_dir             : payload, ..state},
         Action::UpdDestDir(payload)           => State{dest_dir            : payload, ..state},
         Action::UpdFfmpegDir(payload)         => State{ffmpeg_dir          : payload, ..state},
         Action::UpdOutputFilePostfix(payload) => State{output_file_postfix : payload, ..state},
@@ -93,5 +94,3 @@ pub fn get_store() -> Store<State, Action, fn(State, Action) -> State> {
     let initial_state = State::default();
     Store::new_with_state(reducer, initial_state)
 }
-
-

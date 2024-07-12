@@ -13,8 +13,8 @@
   -webkit-text-size-adjust: 100%;
 }
 body {
-    --timer-idle-color: gray;
-    --timer-running-color: #2a50db;
+    --app-idle-color: gray;
+    --app-running-color: #2a50db;
     --blink-duration: 1s;
     --body-background-color: #070707;
     --panel-prime-color: #3851ff;
@@ -76,8 +76,8 @@ body {
     margin-bottom: 2rem;
     /* height: 7rem; */
     /* width: 4.25em; */
-    color: var(--timer-idle-color);
-    border-color: var(--timer-idle-color);
+    color: var(--app-idle-color);
+    border-color: var(--app-idle-color);
 }
 
 
@@ -89,7 +89,7 @@ body {
 .api_requested-btn {
     color: #00ea0c;
     .api-idle & {
-        color: var(--timer-idle-color);
+        color: var(--app-idle-color);
     }
 }
 
