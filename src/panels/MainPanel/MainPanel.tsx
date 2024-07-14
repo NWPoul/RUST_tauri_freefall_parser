@@ -7,7 +7,7 @@ import {
     // useFullscreen,
     // toggleFullscreen,
     // createMiniPanel,
-    // sendSystemInputCommand,
+    sendControlInputCommand,
     // useRustSystemStateUpdateEvent,
     useRustAppStateUpdateEvent,
     useRustConfigStateUpdateEvent,
@@ -24,9 +24,6 @@ import {
 
 import { MainPanelLayout }          from './MainPanelLayout'
 
-import {
-    apiToggleApp,
-}                                   from './serv'
 
 import { TogglePanelBtn }           from './TogglePanelBtn'
 

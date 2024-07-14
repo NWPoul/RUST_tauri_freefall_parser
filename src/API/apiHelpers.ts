@@ -27,8 +27,7 @@ import {
 }                                   from './apiAppStore'
 
 import {
-    API_CONFIG_ACTIONS,
-    useApiConfigStore,
+    configStore,
     type T_apiConfigStateUPD,
 }                                   from './apiConfigStore'
 
@@ -72,7 +71,7 @@ const WINDOW_CONFIG = {
 
 
 
-function initApiStateData() {
+function initApiAppStateData() {
     const appState = useApiAppStore.getState()
     API_getAppStoreData().then(
         appState.stateUPD
@@ -81,7 +80,7 @@ function initApiStateData() {
 
 
 function _getAPIstateUpdateHandler<P extends T_StateUPDPayload>(
-    stateUpdater: (payload?:P)=>void
+    stateUpdater: (payload:P)=>void
 ):EventCallback<P> {
     return (event) => {
         const newState = event.payload
@@ -108,7 +107,7 @@ function useRustAppStateUpdateEvent() {
 
 
 function useRustConfigStateUpdateEvent() {
-    const updateApiConfigState = useApiConfigStore(API_CONFIG_ACTIONS.stateUPD)
+    const updateApiConfigState = configStore.updState
     useEffect(
         () => {
             const handler = _getAPIstateUpdateHandler<T_apiConfigStateUPD>(updateApiConfigState)
@@ -142,7 +141,7 @@ function useWindowLabel() {
     return windowLabel
 }
 
-API_togglePanel
+
 
 
 
@@ -151,14 +150,14 @@ export {
     useWindowLabel,
     useFullscreen,
     toggleFullscreen,
-    initApiStateData,
+    initApiAppStateData,
     useRustAppStateUpdateEvent,
 
     useRustConfigStateUpdateEvent,
-    // createMiniPanel,
-    API_togglePanel       as sendTogglePanelCommand,
-    API_sendControlInput  as sendControlInputCommand,
-    API_sendConfigInput as sendConfigInputCommand,
+    
+    API_togglePanel      as sendTogglePanelCommand,
+    API_sendControlInput as sendControlInputCommand,
+    API_sendConfigInput  as sendConfigInputCommand,
 }
 
 export type {

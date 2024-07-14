@@ -6,14 +6,64 @@
 use tauri::{AppHandle, Manager, WindowBuilder, WindowUrl};
 use serde::{Serialize, Deserialize};
 use std::{sync::OnceLock, vec};
+use std::path::PathBuf;
+use config::{Config, File as CfgFile};
+
+
+pub mod utils {
+    pub mod error;
+    pub mod u_serv;
+}
 
 
 pub mod redux_serv;
 pub mod store_app;
 pub mod store_config;
-
 pub mod file_sys_serv;
-use file_sys_serv::watch_drives;
+pub mod telemetry_parser_serv;
+pub mod telemetry_analysis;
+pub mod commands;
+
+pub mod macros;
+
+use telemetry_analysis::{
+    get_result_metadata_for_file,
+    FileTelemetryResult,
+};
+
+use file_sys_serv::{
+    watch_drives,
+    get_src_files_path_list,
+};
+
+
+
+const DEF_DIR            : &str = ".";
+const DEF_POSTFIX        : &str = "_FFCUT";
+const DEP_TIME_CORRECTION:  f64 = 2.0;
+const TIME_START_OFFSET  :  f64 = -60.0;
+const TIME_END_OFFSET    :  f64 = 3.0;
+
+const MIN_ACCEL_TRIGGER  :  f64 = 20.0;
+
+
+type FileParsingOkData  = Vec<(PathBuf, FileTelemetryResult)>;
+type FileParsingErrData = Vec<(PathBuf, String)>;
+
+configValues!(
+    ( srs_dir_path       , String , DEF_DIR.to_string() ),
+    ( dest_dir_path      , String , DEF_DIR.to_string() ),
+    ( ffmpeg_dir_path    , String , DEF_DIR.to_string() ),
+    ( output_file_postfix, String , DEF_POSTFIX.to_string() ),
+    ( dep_time_correction, f64    , DEP_TIME_CORRECTION ),
+    ( time_start_offset  , f64    , TIME_START_OFFSET ),
+    ( time_end_offset    , f64    , TIME_END_OFFSET ),
+    ( min_accel_trigger  , f64    , MIN_ACCEL_TRIGGER ),
+
+    ( no_ffmpeg_processing, bool  , false )
+);
+
+
 
 
 static APP_HANDLE_INSTANCE: OnceLock< AppHandle > = OnceLock::new();
@@ -109,55 +159,59 @@ create_get_store_data_command!(get_app_store_data , STORE_APP_INSTANCE   , store
 create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
 
 
+
+
+
+
+
+pub fn get_telemetry_for_files(
+    src_files_path_list: &[PathBuf],
+    config_values      : &ConfigValues,
+) -> (FileParsingOkData, FileParsingErrData) {
+    let mut ok_list : FileParsingOkData  = vec![];
+    let mut err_list: FileParsingErrData = vec![];
+
+    for src_file_path in src_files_path_list {
+        let input_file = src_file_path.to_string_lossy();
+
+        match get_result_metadata_for_file(&input_file, &config_values) {
+            Ok(data)     => ok_list.push((src_file_path.clone(), data)),
+            Err(err_str) => err_list.push((src_file_path.clone(), err_str)),
+        };
+    };
+    (ok_list, err_list)
+}
+
+
+fn on_open_files() {
+    let config_values = get_config_values();
+    let src_files_path_list = match get_src_files_path_list(".") {
+        None => {
+            println!("NO MP4 FILES CHOSEN!");
+            return;// Ok(format!("NO MP4 FILES CHOSEN!"))
+        }
+        Some(path_list) => path_list,
+    };
+    let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
+}
+
+
 #[tauri::command]
 async fn front_control_input(input: FrontInputEventStringPayload) -> Result<String, ()> {
     dbg!("FRONT: control_input: ", &input);
-    let store_instance = STORE_APP_INSTANCE.get()
-        .expect("static store instance not init");
+    // let store_instance = STORE_APP_INSTANCE.get()
+    //     .expect("static store instance not init");
 
     let id: &str = &input.id;
 
-    let resp = id;
-    // let resp = match id {
-    //     "StartPause" => {
-    //         store_instance.dispatch(store_app::Action::StartPause(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "Increment" => {
-    //         store_instance.dispatch(store_app::Action::Increment(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "StartTimeblock" => {
-    //         store_instance.dispatch(store_app::Action::StartTimeblock(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "StartNextTimeblock" => {
-    //         store_instance.dispatch(store_app::Action::StartNextTimeblock(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "SetNextTimeblock" => {
-    //         store_instance.dispatch(store_app::Action::SetNextTimeblock(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "RestartTimeblock" => {
-    //         store_instance.dispatch(store_app::Action::RestartTimeblock(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "ClearTimeblocks" => {
-    //         store_instance.dispatch(store_app::Action::ClearTimeblocks(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "ToggleCycle" => {
-    //         store_instance.dispatch(store_app::Action::ToggleCycle(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
-    //     "UpdateMessage" => {
-    //         store_instance.dispatch(store_app::Action::UpdateMessage(input.val)).await;
-    //         format!("ok {id} command:")
-    //     },
+    let resp = match id {
+        "openFiles" => {
+            on_open_files();
+            format!("ok {id} command:")
+        },
 
-    //     _ => format!("unknown command: {id}"),
-    // };
+        _ => format!("unknown command: {id}"),
+    };
 
     dbg!(&resp);
     Ok(format!("API response: {resp}"))

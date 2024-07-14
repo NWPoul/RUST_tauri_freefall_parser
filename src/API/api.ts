@@ -25,18 +25,8 @@ import {
 
 
 type T_controlInputId =
-    | "StartPause"
-    | "Start"
-    | "Stop"
-    | "StartTimeblock"
-    | "StartNextTimeblock"
-    | "SetNextTimeblock"
-    | "RestartTimeblock"
-    | "Increment"
-    | "ClearTimeblocks"
-    | "ToggleCycle"
-    | "UpdateMessage"
-    | "RunFlasher"
+    | "openFiles"
+
 type T_controlInput = {
     id : T_controlInputId;
     val: string | number;
