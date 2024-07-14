@@ -82,6 +82,11 @@ create_store_subscriber! (
     "app-state-update-event",
     &store_app::State
 );
+create_store_subscriber! (
+    store_config_subscriber,
+    "config-state-update-event",
+    &store_config::State
+);
 
 
 fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
@@ -130,6 +135,11 @@ async fn main() {
         let store_app_instance = STORE_APP_INSTANCE.get()
             .expect("static app store instance not init");
         store_app_instance.subscribe(store_app_subscriber).await;
+
+        let store_config_instance = STORE_CONFIG_INSTANCE.get()
+            .expect("static config store instance not init");
+        store_config_instance.subscribe(store_config_subscriber).await;
+
         watch_drives(store_app_instance).await;
     });
 
