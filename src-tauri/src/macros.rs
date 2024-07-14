@@ -53,3 +53,31 @@ macro_rules! configValues {
         }
     };
 }
+
+
+#[macro_export]
+macro_rules! create_store_subscriber {
+    ($name:ident, $event:expr, $state_type:ty) => {
+        fn $name(state: $state_type) {
+            APP_HANDLE_INSTANCE.get()
+                .expect("app is not init yet")
+                .emit_all($event, StateUpdateEventPayload(state))
+                .unwrap();
+            println!("New state: {:?}", state);
+        }
+    }
+}
+
+
+#[macro_export]
+macro_rules! create_get_store_data_command {
+    ($name:ident, $store_instance:ident, $store_name:ident) => {
+        #[tauri::command]
+        pub async fn $name() -> Result<$store_name::State, ()> {
+            let store_instance = $store_instance.get()
+                .expect("static store instance not init");
+            let store_data = store_instance.select($store_name::SELECTORS::AllState).await;
+            Ok(store_data)
+        }
+    }
+}
