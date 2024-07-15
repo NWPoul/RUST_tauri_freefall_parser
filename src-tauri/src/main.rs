@@ -70,6 +70,19 @@ fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     APP_HANDLE_INSTANCE
         .set( app.app_handle().clone() )
         .expect("APP_HANDLE_INSTANCE initialisation error");
+
+    tokio::spawn(async {
+        let store_app_instance = STORE_APP_INSTANCE.get()
+            .expect("static app store instance not init");
+        store_app_instance.subscribe(store_app_subscriber).await;
+
+        let store_config_instance = STORE_CONFIG_INSTANCE.get()
+            .expect("static config store instance not init");
+        store_config_instance.subscribe(store_config_subscriber).await;
+
+        watch_drives(store_app_instance).await;
+    });
+    
     Ok(())
 }
 
@@ -92,17 +105,7 @@ async fn main() {
     STORE_CONFIG_INSTANCE.set(store_config::get_store()).unwrap_or(());
 
 
-    tokio::spawn(async {
-        let store_app_instance = STORE_APP_INSTANCE.get()
-            .expect("static app store instance not init");
-        store_app_instance.subscribe(store_app_subscriber).await;
 
-        let store_config_instance = STORE_CONFIG_INSTANCE.get()
-            .expect("static config store instance not init");
-        store_config_instance.subscribe(store_config_subscriber).await;
-
-        watch_drives(store_app_instance).await;
-    });
 
 
     tauri::Builder::default()

@@ -1,11 +1,11 @@
 import {
     useWindowLabel,
-    initApiAppStateData,
+    initApiStateData,
 }                         from './API/apiHelpers'
 
 import { MainPanel }      from './panels/MainPanel'
 
-initApiAppStateData()
+initApiStateData()
 
 const PANEL = {
     MAIN  : MainPanel,

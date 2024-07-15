@@ -10,6 +10,17 @@ import type { T_apiConfigState }         from 'API/apiConfigStore'
 
 
 
+function openFiles() {
+    sendControlInputCommand(
+        {
+            id: "openFiles",
+            val: "",
+        }
+    )
+    console.log('openFilesBtn')
+}
+
+
 
 export function MainPanelLayout({
     APP_STATE,
@@ -22,18 +33,17 @@ export function MainPanelLayout({
 
     const className  = `controls_wrapper`
 
-    function openFiles() {
-        sendControlInputCommand(
-            {
-                id: "openFiles",
-                val: "",
-            }
-        )
-        console.log('openFilesBtn')
-    }
-
 
     return <div className={className}>
+        <div className="mainBtnBlock">
+            <button
+                type      = "button"
+                className = "quickBtn api_requested-btn"
+                // onClick   = {openFiles}
+            >
+                freefall {-CONFIG_STATE.time_start_offset}
+            </button>
+        </div>
         <div className="mainBtnBlock">
             <button
                 type      = "button"

@@ -53,8 +53,11 @@ crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTAN
 
 
 
-fn on_open_files_for_parse() {
-    let config_values = store_config::get_config_values();
+async fn on_open_files_for_parse() {
+    let store_config_instance = STORE_CONFIG_INSTANCE.get()
+        .expect("static config store instance not init");
+    let config_values = store_config_instance.select(store_config::SELECTORS::AllState).await;
+    
     let src_files_path_list = match get_src_files_path_list(".") {
         None => {
             println!("NO MP4 FILES CHOSEN!");
@@ -76,7 +79,7 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
 
     let resp = match id {
         "openFiles" => {
-            on_open_files_for_parse();
+            on_open_files_for_parse().await;
             format!("ok {id} command:")
         },
 

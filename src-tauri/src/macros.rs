@@ -25,7 +25,7 @@ macro_rules! promptContinue {
 #[macro_export]
 macro_rules! configValues {
     ($(($var:ident, $type:ty, $default:expr)),*) => {
-        #[derive(Debug, Clone)]
+        #[derive(Debug, Clone, PartialEq, PartialOrd, serde::Serialize)]
         pub struct ConfigValues {
             $(pub $var:$type),*
         }
@@ -43,7 +43,7 @@ macro_rules! configValues {
                 let $var = settings
                     .get::<$type>(stringify!($var))
                     .unwrap_or($default);
-                println!(concat!(stringify!($var), ": {}"), $var);
+                println!(concat!(stringify!($var), ": {:?}"), $var);
             )*
             println!();
 

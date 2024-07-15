@@ -3,11 +3,15 @@ import { store }                from '@davstack/store'
 
 
 type T_State = {
-    curDir   : string;
-    curName  : string;
-    isName   : boolean;
-    curFlight: number;
-    isFight  : boolean;
+    srs_dir_path        : string,
+    dest_dir_path       : string,
+    ffmpeg_dir_path     : string,
+    output_file_postfix : string,
+    dep_time_correction : 0,    
+    time_start_offset   : number,    
+    time_end_offset     : number,    
+    min_accel_trigger   : number,    
+    no_ffmpeg_processing: boolean,   
 }
 
 type T_StateUPD = Partial<T_State>
@@ -15,11 +19,15 @@ type T_StateUPD = Partial<T_State>
 
 
 const initialState: T_State = {
-    curDir   : ".",
-    curName  : "...",
-    curFlight: 1,
-    isName   : false,
-    isFight  : false,
+    srs_dir_path        : "",
+    dest_dir_path       : "",
+    ffmpeg_dir_path     : "",
+    output_file_postfix : "",
+    dep_time_correction : 0,    
+    time_start_offset   : 0,    
+    time_end_offset     : 0,    
+    min_accel_trigger   : 0,    
+    no_ffmpeg_processing: false,
 }
 
 

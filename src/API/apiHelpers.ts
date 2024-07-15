@@ -10,7 +10,7 @@ import {
     API_getAppStoreData,
     API_sendControlInput,
 
-
+    API_getConfigData,
     API_sendConfigInput,
 
 
@@ -71,10 +71,14 @@ const WINDOW_CONFIG = {
 
 
 
-function initApiAppStateData() {
+function initApiStateData() {
     const appState = useApiAppStore.getState()
     API_getAppStoreData().then(
         appState.stateUPD
+    )
+    
+    API_getConfigData().then(
+        configStore.set
     )
 }
 
@@ -150,7 +154,7 @@ export {
     useWindowLabel,
     useFullscreen,
     toggleFullscreen,
-    initApiAppStateData,
+    initApiStateData,
     useRustAppStateUpdateEvent,
 
     useRustConfigStateUpdateEvent,

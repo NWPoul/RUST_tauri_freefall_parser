@@ -36,8 +36,7 @@ export function MainPanel() {
     const appState   = useAppState()
     const sys_state  = configStore.use()
 
-    const className = cx( 'AppServWrapper'
-    )
+    const className = cx( 'AppServWrapper' )
 
 
     return (
