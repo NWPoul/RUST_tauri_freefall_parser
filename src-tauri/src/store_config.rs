@@ -1,13 +1,30 @@
 use redux_rs::Store;
 use std::path::PathBuf;
 
+use config::{Config, File as CfgFile};
 
-const DEF_DIR                : &str = ".";
-const DEF_FILE_POSTFIX       : &str = "_FFCUT";
-const DEF_DEP_TIME_CORRECTION:  f64 = 2.0;
-const DEF_TIME_START_OFFSET  :  f64 = -60.0;
-const DEF_TIME_END_OFFSET    :  f64 = 3.0;
-const DEF_MIN_ACCEL_TRIGGER  :  f64 = 20.0;
+
+const DEF_DIR            : &str = ".";
+const DEF_POSTFIX        : &str = "_FFCUT";
+const DEP_TIME_CORRECTION:  f64 = 2.0;
+const TIME_START_OFFSET  :  f64 = -60.0;
+const TIME_END_OFFSET    :  f64 = 3.0;
+const MIN_ACCEL_TRIGGER  :  f64 = 20.0;
+
+
+
+crate::configValues!(
+    ( srs_dir_path       , String , DEF_DIR.to_string() ),
+    ( dest_dir_path      , String , DEF_DIR.to_string() ),
+    ( ffmpeg_dir_path    , String , DEF_DIR.to_string() ),
+    ( output_file_postfix, String , DEF_POSTFIX.to_string() ),
+    ( dep_time_correction, f64    , DEP_TIME_CORRECTION ),
+    ( time_start_offset  , f64    , TIME_START_OFFSET ),
+    ( time_end_offset    , f64    , TIME_END_OFFSET ),
+    ( min_accel_trigger  , f64    , MIN_ACCEL_TRIGGER ),
+
+    ( no_ffmpeg_processing, bool  , false )
+);
 
 
 
@@ -29,11 +46,11 @@ impl Default for State { fn default() -> Self {
         srs_dir            : DEF_DIR.into(),
         dest_dir           : DEF_DIR.into(),
         ffmpeg_dir         : DEF_DIR.into(),
-        output_file_postfix: DEF_FILE_POSTFIX.into(),
-        dep_time_correction: DEF_DEP_TIME_CORRECTION,
-        time_start_offset  : DEF_TIME_START_OFFSET,
-        time_end_offset    : DEF_TIME_END_OFFSET,
-        min_accel_trigger  : DEF_MIN_ACCEL_TRIGGER,
+        output_file_postfix: DEF_POSTFIX.into(),
+        dep_time_correction: DEP_TIME_CORRECTION,
+        time_start_offset  : TIME_START_OFFSET,
+        time_end_offset    : TIME_END_OFFSET,
+        min_accel_trigger  : MIN_ACCEL_TRIGGER,
         no_ffmpeg_process  : false,
     }
 }}

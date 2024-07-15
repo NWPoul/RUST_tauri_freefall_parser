@@ -1,12 +1,16 @@
 
+use std::path::PathBuf;
+
 use crate::telemetry_parser_serv::parse_telemetry_from_file;
-use crate::ConfigValues;
+use crate::store_config;
 
 
 
 const SMA_BASE: usize = 50;
 
 
+type FileParsingOkData  = Vec<(PathBuf, FileTelemetryResult)>;
+type FileParsingErrData = Vec<(PathBuf, String)>;
 
 
 pub struct MaxAccData {
@@ -80,7 +84,7 @@ pub fn get_max_vec_data(data: Vec<f64>) -> MaxAccData {
 
 pub fn get_result_metadata_for_file(
     input_file   : &str,
-    config_values: &ConfigValues,
+    config_values: &store_config::ConfigValues,
 ) -> Result<FileTelemetryResult, String> {
     let telemetry_data = parse_telemetry_from_file(input_file)?;
     let camera_name    = format_camera_name(&telemetry_data.cam_info);
@@ -112,4 +116,20 @@ pub fn get_result_metadata_for_file(
 }
 
 
+pub fn get_telemetry_for_files(
+    src_files_path_list: &[PathBuf],
+    config_values      : &store_config::ConfigValues,
+) -> (FileParsingOkData, FileParsingErrData) {
+    let mut ok_list : FileParsingOkData  = vec![];
+    let mut err_list: FileParsingErrData = vec![];
 
+    for src_file_path in src_files_path_list {
+        let input_file = src_file_path.to_string_lossy();
+
+        match get_result_metadata_for_file(&input_file, &config_values) {
+            Ok(data)     => ok_list.push((src_file_path.clone(), data)),
+            Err(err_str) => err_list.push((src_file_path.clone(), err_str)),
+        };
+    };
+    (ok_list, err_list)
+}

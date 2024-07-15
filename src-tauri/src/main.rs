@@ -4,8 +4,7 @@
 
 use tauri::{AppHandle, Manager};
 use std::{sync::OnceLock, vec};
-use std::path::PathBuf;
-use config::{Config, File as CfgFile};
+// use std::path::PathBuf;
 
 
 pub mod utils {
@@ -26,8 +25,9 @@ pub mod commands;
 
 
 use telemetry_analysis::{
-    get_result_metadata_for_file,
-    FileTelemetryResult,
+    // get_result_metadata_for_file,
+    get_telemetry_for_files,
+    // FileTelemetryResult,
 };
 
 use file_sys_serv::{
@@ -44,30 +44,7 @@ use commands:: {
 };
 
 
-const DEF_DIR            : &str = ".";
-const DEF_POSTFIX        : &str = "_FFCUT";
-const DEP_TIME_CORRECTION:  f64 = 2.0;
-const TIME_START_OFFSET  :  f64 = -60.0;
-const TIME_END_OFFSET    :  f64 = 3.0;
-const MIN_ACCEL_TRIGGER  :  f64 = 20.0;
 
-
-type FileParsingOkData  = Vec<(PathBuf, FileTelemetryResult)>;
-type FileParsingErrData = Vec<(PathBuf, String)>;
-
-
-configValues!(
-    ( srs_dir_path       , String , DEF_DIR.to_string() ),
-    ( dest_dir_path      , String , DEF_DIR.to_string() ),
-    ( ffmpeg_dir_path    , String , DEF_DIR.to_string() ),
-    ( output_file_postfix, String , DEF_POSTFIX.to_string() ),
-    ( dep_time_correction, f64    , DEP_TIME_CORRECTION ),
-    ( time_start_offset  , f64    , TIME_START_OFFSET ),
-    ( time_end_offset    , f64    , TIME_END_OFFSET ),
-    ( min_accel_trigger  , f64    , MIN_ACCEL_TRIGGER ),
-
-    ( no_ffmpeg_processing, bool  , false )
-);
 
 
 
@@ -98,23 +75,7 @@ fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
 
 
-pub fn get_telemetry_for_files(
-    src_files_path_list: &[PathBuf],
-    config_values      : &ConfigValues,
-) -> (FileParsingOkData, FileParsingErrData) {
-    let mut ok_list : FileParsingOkData  = vec![];
-    let mut err_list: FileParsingErrData = vec![];
 
-    for src_file_path in src_files_path_list {
-        let input_file = src_file_path.to_string_lossy();
-
-        match get_result_metadata_for_file(&input_file, &config_values) {
-            Ok(data)     => ok_list.push((src_file_path.clone(), data)),
-            Err(err_str) => err_list.push((src_file_path.clone(), err_str)),
-        };
-    };
-    (ok_list, err_list)
-}
 
 
 

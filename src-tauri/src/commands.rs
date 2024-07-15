@@ -18,7 +18,6 @@ use crate::file_sys_serv::{
 };
 
 use crate::{
-    get_config_values,
     STORE_APP_INSTANCE,
     STORE_CONFIG_INSTANCE,
     get_telemetry_for_files,
@@ -55,7 +54,7 @@ crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTAN
 
 
 fn on_open_files_for_parse() {
-    let config_values = get_config_values();
+    let config_values = store_config::get_config_values();
     let src_files_path_list = match get_src_files_path_list(".") {
         None => {
             println!("NO MP4 FILES CHOSEN!");
