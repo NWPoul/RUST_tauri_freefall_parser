@@ -27,7 +27,7 @@ export default defineConfig(async () => ({
     rollupOptions: {
       input: {
         main: resolve(process.cwd(), 'index.html'),
-        spanel: resolve(process.cwd(), './src/serv_window/index.html'),
+        // spanel: resolve(process.cwd(), './src/serv_window/index.html'),
       },
     },
   },

@@ -51,6 +51,10 @@ async function API_isFullscreen() {
     return await appWindow.isFullscreen()
 }
 
+function API_setFullscreen(reqFullscreen: boolean) {
+    appWindow.setFullscreen(reqFullscreen)
+}
+
 async function API_getWindowLabel() {
     const currentWindowLabel = await appWindow.label
     return currentWindowLabel
@@ -74,8 +78,8 @@ async function API_sendControlInput(input: T_controlInput) {
 
 
 
-async function API_getConfigData() {
-    let resp = await invoke("get_config_data")
+async function API_getConfigStoreData() {
+    let resp = await invoke("get_config_store_data")
     return resp as T_apiConfigState
 }
 async function API_sendConfigInput(input: T_configInput) {
@@ -91,19 +95,17 @@ async function API_sendConfigInput(input: T_configInput) {
 }
 
 
-function API_setFullscreen(reqFullscreen: boolean) {
-    appWindow.setFullscreen(reqFullscreen)
-}
 
 
-
-function get_API_stateUpdeteListener<T_Payload>(eventId: string) {
+function get_API_stateUpdateListener<T_Payload>(eventId: string) {
     return (handler: EventCallback<T_Payload>) => listen<T_Payload>(eventId, handler )
 }
 const API_UPD_EVENT_LISTENERS = {
-    appState   : get_API_stateUpdeteListener<T_API_app_stateUpdatePayload>('app-state-update-event'),
-    configState: get_API_stateUpdeteListener<T_API_config_stateUpdatePayload>('config-state-update-event'),
+    appState   : get_API_stateUpdateListener<T_API_app_stateUpdatePayload>('app-state-update-event'),
+    configState: get_API_stateUpdateListener<T_API_config_stateUpdatePayload>('config-state-update-event'),
 }
+
+
 
 
 function API_createPanel(label:string, config?:WindowOptions) {
@@ -144,7 +146,7 @@ export {
     API_getAppStoreData,
     API_sendControlInput,
 
-    API_getConfigData,
+    API_getConfigStoreData,
     API_sendConfigInput,
 }
 

@@ -21,6 +21,7 @@ pub mod store_config;
 pub mod file_sys_serv;
 pub mod telemetry_parser_serv;
 pub mod telemetry_analysis;
+pub mod ffmpeg_serv;
 pub mod commands;
 
 
@@ -82,7 +83,7 @@ fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
         watch_drives(store_app_instance).await;
     });
-    
+
     Ok(())
 }
 

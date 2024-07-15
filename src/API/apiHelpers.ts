@@ -10,7 +10,7 @@ import {
     API_getAppStoreData,
     API_sendControlInput,
 
-    API_getConfigData,
+    API_getConfigStoreData,
     API_sendConfigInput,
 
 
@@ -56,17 +56,32 @@ const WINDOW_CONFIG = {
         "width": 1300,
         "height": 1000
     },
-    SERV: {
-        "url": "src/serv_window/",
-        "label": "SERV",
-        "title": "serv panel",
-        "fullscreen": false,
-        "resizable": false,
-        "width": 300,
-        "height": 800,
-        "alwaysOnTop": true
-    },
 } as const
+
+
+
+
+
+function useFullscreen() {
+    const [isFullscreen, setIsFullscreen] = useState(false)
+    useEffect(
+        () => {
+            console.log(`isFullscreen ${isFullscreen}`)
+            toggleFullscreen(isFullscreen)
+        }, [isFullscreen]
+    )
+    return [isFullscreen, setIsFullscreen] as const
+}
+async function toggleFullscreen(reqFullscreen?: boolean) {
+    reqFullscreen ??= !(await API_isFullscreen())
+    API_setFullscreen(reqFullscreen)
+}
+
+function useWindowLabel() {
+    const [windowLabel, setWindowLabel] = useState("")
+    API_getWindowLabel().then(setWindowLabel)
+    return windowLabel
+}
 
 
 
@@ -76,8 +91,8 @@ function initApiStateData() {
     API_getAppStoreData().then(
         appState.stateUPD
     )
-    
-    API_getConfigData().then(
+
+    API_getConfigStoreData().then(
         configStore.set
     )
 }
@@ -124,29 +139,6 @@ function useRustConfigStateUpdateEvent() {
 
 
 
-function useFullscreen() {
-    const [isFullscreen, setIsFullscreen] = useState(false)
-    useEffect(
-        () => {
-            console.log(`isFullscreen ${isFullscreen}`)
-            toggleFullscreen(isFullscreen)
-        }, [isFullscreen]
-    )
-    return [isFullscreen, setIsFullscreen] as const
-}
-async function toggleFullscreen(reqFullscreen?: boolean) {
-    reqFullscreen ??= !(await API_isFullscreen())
-    API_setFullscreen(reqFullscreen)
-}
-
-function useWindowLabel() {
-    const [windowLabel, setWindowLabel] = useState("")
-    API_getWindowLabel().then(setWindowLabel)
-    return windowLabel
-}
-
-
-
 
 
 export {
@@ -158,7 +150,7 @@ export {
     useRustAppStateUpdateEvent,
 
     useRustConfigStateUpdateEvent,
-    
+
     API_togglePanel      as sendTogglePanelCommand,
     API_sendControlInput as sendControlInputCommand,
     API_sendConfigInput  as sendConfigInputCommand,

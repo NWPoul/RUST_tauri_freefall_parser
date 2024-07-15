@@ -9,8 +9,8 @@ use crate::store_config;
 const SMA_BASE: usize = 50;
 
 
-type FileParsingOkData  = Vec<(PathBuf, FileTelemetryResult)>;
-type FileParsingErrData = Vec<(PathBuf, String)>;
+pub type FileParsingOkData  = Vec<(PathBuf, FileTelemetryResult)>;
+pub type FileParsingErrData = Vec<(PathBuf, String)>;
 
 
 pub struct MaxAccData {
