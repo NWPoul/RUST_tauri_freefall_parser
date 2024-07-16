@@ -57,7 +57,7 @@
             "fullscreen": false,
             "resizable": false,
             "width": 300,
-            "height": 500,
+            "height": 600,
             "alwaysOnTop": true
         }
     ]

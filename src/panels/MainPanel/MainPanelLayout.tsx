@@ -34,7 +34,7 @@ export function MainPanelLayout({
     const className  = `controls_wrapper`
 
 
-    return <div className={className}>
+    return <div className={className}>        
         <div className="mainBtnBlock">
             <button
                 type      = "button"
@@ -43,8 +43,28 @@ export function MainPanelLayout({
             >
                 freefall {-CONFIG_STATE.time_start_offset}
             </button>
-        </div>
-        <div className="mainBtnBlock">
+
+            <button
+                type      = "button"
+                className = "quickBtn api_requested-btn"
+                // onClick   = {openFiles}
+            >
+                Камерамен
+            </button>
+
+            <button
+                type      = "button"
+                className = "quickBtn api_requested-btn"
+                // onClick   = {openFiles}
+            >
+                ВЗЛЁТ: 
+            </button>
+
+            <br/>
+
+
+
+
             <button
                 type      = "button"
                 className = "quickBtn api_requested-btn"

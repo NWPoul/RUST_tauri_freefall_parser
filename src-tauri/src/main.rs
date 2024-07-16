@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+#![allow(unused_braces)]
+
 
 use tauri::{AppHandle, Manager};
 use std::{sync::OnceLock, vec};
@@ -49,9 +51,9 @@ use commands:: {
 
 
 
-pub static APP_HANDLE_INSTANCE  : OnceLock< AppHandle > = OnceLock::new();
-pub static STORE_APP_INSTANCE   : OnceLock< store_app::StoreType >    = OnceLock::new();
-pub static STORE_CONFIG_INSTANCE: OnceLock< store_config::StoreType > = OnceLock::new();
+pub static APP_HANDLE_INSTANCE  : OnceLock<AppHandle>               = OnceLock::new();
+pub static STORE_APP_INSTANCE   : OnceLock<store_app::StoreType>    = OnceLock::new();
+pub static STORE_CONFIG_INSTANCE: OnceLock<store_config::StoreType> = OnceLock::new();
 
 
 
@@ -104,10 +106,6 @@ async fn main() {
 
     STORE_APP_INSTANCE.set(store_app::get_store()).unwrap_or(());
     STORE_CONFIG_INSTANCE.set(store_config::get_store()).unwrap_or(());
-
-
-
-
 
     tauri::Builder::default()
         .setup(app_handler)

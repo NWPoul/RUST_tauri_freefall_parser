@@ -7,23 +7,6 @@ import { TogglePanelBtn }          from './TogglePanelBtn'
 
 
 
-// export const apiToggleApp = () => {
-//     const payload = {
-//         id : 'StartPause',
-//         val: '',
-//     } as const
-//     sendControlInputCommand(payload);
-// }
-
-
-
-
-
-
-
-
-
-
 export const useKeys = () =>{
     useEffect(() => {
         const handleKeyUp = (event: KeyboardEvent) => {

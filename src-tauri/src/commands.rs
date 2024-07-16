@@ -1,7 +1,8 @@
-
+#![allow(unused_braces)]
 
 use std::path::PathBuf;
 
+// use redux_rs::StoreApi;
 use serde::{Serialize, Deserialize};
 // use tauri::{
 //     AppHandle,
@@ -17,7 +18,6 @@ use crate::store_app;
 use crate::store_config;
 
 use crate::file_sys_serv::{
-    watch_drives,
     get_src_files_path_list,
 };
 
@@ -106,21 +106,8 @@ pub fn ffmpeg_ok_files(
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 #[derive(Clone, Serialize)]
 pub struct StateUpdateEventPayload<P: Serialize>(pub P);
-
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct FrontInputEventStringPayload {
@@ -144,18 +131,37 @@ pub struct FrontInputEventMixPayload {
 #[tauri::command]
 pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<String, ()> {
     dbg!("FRONT: control_input: ", &input);
-    // let store_instance = STORE_APP_INSTANCE.get()
-    //     .expect("static store instance not init");
+    let app_store_instance = STORE_APP_INSTANCE.get()
+        .expect("static app store instance not init");
+    let config_store_instance = STORE_CONFIG_INSTANCE.get()
+        .expect("static config store instance not init");
 
-    let id: &str = &input.id;
+    let id: &str  = &input.id;
+    let val: &str = &input.val;
 
-    let resp = match id {
+    let mut resp = format!("ok {id} command, val {val}:");
+
+    match id {
         "openFiles" => {
             on_open_files_for_parse().await;
-            format!("ok {id} command:")
+        },
+        "setFreefallTime" => {
+            config_store_instance
+                .dispatch(store_config::Action::UpdTimeStartOffset(val.parse::<f64>().unwrap()))
+                .await;
+        },
+        "setFlight" => {
+            app_store_instance
+                .dispatch(store_app::Action::UpdFlight(val.parse::<u8>().unwrap()))
+                .await;
+        },
+        "setName" => {
+            app_store_instance
+                .dispatch(store_app::Action::UpdName(val.into()))
+                .await;
         },
 
-        _ => format!("unknown command: {id}"),
+        _ => resp = format!("unknown command: {id} {val}"),
     };
 
     dbg!(&resp);
