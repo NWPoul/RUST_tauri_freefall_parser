@@ -14,119 +14,76 @@
 }
 body {
     --app-idle-color: gray;
-    --app-running-color: #2a50db;
     --blink-duration: 1s;
     --body-background-color: #070707;
+    --panel-active-color: rgb(0, 255, 0);
     --panel-prime-color: #3851ff;
     --panel-contrast-color: #00a0fd;
 
     background-color: var(--body-background-color);
 }
 
-#AppServ {
+#AppMainPanel {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 
-.controls_wrapper {
-    padding-top: 3em;
+.mainPanel-controlsWrapper {
     display: flex;
+    padding-top: 1rem;
+    height: 92vh;
+    /* width: 20rem; */
     background-color: inherit;
     flex-direction: column;
-    justify-content: flex-start;
-    height: 90%;
+    justify-content: space-between;
 
     & button:focus-visible{
         outline: unset;
     }
 
-    /* border: solid 1px blue; */
 }
-
 
 .mainBtnBlock {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width: 17em;
-}
-
-
-.quickBtn {
-    position: relative;
-    display: block;
-    width: 95%;
-    min-height: 2em;
-    
-    margin: 0.25em;
-    font-size: 2em;
-    font-weight: bold;
-    border-radius: 0.25em;
-    background-color: inherit;
-    border-color: var(--panel-contrast-color);
-    color: var(--panel-contrast-color);
-    cursor: pointer;
-}
-
-
-#pauseBtn {
-    /* margin: 1rem; */
-    margin-bottom: 2rem;
-    /* height: 7rem; */
-    /* width: 4.25em; */
-    color: var(--app-idle-color);
-    border-color: var(--app-idle-color);
-}
-
-
-.api_addr-btn,
-.api_flasherPort-btn {
-    padding: 0 1em;
-}
-
-.api_requested-btn {
-    color: #00ea0c;
-    .api-idle & {
-        color: var(--app-idle-color);
-    }
-}
-
-.api_addr-option,
-.api_flasherPort-option {
-    background-color: #000000;
-    color:yellow;
+    width: 20em;
+    padding-bottom: 50%;
 }
 
 
 
-.push-api-inputs-block {
+#time_freefall_settings {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding-top: 1.5em;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 2rem;
+    color: var(--panel-prime-color);
 }
 
 
-.slider-wrapper {
+#flightNumberBlock {
     display: flex;
-    flex-direction: column;
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-.slider-label {
-    display: flex;
-    flex-direction: row;
     justify-content: space-between;
-}
-.slider-label-val{
-    color: rgb(200, 194, 194);
-}
+    align-items: center;
 
-#panelBtn-wrapper {
-    display: flex;
-    padding-top: 1em;
+    box-sizing: border-box;
+    padding: 0 0.5em;
+    width: 100%;
+    /* font-size: 2rem; */
+    color: var(--panel-active-color);
+    &.isMuted {
+        color: var(--app-idle-color);
+        border-color: var(--app-idle-color);
+    }
+    .quickBtn {
+        border-color: inherit;
+        border-right: none;
+        color: inherit;
+        margin: 0;
+    }
+
 }

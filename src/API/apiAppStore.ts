@@ -6,11 +6,12 @@ import { logger } from './loggerMw'
 type T_defaultAction<P> = (payload?: P) => void
 
 type T_State = {
-    curDir   : string;
-    curName  : string;
-    isName   : boolean;
-    curFlight: number;
-    isFight  : boolean;
+    cur_dir    : string;
+    flight     : number;
+    add_flight : boolean;
+    cur_nick   : string;
+    add_nick   : boolean;
+    nick_list  : string[];
 }
 
 type T_StateUPD = Partial<T_State>
@@ -23,20 +24,22 @@ interface T_Actions {
 
 
 const initialState: T_State = {
-    curDir   : ".",
-    curName  : "...",
-    curFlight: 1,
-    isName   : false,
-    isFight  : false,
+    cur_dir   : ".",
+    flight    : 1,
+    add_flight: false,
+    cur_nick  : "",
+    add_nick  : false,
+    nick_list : [],
 }
 
 const SELECTORS = {
-    allState : (state: T_State) => state,
-    curDir   : (state: T_State) => state.curDir,
-    curName  : (state: T_State) => state.curName,
-    isName   : (state: T_State) => state.isName,
-    curFlight: (state: T_State) => state.curFlight,
-    isFlight : (state: T_State) => state.isFight,
+    allState  : (state: T_State) => state,
+    cur_dir   : (state: T_State) => state.cur_dir,
+    cur_nick  : (state: T_State) => state.cur_nick,
+    nick_list : (state: T_State) => state.nick_list,
+    isNick    : (state: T_State) => state.add_nick,
+    flight    : (state: T_State) => state.flight,
+    add_flight: (state: T_State) => state.add_flight,
 }
 
 const ACTIONS = {

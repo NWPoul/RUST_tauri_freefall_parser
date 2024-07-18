@@ -104,7 +104,7 @@ pub fn get_result_metadata_for_file(
     }
 
     let deployment_time   = max_acc_data.time         + config_values.dep_time_correction;
-    let target_start_time = 0f64.max( deployment_time + config_values.time_start_offset );
+    let target_start_time = 0f64.max( deployment_time - (config_values.time_freefall + config_values.time_start_offset) );
     let target_end_time   = deployment_time           + config_values.time_end_offset;
 
     Ok(FileTelemetryResult{

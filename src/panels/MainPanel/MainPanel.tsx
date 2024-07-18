@@ -22,10 +22,55 @@ import {
 }                                   from 'API/apiConfigStore'
 
 
-import { MainPanelLayout }          from './MainPanelLayout'
+import { IncButtonBlock }           from 'components/controls/buttons'
+
+import {
+    useKeys,
+}                                   from './serv'
+import { NickSelect }               from './NickSelect'
+import { FlightNumberBlock }        from './FlightNumberBlock'
 
 
-import { TogglePanelBtn }           from './TogglePanelBtn'
+
+
+
+function openFiles() {
+    sendControlInputCommand(
+        {
+            id: "openFiles",
+            val: "",
+        }
+    )
+    console.log('openFilesBtn')
+}
+
+
+
+
+
+
+function updFFTime(newVal: number) {
+    sendControlInputCommand({
+        id: "setFreefallTime",
+        val: newVal
+    })
+}
+function FreeFallSettingsBlock({ffTime}:{ffTime: number}) {
+    return (
+        <div id="time_freefall_settings">
+            FF time (s):
+            <IncButtonBlock
+                val    = {ffTime}
+                incVal = {10}
+                minVal = {10}
+                maxVal = {300}
+                valUpdateHandler = {updFFTime}
+            />
+        </div>
+    )
+}
+
+
 
 
 
@@ -33,32 +78,43 @@ export function MainPanel() {
     useRustAppStateUpdateEvent()
     useRustConfigStateUpdateEvent()
 
-    const appState   = useAppState()
-    const sys_state  = configStore.use()
+    const appState    = useAppState()
+    const configState = configStore.use()
 
-    const className = cx( 'AppServWrapper' )
+    useKeys()
+
+    const className = cx( 'MainPanelWrapper' )
 
 
     return (
-        <div id = "AppServ"
+        <div id = "AppMainPanel"
             className     = {className}
             onContextMenu = {e => e.preventDefault()}
         >
+            <div className="mainPanel-controlsWrapper">
+                <FreeFallSettingsBlock ffTime={configState.time_freefall}/>
+                <br />
 
-            <MainPanelLayout
-                APP_STATE={appState}
-                CONFIG_STATE={sys_state}
-            />
+                <div className="mainBtnBlock">
+                    <NickSelect
+                        curNick  = {appState.cur_nick}
+                        nickList = {appState.nick_list}
+                        isMuted  = {!appState.add_nick}
+                    />
+                    <br />
 
-            <div id="panelBtn-wrapper">
-                <TogglePanelBtn
-                    label = {'CONTROL'}
-                    text  = 'CP'
-                />
-                <TogglePanelBtn
-                    label = {'DISPLAY'}
-                    text  = 'DP'
-                />
+                    <FlightNumberBlock
+                        flightN = {appState.flight}
+                        isMuted = {!appState.add_flight}
+                    />
+                </div>
+                <button
+                    type      = "button"
+                    className = "quickBtn api_requested-btn"
+                    onClick   = {openFiles}
+                >
+                    Выбрать файлы
+                </button>
             </div>
         </div>
     );

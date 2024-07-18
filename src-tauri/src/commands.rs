@@ -44,6 +44,12 @@ async fn on_open_files_for_parse() {
         .expect("static config store instance not init");
     let config_values = store_config_instance.select(store_config::SELECTORS::AllState).await;
 
+
+    let store_app_instance = STORE_APP_INSTANCE.get()
+        .expect("static app store instance not init");
+    let app_values = store_app_instance.select(store_app::SELECTORS::AllState).await;
+
+
     let src_files_path_list = match get_src_files_path_list(".") {
         None => {
             println!("NO MP4 FILES CHOSEN!");
@@ -53,7 +59,7 @@ async fn on_open_files_for_parse() {
     };
     let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
 
-    ffmpeg_ok_files(&parsing_results, &config_values);
+    ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
 }
 
 
@@ -61,12 +67,21 @@ pub fn get_ffmpeg_status_for_file(
     src_file_path   : &PathBuf,
     file_result_data: &FileTelemetryResult,
     config_values   : &store_config::ConfigValues,
+    app_values      : &store_app::State,
 ) -> Result<String, String> {
+    let flight_info = if app_values.add_flight {
+        Some(app_values.flight)
+    } else {
+        None
+    };
+
     let output_file_path = get_output_file_path(
         src_file_path,
         &(&config_values.dest_dir_path).into(),
         &config_values.output_file_postfix,
         &file_result_data.device_name,
+        flight_info,
+        app_values.cur_nick.clone(),
     );
 
 
@@ -92,12 +107,14 @@ pub fn get_ffmpeg_status_for_file(
 pub fn ffmpeg_ok_files(
     parsing_results: &(FileParsingOkData, FileParsingErrData),
     config_values  : &store_config::ConfigValues,
+    app_values     : &store_app::State,
 ) {
     for res in &parsing_results.0 {
         _ = get_ffmpeg_status_for_file(
             &res.0,
             &res.1,
             config_values,
+            app_values,
         );
     }
 }
@@ -141,13 +158,15 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
 
     let mut resp = format!("ok {id} command, val {val}:");
 
+    dbg!(&resp);
+
     match id {
         "openFiles" => {
             on_open_files_for_parse().await;
         },
         "setFreefallTime" => {
             config_store_instance
-                .dispatch(store_config::Action::UpdTimeStartOffset(val.parse::<f64>().unwrap()))
+                .dispatch(store_config::Action::UpdTimeFreefall(val.parse::<f64>().unwrap()))
                 .await;
         },
         "setFlight" => {
@@ -155,9 +174,27 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
                 .dispatch(store_app::Action::UpdFlight(val.parse::<u8>().unwrap()))
                 .await;
         },
-        "setName" => {
+        "toggleFlight" => {
+            let new_is_flight = val.parse::<bool>().unwrap_or(
+                !app_store_instance.select(store_app::SELECTORS::IsAddFlight).await
+            );
             app_store_instance
-                .dispatch(store_app::Action::UpdName(val.into()))
+                .dispatch(store_app::Action::ToggleAddFlight(new_is_flight))
+                .await;
+        },
+        "setCurNick" => {
+            let new_nick = if val.is_empty() {
+                None
+            } else {
+                Some(val.into())
+            };
+            app_store_instance
+                .dispatch(store_app::Action::UpdCurNick(new_nick))
+                .await;
+        },
+        "newNick" => {
+            app_store_instance
+                .dispatch(store_app::Action::AddNewNick(val.into()))
                 .await;
         },
 

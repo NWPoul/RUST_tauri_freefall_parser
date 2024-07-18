@@ -18,6 +18,7 @@ import {
     type EventCallback,
     type UnlistenFn,
     type WindowOptions,
+    T_controlInput,
 }                                   from './api'
 
 import {
@@ -124,7 +125,6 @@ function useRustAppStateUpdateEvent() {
 }
 
 
-
 function useRustConfigStateUpdateEvent() {
     const updateApiConfigState = configStore.updState
     useEffect(
@@ -157,6 +157,7 @@ export {
 }
 
 export type {
-    WindowOptions
+    WindowOptions,
+    T_controlInput,
 }
 

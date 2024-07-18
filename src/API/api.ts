@@ -26,6 +26,11 @@ import {
 
 type T_controlInputId =
     | "openFiles"
+    | "setFreefallTime"
+    | "setFlight"
+    | "toggleFlight"
+    | "setCurNick"
+    | "newNick"
 
 type T_controlInput = {
     id : T_controlInputId;
@@ -155,4 +160,6 @@ export type {
     EventCallback,
     UnlistenFn,
     WindowOptions,
+
+    T_controlInput,
 }

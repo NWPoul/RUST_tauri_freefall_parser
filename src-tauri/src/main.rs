@@ -16,7 +16,6 @@ pub mod utils {
 
 pub mod macros;
 
-
 pub mod redux_serv;
 pub mod store_app;
 pub mod store_config;
@@ -38,16 +37,12 @@ use file_sys_serv::{
     // get_src_files_path_list,
 };
 
-
 use commands:: {
     front_control_input,
     get_app_store_data,
     get_config_store_data,
     StateUpdateEventPayload,
 };
-
-
-
 
 
 
@@ -93,16 +88,12 @@ fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
 
 
-
-
-
-
-
-
-
 #[tokio::main]
 async fn main() {
     tauri::async_runtime::set(tokio::runtime::Handle::current());
+
+    store_config::init_cfg_file();
+    store_app::init_operators_list_file();
 
     STORE_APP_INSTANCE.set(store_app::get_store()).unwrap_or(());
     STORE_CONFIG_INSTANCE.set(store_config::get_store()).unwrap_or(());

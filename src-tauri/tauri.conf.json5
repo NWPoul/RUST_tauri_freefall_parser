@@ -55,8 +55,8 @@
             "label": "MAIN",
             "title": "freefall parser",
             "fullscreen": false,
-            "resizable": false,
-            "width": 300,
+            "resizable": true,
+            "width": 350,
             "height": 600,
             "alwaysOnTop": true
         }

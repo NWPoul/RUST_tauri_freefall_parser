@@ -6,6 +6,13 @@ use std::{
     time::SystemTime,
 };
 
+use toml::{
+    Value,
+    de::from_str,
+    ser::to_string_pretty,
+};
+
+
 use rfd::FileDialog;
 
 use tokio::time as tokio_time;
@@ -94,11 +101,18 @@ pub fn get_output_file_path(
     dest_dir_path      : &PathBuf,
     output_file_postfix: &str,
     device_info        : &str,
+    flight_info        : Option<u8>,
+    operator_info      : Option<String>,
 ) -> PathBuf {
     let def_path = PathBuf::from(".");
     let dest_dir_path = get_output_abs_dir(dest_dir_path);
     let output_file_name = format!(
-        "{} {}{}.mp4",
+        "{} {} {} {}{}.mp4",
+        operator_info.unwrap_or("".into()),
+        match flight_info {
+            Some(n) => format!("FLIGHT_{}", n),
+            None    => "".into(),
+        },
         device_info,
         src_file_path.file_stem().unwrap_or(&def_path.into_os_string()).to_str().unwrap(),
         output_file_postfix
@@ -284,6 +298,52 @@ pub async fn watch_drives(store: &StoreType) {
 
 
 
+
+pub fn init_file(file_path: &PathBuf) {
+    if std::path::Path::new(file_path).exists() {
+        println!("{:?} file found", file_path);
+        return;
+    }
+
+    let default_config = "";
+    fs::write(file_path, default_config).expect("Unable to write config file");
+    println!("Created {:?} file", file_path);
+}
+
+
+
+
+pub fn update_toml_field<V: serde::Serialize>(
+    file_path  : &PathBuf,
+    field_name : &str,
+    field_value: V,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = fs::File::open(file_path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+
+
+    let new_value = Value::String(
+        serde_json::to_string(&field_value).map_err(|e| e.to_string())?
+    );
+
+    let mut config: Value = from_str(&contents)?;
+
+    if let Some(table) = config.as_table_mut() {
+        if let Some(value) = table.get_mut(field_name) {
+            *value = new_value;
+        } else {
+            table.insert(field_name.into(), new_value);
+        }
+    }
+
+    let updated_contents = to_string_pretty(&config)?;
+
+    file = fs::File::create(file_path)?;
+    writeln!(file, "{}", updated_contents)?;
+
+    Ok(())
+}
 
 
 
