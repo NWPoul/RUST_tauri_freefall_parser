@@ -8,35 +8,16 @@
     font-size: 2em;
     font-weight: bold;
     border-radius: 0.25em;
+    border: inset 3px;
     background-color: inherit;
-    border-color: var(--panel-contrast-color);
-    color: var(--panel-active-color);
+    /* border-color: var(--panel-contrast-color); */
+    /* color: inherit; */
     cursor: pointer;
-}
 
-
-
-.nick-btn {
-    padding: 0 1em;
-    &.isMuted {
-        color: var(--app-idle-color);
-        border-color: var(--app-idle-color);
+    &:focus-visible{
+        outline: none;
     }
 }
-.nick-select--option {
-    background-color: #000000;
-    color: var(--panel-contrast-color);
-    &.no_nick {
-        color: var(--app-idle-color);
-        font-weight: bold;
-    }
-    &.new_nick {
-        color: yellow;
-        font-weight: bold;
-        font-style: italic;
-    }
-}
-
 
 
 .incBtn {

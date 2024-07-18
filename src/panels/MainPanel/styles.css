@@ -14,7 +14,6 @@
 }
 body {
     --app-idle-color: gray;
-    --blink-duration: 1s;
     --body-background-color: #070707;
     --panel-active-color: rgb(0, 255, 0);
     --panel-prime-color: #3851ff;
@@ -38,11 +37,6 @@ body {
     background-color: inherit;
     flex-direction: column;
     justify-content: space-between;
-
-    & button:focus-visible{
-        outline: unset;
-    }
-
 }
 
 .mainBtnBlock {
@@ -61,7 +55,10 @@ body {
     justify-content: flex-end;
     align-items: center;
     font-size: 2rem;
-    color: var(--panel-prime-color);
+    color : var(--panel-prime-color);
+    button {
+        border-color: var(--panel-prime-color);
+    }
 }
 
 
@@ -75,15 +72,52 @@ body {
     width: 100%;
     /* font-size: 2rem; */
     color: var(--panel-active-color);
+    border-color: var(--panel-active-color);
+
     &.isMuted {
         color: var(--app-idle-color);
         border-color: var(--app-idle-color);
     }
+
     .quickBtn {
-        border-color: inherit;
+        margin: 0;
         border-right: none;
         color: inherit;
-        margin: 0;
+        border-color: inherit;
+    }
+}
+
+.selectFilesBtn.quickBtn {
+    color: var(--panel-contrast-color);
+    border-color: var(--panel-contrast-color);
+}
+
+
+
+.nick-btn.quickBtn {
+    padding: 0 1em;
+    color: var(--panel-active-color);
+    border-color: var(--panel-active-color);
+    &.isMuted {
+        color: var(--app-idle-color);
+        border-color: var(--app-idle-color);
     }
 
+    &select {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+}
+.nick-select--option {
+    background-color: #000000;
+    color: var(--panel-contrast-color);
+    &.no_nick {
+        color: var(--app-idle-color);
+        font-weight: bold;
+    }
+    &.new_nick {
+        color: yellow;
+        font-weight: bold;
+        font-style: italic;
+    }
 }

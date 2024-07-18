@@ -58,7 +58,7 @@ function updFFTime(newVal: number) {
 function FreeFallSettingsBlock({ffTime}:{ffTime: number}) {
     return (
         <div id="time_freefall_settings">
-            FF time (s):
+            FF cut time&nbsp;
             <IncButtonBlock
                 val    = {ffTime}
                 incVal = {10}
@@ -110,7 +110,7 @@ export function MainPanel() {
                 </div>
                 <button
                     type      = "button"
-                    className = "quickBtn api_requested-btn"
+                    className = "quickBtn selectFilesBtn"
                     onClick   = {openFiles}
                 >
                     Выбрать файлы
