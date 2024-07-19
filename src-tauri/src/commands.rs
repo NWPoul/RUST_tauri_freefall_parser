@@ -58,7 +58,7 @@ pub async fn on_open_files_for_parse(dir_path: &PathBuf) {
     let src_files_path_list = match get_src_files_path_list(dir_path) {
         None => {
             println!("NO MP4 FILES CHOSEN!");
-            return;// Ok(format!("NO MP4 FILES CHOSEN!"))
+            return;
         }
         Some(path_list) => path_list,
     };

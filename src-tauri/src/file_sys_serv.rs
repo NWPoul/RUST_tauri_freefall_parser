@@ -216,7 +216,6 @@ pub fn get_last_file(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
                 "No  correct files found in the directory",
             ))),
         }
-
 }
 
 #[cfg(target_os = "windows")]
