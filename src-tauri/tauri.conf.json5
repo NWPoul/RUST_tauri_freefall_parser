@@ -53,7 +53,7 @@
     "windows": [
         {
             "label": "MAIN",
-            "title": "freefall parser",
+            "title": "NW FF parser",
             "fullscreen": false,
             "resizable": true,
             "width": 350,
