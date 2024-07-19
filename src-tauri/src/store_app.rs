@@ -129,23 +129,13 @@ fn reducer(state: State, action: Action) -> State {
             on_new_drive_event(payload);
             state
         },
-        Action::UpdCurDir(payload)       => {State{cur_dir   : payload, ..state}},
-        Action::UpdFlight(payload)       => State{flight    : payload, ..state},
+        Action::UpdCurDir(payload)       => State{cur_dir   : payload, ..state},
         Action::ToggleAddFlight(payload) => State{add_flight: payload, ..state},
-        Action::UpdCurNick(payload)      => {
-            match payload {
-                Some(nick) => State{
-                    cur_nick: Some(nick),
-                    add_nick: true,
-                    ..state
-                },
-                None => State{
-                    cur_nick:None,
-                    add_nick: false,
-                    ..state
-                }
-            }
-        },
+        Action::UpdFlight(payload)       => State{flight    : payload, add_flight: true, ..state},
+        Action::UpdCurNick(payload)      => {match payload {
+            Some(nick) => State{ cur_nick:Some(nick), add_nick:true , ..state },
+            None       => State{ cur_nick:None      , add_nick:false, ..state },
+        }},
         Action::ToggleAddNick(payload)   => State{add_nick  : payload, ..state},
         Action::UpdNickList(payload)     => State{nick_list : payload, ..state},
         Action::AddNewNick(payload)      => {
