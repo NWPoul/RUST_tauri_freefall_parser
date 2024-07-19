@@ -2,6 +2,9 @@ import { useEffect} from 'react'
 
 import { cx }                       from 'helpers'
 
+
+import { API_minimizeWindow }       from 'API/api'
+
 import {
     // useWindowLabel,
     // useFullscreen,
@@ -57,7 +60,7 @@ function updFFTime(newVal: number) {
 }
 function FreeFallSettingsBlock({ffTime}:{ffTime: number}) {
     return (
-        <div id="time_freefall_settings">
+        <div id="time_freefall_settings" data-tauri-drag-region>
             FF cut time&nbsp;
             <IncButtonBlock
                 val    = {ffTime}
@@ -85,17 +88,26 @@ export function MainPanel() {
 
     const className = cx( 'MainPanelWrapper' )
 
+    const doubleClickEventHandler = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        const eTarget = e.target as HTMLDivElement
+        const watchedElements = ['BackBase', 'mainBtnBlock']
+        if ( watchedElements.includes(eTarget.id) === false) {
+            return
+        }
+        API_minimizeWindow()
+    }
 
-    return (
-        <div id = "AppMainPanel"
+
+    return <div id = "BackBase" data-tauri-drag-region onDoubleClick={doubleClickEventHandler}>
+        <div id = "AppMainPanel" data-tauri-drag-region
             className     = {className}
             onContextMenu = {e => e.preventDefault()}
         >
-            <div className="mainPanel-controlsWrapper">
+            <div className="mainPanel-controlsWrapper" data-tauri-drag-region>
                 <FreeFallSettingsBlock ffTime={configState.time_freefall}/>
                 <br />
 
-                <div className="mainBtnBlock">
+                <div id = "mainBtnBlock" className="mainBtnBlock" data-tauri-drag-region>
                     <NickSelect
                         curNick  = {appState.cur_nick}
                         nickList = {appState.nick_list}
@@ -117,7 +129,7 @@ export function MainPanel() {
                 </button>
             </div>
         </div>
-    );
+    </div>
 }
 
 export default MainPanel

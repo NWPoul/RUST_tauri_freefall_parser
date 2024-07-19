@@ -8,7 +8,7 @@
     font-size: 2em;
     font-weight: bold;
     border-radius: 0.25em;
-    border: inset 3px;
+    border: outset 3px;
     background-color: inherit;
     /* border-color: var(--panel-contrast-color); */
     /* color: inherit; */
@@ -16,6 +16,9 @@
 
     &:focus-visible{
         outline: none;
+    }
+    &:active {
+        border-style: inset;
     }
 }
 

@@ -60,6 +60,14 @@ function API_setFullscreen(reqFullscreen: boolean) {
     appWindow.setFullscreen(reqFullscreen)
 }
 
+async function API_minimizeWindow() {
+    try {
+        return await appWindow.minimize()
+    } catch (error) {
+        console.error('Error minimizing  window:', error)
+    }
+}
+
 async function API_getWindowLabel() {
     const currentWindowLabel = await appWindow.label
     return currentWindowLabel
@@ -143,6 +151,7 @@ export {
     API_getWindowLabel,
     API_isFullscreen,
     API_setFullscreen,
+    API_minimizeWindow,
     API_createPanel,
     API_togglePanel,
 
