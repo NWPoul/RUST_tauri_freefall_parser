@@ -54,6 +54,7 @@ body {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    margin-right: 0.25em;
     font-size: 2rem;
     color : var(--panel-prime-color);
     button {
