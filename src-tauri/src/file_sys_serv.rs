@@ -234,7 +234,7 @@ pub fn open_folder_last_file_selected(folder_path: &PathBuf) -> MyResult<fs::Dir
     Ok(latest_file)
 }
 #[cfg(not(target_os = "windows"))]
-pub fn open_folder_last_file_selected1(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
+pub fn open_folder_last_file_selected(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
     Err(Box::new(
         io::Error::new(io::ErrorKind::Other, "Not implemented yet")
     ))
