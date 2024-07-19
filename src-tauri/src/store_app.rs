@@ -1,6 +1,7 @@
 use redux_rs::Store;
 use std::path::PathBuf;
 
+use crate::commands::on_open_files_for_parse;
 use crate::file_sys_serv::{
     init_file,
     update_toml_field,
@@ -111,8 +112,12 @@ pub mod SELECTORS {
 
 
 
-pub fn on_new_drive_event(new_drive: &PathBuf) {
+pub fn on_new_drive_event(new_drive: PathBuf) {
     println!("\nNEW DRIVE PLUGGED IN: {:?}", new_drive);
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    std::thread::spawn(move || {
+        rt.block_on(on_open_files_for_parse(&new_drive));
+    });
 }
 
 
@@ -121,10 +126,10 @@ fn reducer(state: State, action: Action) -> State {
     match action {
         Action::UpdState(payload)        => payload,
         Action::EventNewDrive(payload)   => {
-            on_new_drive_event(&payload);
+            on_new_drive_event(payload);
             state
         },
-        Action::UpdCurDir(payload)       => State{cur_dir   : payload, ..state},
+        Action::UpdCurDir(payload)       => {State{cur_dir   : payload, ..state}},
         Action::UpdFlight(payload)       => State{flight    : payload, ..state},
         Action::ToggleAddFlight(payload) => State{add_flight: payload, ..state},
         Action::UpdCurNick(payload)      => {
@@ -173,6 +178,15 @@ pub fn get_store() -> Store<State, Action, fn(State, Action) -> State> {
 
 
 
+
+
+
+
+
+
+
+
+
 use std::io::{self, BufReader, BufRead};
 use toml::Value;
 
@@ -192,16 +206,6 @@ impl OperatorRecord {
         }
     }
 }
-
-//     fn from_toml(toml_value: &Value) -> Option<Self> {
-//         let name = toml_value.as_str()?.to_string();
-//         let values = match toml_value.get("values")?.as_array() {
-//             Some(arr) => arr.iter().map(|v| v.as_str().unwrap_or("").to_string()).collect::<Vec<String>>(),
-//             None => Vec::new(),
-//         };
-//         Some(OperatorRecord { name, values })
-//     }
-// }
 
 
 fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String>>, io::Error> {

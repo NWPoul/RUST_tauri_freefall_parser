@@ -38,19 +38,24 @@ crate::create_get_store_data_command!(get_app_store_data   , STORE_APP_INSTANCE 
 crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
 
 
-
-async fn on_open_files_for_parse() {
+pub async fn get_config_and_app_store_state() -> (store_config::State, store_app::State) {
     let store_config_instance = STORE_CONFIG_INSTANCE.get()
         .expect("static config store instance not init");
-    let config_values = store_config_instance.select(store_config::SELECTORS::AllState).await;
-
 
     let store_app_instance = STORE_APP_INSTANCE.get()
-        .expect("static app store instance not init");
-    let app_values = store_app_instance.select(store_app::SELECTORS::AllState).await;
+    .expect("static app store instance not init");
+
+    let config_values = store_config_instance.select(store_config::SELECTORS::AllState).await;
+    let app_values    = store_app_instance.select(store_app::SELECTORS::AllState).await;
+
+    return (config_values, app_values);
+}
 
 
-    let src_files_path_list = match get_src_files_path_list(".") {
+pub async fn on_open_files_for_parse(dir_path: &PathBuf) {
+    let (config_values, app_values) = get_config_and_app_store_state().await;
+
+    let src_files_path_list = match get_src_files_path_list(dir_path) {
         None => {
             println!("NO MP4 FILES CHOSEN!");
             return;// Ok(format!("NO MP4 FILES CHOSEN!"))
@@ -61,6 +66,9 @@ async fn on_open_files_for_parse() {
 
     ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
 }
+
+
+
 
 
 pub fn get_ffmpeg_status_for_file(
@@ -162,7 +170,7 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
 
     match id {
         "openFiles" => {
-            on_open_files_for_parse().await;
+            on_open_files_for_parse(&".".into()).await;
         },
         "setFreefallTime" => {
             config_store_instance
