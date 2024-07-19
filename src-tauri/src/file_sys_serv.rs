@@ -118,15 +118,7 @@ pub fn get_output_file_path(
         output_file_postfix
     );
 
-    let output_file_path = dest_dir_path.join(&output_file_name);
-
-    // if output_file_path.exists() {
-    //     println!("NEW output_file_path: {:?}", output_file_path);
-        // let original_extension = output_file_path.extension().unwrap_or_default();
-        // let new_extension = format!(".copy.{}", original_extension.to_str().unwrap());
-        // let new_file_name = PathBuf::from(output_file_path.file_name().unwrap()).with_extension(new_extension);
-        // output_file_path.set_file_name(new_file_name);
-    // }
+    let output_file_path = dest_dir_path.join(&output_file_name.trim());
 
     output_file_path
 }
