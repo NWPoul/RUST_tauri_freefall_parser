@@ -92,7 +92,6 @@ pub mod SELECTORS {
     use super::State;
     use crate::create_selector;
 
-    create_selector!(); // ALLState
     create_selector!(SrsDir,            srs_dir_path        , PathBuf, clone = true);
     create_selector!(DestDir,           dest_dir_path       , PathBuf, clone = true);
     create_selector!(FfmpegDir,         ffmpeg_dir_path     , PathBuf, clone = true);

@@ -45,8 +45,8 @@ pub async fn get_config_and_app_store_state() -> (store_config::State, store_app
     let store_app_instance = STORE_APP_INSTANCE.get()
     .expect("static app store instance not init");
 
-    let config_values = store_config_instance.select(store_config::SELECTORS::AllState).await;
-    let app_values    = store_app_instance.select(store_app::SELECTORS::AllState).await;
+    let config_values = store_config_instance.state_cloned().await;
+    let app_values    = store_app_instance.state_cloned().await;
 
     return (config_values, app_values);
 }

@@ -101,7 +101,6 @@ pub mod SELECTORS {
     use super::State;
     use crate::create_selector;
 
-    create_selector!(); // ALLState
     create_selector!( CurDir,      cur_dir   , PathBuf       , clone = true );
     create_selector!( Flight,      flight    , u8 );
     create_selector!( IsAddFlight, add_flight, bool );
@@ -119,7 +118,6 @@ pub fn on_new_drive_event(new_drive: PathBuf) {
         rt.block_on(on_open_files_for_parse(&new_drive));
     });
 }
-
 
 
 fn reducer(state: State, action: Action) -> State {

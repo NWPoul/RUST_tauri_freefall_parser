@@ -1,14 +1,5 @@
 #[macro_export]
 macro_rules! create_selector {
-    () => {
-        pub struct AllState;
-        impl redux_rs::Selector<State> for AllState {
-            type Result = State;
-            fn select(&self, state: &State) -> Self::Result {
-                state.clone()
-            }
-        }
-    };
     ($name:ident, $return_state_prop:ident, $return_type:ty, $clone:expr) => {
         pub struct $name;
         impl redux_rs::Selector<State> for $name {

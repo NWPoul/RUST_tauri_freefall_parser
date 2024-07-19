@@ -76,7 +76,7 @@ macro_rules! create_get_store_data_command {
         pub async fn $name() -> Result<$store_name::State, ()> {
             let store_instance = $store_instance.get()
                 .expect("static store instance not init");
-            let store_data = store_instance.select($store_name::SELECTORS::AllState).await;
+            let store_data = store_instance.state_cloned().await;
             Ok(store_data)
         }
     }
