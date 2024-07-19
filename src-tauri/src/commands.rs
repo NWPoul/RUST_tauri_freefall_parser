@@ -4,11 +4,7 @@ use std::path::PathBuf;
 
 // use redux_rs::StoreApi;
 use serde::{Serialize, Deserialize};
-// use tauri::{
-//     AppHandle,
-//     WindowBuilder,
-//     WindowUrl,
-// };
+use tauri::api::dialog::MessageDialogBuilder;
 
 
 
@@ -34,6 +30,15 @@ use crate::{
 
 
 
+
+
+fn tauri_show_msg(title: &str, msg: &str) {
+    let builder = MessageDialogBuilder::new(title, msg);
+    builder.show(|_|println!("DIAG"));
+}
+
+
+
 crate::create_get_store_data_command!(get_app_store_data   , STORE_APP_INSTANCE   , store_app);
 crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
 
@@ -52,22 +57,6 @@ pub async fn get_config_and_app_store_state() -> (store_config::State, store_app
 }
 
 
-pub async fn on_open_files_for_parse(dir_path: &PathBuf) {
-    let (config_values, app_values) = get_config_and_app_store_state().await;
-
-    let src_files_path_list = match get_src_files_path_list(dir_path) {
-        None => {
-            println!("NO MP4 FILES CHOSEN!");
-            return;
-        }
-        Some(path_list) => path_list,
-    };
-    let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
-
-    ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
-}
-
-
 
 
 
@@ -76,7 +65,7 @@ pub fn get_ffmpeg_status_for_file(
     file_result_data: &FileTelemetryResult,
     config_values   : &store_config::ConfigValues,
     app_values      : &store_app::State,
-) -> Result<String, String> {
+) -> Result<PathBuf, String> {
     let flight_info = if app_values.add_flight {
         Some(app_values.flight)
     } else {
@@ -101,11 +90,11 @@ pub fn get_ffmpeg_status_for_file(
 
 
     match ffmpeg_output {
-        Ok(_output) => {
+        Ok(output_path) => {
             println!("\nFFMPEG OK:");// {:?}", _output.stderr);
-            Ok("FFMPEG STATUS - OK".into())
+            Ok(output_path)
         },
-        Err(err)  => {
+        Err(err) => {
             println!("\nFFMPEG ERR: {:?}", err.to_string());
             Err(err.to_string())
         }
@@ -116,16 +105,53 @@ pub fn ffmpeg_ok_files(
     parsing_results: &(FileParsingOkData, FileParsingErrData),
     config_values  : &store_config::ConfigValues,
     app_values     : &store_app::State,
-) {
+) -> (Vec<PathBuf>, Vec<String>) {
+
+    let mut ok_list : Vec<PathBuf> = vec![];
+    let mut err_list: Vec<String>  = vec![];
+
     for res in &parsing_results.0 {
-        _ = get_ffmpeg_status_for_file(
+        match get_ffmpeg_status_for_file(
             &res.0,
             &res.1,
             config_values,
             app_values,
+        ) {
+            Ok(dest_path) => ok_list.push(dest_path),
+            Err(err_str)  => err_list.push(err_str),
+        };
+    }
+
+    (ok_list, err_list)
+}
+
+
+pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
+    let (config_values, app_values) = get_config_and_app_store_state().await;
+
+    let src_files_path_list = match get_src_files_path_list(dir_path) {
+        None => {
+            println!("NO MP4 FILES CHOSEN!");
+            return;
+        }
+        Some(path_list) => path_list,
+    };
+
+    let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
+
+    if config_values.no_ffmpeg_processing == false {
+        let ffmpeg_results = ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
+        let report = format!(
+            "Файлы {} записаны \nОшибки: {}",
+            ffmpeg_results.0.len(),
+            ffmpeg_results.1.len(),
         );
+        tauri_show_msg("Parsing results", &report)
     }
 }
+
+
+
 
 
 
@@ -169,8 +195,11 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
     dbg!(&resp);
 
     match id {
-        "openFiles" => {
-            on_open_files_for_parse(&".".into()).await;
+        "selectVideoFiles" => {
+            let src_dir = if val.is_empty() {
+                config_store_instance.select(store_config::SELECTORS::SrcDir).await
+            } else {val.into()};
+            main_workflow_for_videofiles(&src_dir).await;
         },
         "setFreefallTime" => {
             config_store_instance

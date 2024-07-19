@@ -1,7 +1,7 @@
 use redux_rs::Store;
 use std::path::PathBuf;
 
-use crate::commands::on_open_files_for_parse;
+use crate::commands::main_workflow_for_videofiles;
 use crate::file_sys_serv::{
     init_file,
     update_toml_field,
@@ -115,7 +115,7 @@ pub fn on_new_drive_event(new_drive: PathBuf) {
     println!("\nNEW DRIVE PLUGGED IN: {:?}", new_drive);
     let rt = tokio::runtime::Runtime::new().unwrap();
     std::thread::spawn(move || {
-        rt.block_on(on_open_files_for_parse(&new_drive));
+        rt.block_on(main_workflow_for_videofiles(&new_drive));
     });
 }
 

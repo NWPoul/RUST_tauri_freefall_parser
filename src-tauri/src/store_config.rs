@@ -70,7 +70,7 @@ pub type State = ConfigValues;
 
 #[derive(Debug)]
 pub enum Action {
-    UpdSrsDir(PathBuf),
+    UpdSrcDir(PathBuf),
     UpdDestDir(PathBuf),
     UpdFfmpegDir(PathBuf),
     UpdOutputFilePostfix(String),
@@ -92,7 +92,7 @@ pub mod SELECTORS {
     use super::State;
     use crate::create_selector;
 
-    create_selector!(SrsDir,            srs_dir_path        , PathBuf, clone = true);
+    create_selector!(SrcDir,            srs_dir_path        , PathBuf, clone = true);
     create_selector!(DestDir,           dest_dir_path       , PathBuf, clone = true);
     create_selector!(FfmpegDir,         ffmpeg_dir_path     , PathBuf, clone = true);
     create_selector!(OutputFilePostfix, output_file_postfix , String , clone = true);
@@ -107,7 +107,7 @@ pub mod SELECTORS {
 
 fn reducer(state: State, action: Action) -> State {
     match action {
-        Action::UpdSrsDir(payload)            => State{srs_dir_path        : payload, ..state},
+        Action::UpdSrcDir(payload)            => State{srs_dir_path        : payload, ..state},
         Action::UpdDestDir(payload)           => State{dest_dir_path       : payload, ..state},
         Action::UpdFfmpegDir(payload)         => State{ffmpeg_dir_path     : payload, ..state},
         Action::UpdOutputFilePostfix(payload) => State{output_file_postfix : payload, ..state},

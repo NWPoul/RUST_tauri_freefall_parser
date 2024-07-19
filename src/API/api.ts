@@ -25,7 +25,7 @@ import {
 
 
 type T_controlInputId =
-    | "openFiles"
+    | "selectVideoFiles"
     | "setFreefallTime"
     | "setFlight"
     | "toggleFlight"

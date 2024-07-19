@@ -37,14 +37,14 @@ import { FlightNumberBlock }        from './FlightNumberBlock'
 
 
 
-function openFiles() {
+function selectVideoFiles() {
     sendControlInputCommand(
         {
-            id: "openFiles",
+            id: "selectVideoFiles",
             val: "",
         }
     )
-    console.log('openFilesBtn')
+    console.log('selectVideoFilesBtn')
 }
 
 
@@ -123,7 +123,7 @@ export function MainPanel() {
                 <button
                     type      = "button"
                     className = "quickBtn selectFilesBtn"
-                    onClick   = {openFiles}
+                    onClick   = {selectVideoFiles}
                 >
                     Выбрать файлы
                 </button>

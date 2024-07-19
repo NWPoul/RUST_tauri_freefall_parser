@@ -51,11 +51,11 @@ fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> Result<PathBuf, IOError> {
 
 pub fn run_ffmpeg(
     target_start_end_time: (f64, f64),
-    files_path           : (&PathBuf, &PathBuf),
+    src_dest_files_path  : (&PathBuf, &PathBuf),
     ffmpeg_dir_path      : &PathBuf,
-) -> Result<String, IOError> {
+) -> Result<PathBuf, IOError> {
     let (mut start_time, end_time) = target_start_end_time;
-    let (src_file_path, output_file_path) = files_path;
+    let (src_file_path, dest_file_path) = src_dest_files_path;
 
 
     let glitch_margin:f64 = if start_time >= GLITCH_MARGIN {
@@ -82,13 +82,13 @@ pub fn run_ffmpeg(
         .arg("-ss").arg(glitch_margin.to_string())
         .arg("-c")
         .arg("copy")
-        .arg(output_file_path)
+        .arg(dest_file_path)
         .arg("-n")
         .spawn()?;
 
 
     match ffmpeg_status.wait() {
-        Ok(child)  => Ok(child.to_string()),
+        Ok(_)      => Ok(dest_file_path.clone()),
         Err(error) => Err(error)
     }
 }
