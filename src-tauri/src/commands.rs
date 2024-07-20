@@ -46,9 +46,8 @@ crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTAN
 pub async fn get_config_and_app_store_state() -> (store_config::State, store_app::State) {
     let store_config_instance = STORE_CONFIG_INSTANCE.get()
         .expect("static config store instance not init");
-
     let store_app_instance = STORE_APP_INSTANCE.get()
-    .expect("static app store instance not init");
+        .expect("static app store instance not init");
 
     let config_values = store_config_instance.state_cloned().await;
     let app_values    = store_app_instance.state_cloned().await;
