@@ -43,3 +43,13 @@ pub fn abs_max(f_prev: f64, f_new: f64) -> f64 {
 pub fn remove_symbols(input: &str, symbols: &str) -> String {
     input.chars().filter(|c| !symbols.contains(*c)).collect()
 }
+
+pub fn normalize_name(t_name: &str) -> String {
+    let lowercased = t_name.to_lowercase();
+    if lowercased.is_empty() {
+        return String::from(&lowercased);
+    }
+    let result = format!("{0}{1}", lowercased[0..1].to_uppercase(), &lowercased[1..]);
+
+    result
+}

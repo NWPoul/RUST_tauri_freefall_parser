@@ -6,6 +6,7 @@ use crate::file_sys_serv::{
     init_file,
     update_toml_field,
 };
+use crate::utils::u_serv::normalize_name;
 
 
 
@@ -137,19 +138,20 @@ fn reducer(state: State, action: Action) -> State {
         Action::ToggleAddNick(payload)   => State{add_nick  : payload, ..state},
         Action::UpdNickList(payload)     => State{nick_list : payload, ..state},
         Action::AddNewNick(payload)      => {
-            if state.nick_list.contains(&payload) {
-                println!("Nickname '{}' already exists.", payload);
+            let normalized_name = normalize_name(&payload);
+            if state.nick_list.contains(&normalized_name) {
+                println!("Nickname '{}' already exists.", normalized_name);
                 return  state;
             }
             let mut new_nick_list = state.nick_list.clone();
-            new_nick_list.extend([payload.clone()]);
+            new_nick_list.extend([normalized_name.clone()]);
             new_nick_list.sort();
 
-            _ = update_operators_file(&payload);
+            _ = update_operators_file(&normalized_name);
 
             State{
                 nick_list: new_nick_list,
-                cur_nick : Some(payload),
+                cur_nick : Some(normalized_name),
                 add_nick : true,
                 ..state}
         },
