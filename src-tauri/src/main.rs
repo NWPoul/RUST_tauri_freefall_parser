@@ -19,6 +19,7 @@ pub mod macros;
 pub mod redux_serv;
 pub mod store_app;
 pub mod store_config;
+pub mod operators_serv;
 pub mod file_sys_serv;
 pub mod telemetry_parser_serv;
 pub mod telemetry_analysis;

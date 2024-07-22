@@ -96,12 +96,12 @@ pub mod SELECTORS {
     create_selector!(DestDir,           dest_dir_path       , PathBuf, clone = true);
     create_selector!(FfmpegDir,         ffmpeg_dir_path     , PathBuf, clone = true);
     create_selector!(OutputFilePostfix, output_file_postfix , String , clone = true);
-    create_selector!(DepTimeCorrection, dep_time_correction , f64    );
-    create_selector!(TimeFreefall,      time_freefall       , f64    );
-    create_selector!(TimeStartOffset,   time_start_offset   , f64    );
-    create_selector!(TimeEndOffset,     time_end_offset     , f64    );
-    create_selector!(MinAccelTrigger,   min_accel_trigger   , f64    );
-    create_selector!(NoFfmpegProcess,   no_ffmpeg_processing, bool   );
+    create_selector!(DepTimeCorrection, dep_time_correction , f64 );
+    create_selector!(TimeFreefall,      time_freefall       , f64 );
+    create_selector!(TimeStartOffset,   time_start_offset   , f64 );
+    create_selector!(TimeEndOffset,     time_end_offset     , f64 );
+    create_selector!(MinAccelTrigger,   min_accel_trigger   , f64 );
+    create_selector!(NoFfmpegProcess,   no_ffmpeg_processing, bool);
 }
 
 

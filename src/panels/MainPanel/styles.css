@@ -43,7 +43,7 @@ body {
 .mainPanel-controlsWrapper {
     display: flex;
     padding-top: 1rem;
-    height: 92vh;
+    height: 29rem;
     /* width: 20rem; */
     background-color: inherit;
     flex-direction: column;
