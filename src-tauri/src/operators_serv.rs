@@ -3,14 +3,15 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::path::PathBuf;
 
-
-
-
-
 use toml::Value;
 
+
+use crate::utils::u_serv::normalize_name;
+use crate::file_sys_serv::{check_path, init_file};
 use crate::store_app::OPERATORS_LIST_FILE_NAME;
 
+
+pub const OPERATOR_ID_FILENAME: &str = "operator_id.txt";
 
 #[derive(serde::Serialize)]
 struct OperatorRecord {
@@ -45,7 +46,10 @@ pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String
                     let values = vals.iter()
                         .filter_map(|v| v.as_str().map(String::from))
                         .collect::<Vec<String>>();
-                    table.insert(key.clone(), values);
+                    table.insert(
+                        normalize_name(&key.clone()),
+                        values
+                    );
                 }
             }
         }
@@ -55,10 +59,11 @@ pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String
 }
 
 pub fn update_operators_file(new_nick: &str) -> std::io::Result<()> {
+    let normalized_nick = normalize_name(new_nick);
     let operators_file_path: PathBuf = OPERATORS_LIST_FILE_NAME.into();
     let mut records = read_operators_file(OPERATORS_LIST_FILE_NAME)?;
 
-    let new_record = OperatorRecord::new(new_nick, &Vec::new());
+    let new_record = OperatorRecord::new(&normalized_nick, &Vec::new());
     records.insert(new_record.name.clone(), new_record.values);
 
     let mut vec_of_tuples: Vec<(String, Vec<String>)> = records.into_iter().collect();
@@ -89,4 +94,23 @@ fn save_tuples_to_file(tuples: Vec<(String, Vec<String>)>, file_path: &PathBuf) 
     file.write_all(toml_content.as_bytes())?;
 
     Ok(())
+}
+
+
+pub fn recognize_card(drivepath_str: &PathBuf) -> io::Result<()> {
+    let dcim_path  = drivepath_str.join("DCIM");
+    let misc_path  = drivepath_str.join("MISC");
+    let card_id_path = misc_path.join("card");
+    let operator_id_path = misc_path.join(OPERATOR_ID_FILENAME);
+
+    if check_path(&dcim_path) == false { return Err(io::Error::new(io::ErrorKind::NotFound, "No DCIM")); };
+    if check_path(&card_id_path) {
+
+        init_file(&operator_id_path);
+    } else if check_path(&dcim_path) {
+        misc_path
+    } else {
+        drivepath_str.clone()
+    };
+    // res_path
 }

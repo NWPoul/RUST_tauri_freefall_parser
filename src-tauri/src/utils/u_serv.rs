@@ -45,7 +45,7 @@ pub fn remove_symbols(input: &str, symbols: &str) -> String {
 }
 
 pub fn normalize_name(t_name: &str) -> String {
-    let lowercased = t_name.to_lowercase();
+    let lowercased = t_name.trim().to_lowercase();
     if lowercased.is_empty() {
         return String::from(&lowercased);
     }

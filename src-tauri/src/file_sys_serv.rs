@@ -15,8 +15,6 @@ use toml::{
 
 use rfd::FileDialog;
 
-use tokio::time as tokio_time;
-
 
 
 use crate::store_app::{Action, StoreType};
@@ -31,7 +29,7 @@ const VERBATIM_PREFIX: &str = r"\\?\";
 
 
 
-fn check_path<T: AsRef<Path>>(path: T) -> bool {
+pub fn check_path<T: AsRef<Path>>(path: T) -> bool {
     let path_buf = PathBuf::from(path.as_ref());
     path_buf.exists()
 }
@@ -283,7 +281,7 @@ pub async fn watch_drives(store: &StoreType) {
 
         known_drives = current_drives;
 
-        tokio_time::sleep(tokio_time::Duration::from_millis(FETCH_INTERVAL)).await;
+        tokio::time::sleep(tokio::time::Duration::from_millis(FETCH_INTERVAL)).await;
     }
 }
 
@@ -296,8 +294,8 @@ pub fn init_file(file_path: &PathBuf) {
         return;
     }
 
-    let default_config = "";
-    fs::write(file_path, default_config).expect("Unable to write config file");
+    let default_content = "";
+    fs::write(file_path, default_content).expect("Unable to init write file");
     println!("Created {:?} file", file_path);
 }
 
