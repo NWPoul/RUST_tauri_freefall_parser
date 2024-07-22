@@ -105,12 +105,7 @@ pub fn recognize_card(drivepath_str: &PathBuf) -> io::Result<()> {
 
     if check_path(&dcim_path) == false { return Err(io::Error::new(io::ErrorKind::NotFound, "No DCIM")); };
     if check_path(&card_id_path) {
-
         init_file(&operator_id_path);
-    } else if check_path(&dcim_path) {
-        misc_path
-    } else {
-        drivepath_str.clone()
-    };
-    // res_path
+    }
+    Ok(())
 }
