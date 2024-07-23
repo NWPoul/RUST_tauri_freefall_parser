@@ -46,10 +46,14 @@ pub fn remove_symbols(input: &str, symbols: &str) -> String {
 
 pub fn normalize_name(t_name: &str) -> String {
     let lowercased = t_name.trim().to_lowercase();
-    if lowercased.is_empty() {
-        return String::from(&lowercased);
-    }
-    let result = format!("{0}{1}", lowercased[0..1].to_uppercase(), &lowercased[1..]);
+    let mut chars = lowercased.chars();
+    let first_char = chars.next().unwrap_or('X').to_uppercase();
+    let remaining_chars: String = if lowercased.len() >= 2 {
+        chars.collect::<Vec<char>>().into_iter().collect::<String>()
+    } else {
+        "".to_string()
+    };
+    let result = format!("{0}{1}", first_char, remaining_chars);
 
     result
 }
