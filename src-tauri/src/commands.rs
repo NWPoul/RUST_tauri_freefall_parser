@@ -32,7 +32,7 @@ use crate::{
 
 
 
-fn tauri_show_msg(title: &str, msg: &str) {
+pub fn tauri_show_msg(title: &str, msg: &str) {
     let builder = MessageDialogBuilder::new(title, msg);
     builder.show(|_|println!("DIAG"));
 }

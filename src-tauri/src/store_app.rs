@@ -1,12 +1,17 @@
 use redux_rs::Store;
 use std::path::PathBuf;
 
-use crate::commands::main_workflow_for_videofiles;
+use crate::commands::{main_workflow_for_videofiles, tauri_show_msg};
 use crate::file_sys_serv::{
     init_file,
     update_toml_field,
+    get_src_path_for_ext_drive,
 };
-use crate::operators_serv::{read_operators_file, update_operators_file};
+
+use crate::operators_serv::{
+    find_operator_by_id_invec, get_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
+};
+
 use crate::utils::u_serv::normalize_name;
 
 
@@ -17,7 +22,7 @@ pub const OPERATORS_LIST_FILE_NAME: &str = "operators_list.toml";
 
 pub fn init_operators_list_file() {
     let config_file_path: PathBuf = OPERATORS_LIST_FILE_NAME.into();
-    init_file(&config_file_path);
+    init_file(&config_file_path, "");
 }
 
 pub fn update_operators_list<V: serde::Serialize>(
@@ -40,7 +45,8 @@ pub struct State {
     pub add_flight: bool,
     pub cur_nick  : Option<String>,
     pub add_nick  : bool,
-    pub nick_list : Vec<String>,
+    pub nick_list     : Vec<String>,
+    pub operators_list: Vec<OperatorRecord>,
     // pub cur_date  : String,
 }
 
@@ -51,8 +57,8 @@ impl Default for State { fn default() -> Self {
         add_flight : false,
         cur_nick   : None,
         add_nick   : false,
-        nick_list  : Vec::new(),
-        // cur_date   : "".into(),
+        nick_list     : Vec::new(),
+        operators_list: Vec::new(),
     };
 
     match read_operators_file(OPERATORS_LIST_FILE_NAME) {
@@ -97,11 +103,13 @@ pub mod SELECTORS {
 
 
 
-pub fn on_new_drive_event(new_drive: PathBuf) {
+pub fn on_new_drive_event(new_drive: &PathBuf) {
     println!("\nNEW DRIVE PLUGGED IN: {:?}", new_drive);
+    let src_path = get_src_path_for_ext_drive(&new_drive);
+
     let rt = tokio::runtime::Runtime::new().unwrap();
     std::thread::spawn(move || {
-        rt.block_on(main_workflow_for_videofiles(&new_drive));
+        rt.block_on(main_workflow_for_videofiles(&src_path));
     });
 }
 
@@ -110,8 +118,22 @@ fn reducer(state: State, action: Action) -> State {
     match action {
         Action::UpdState(payload)        => payload,
         Action::EventNewDrive(payload)   => {
-            on_new_drive_event(payload);
-            state
+            let mut new_state = state.clone();
+            if let Ok(operator_id) = recognize_card(&payload) {
+                match find_operator_by_id_invec(&state.operators_list, &operator_id) {
+                    Some(operator) => {
+                        tauri_show_msg("SD Card recognized!", &operator.name);
+                        new_state.cur_nick = Some(operator.name);
+                        new_state.add_nick = true;
+                    },
+                    None => tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
+                }
+            } else {
+                tauri_show_msg("SD Card plugged!", "not GO PRO card");
+            }
+
+            on_new_drive_event(&payload);
+            new_state
         },
         Action::UpdCurDir(payload)       => State{cur_dir   : payload, ..state},
         Action::ToggleAddFlight(payload) => State{add_flight: payload, ..state},
@@ -128,11 +150,13 @@ fn reducer(state: State, action: Action) -> State {
                 println!("Nickname '{}' already exists.", normalized_name);
                 return  state;
             }
+            // dbg!(&normalized_name);
             let mut new_nick_list = state.nick_list.clone();
             new_nick_list.extend([normalized_name.clone()]);
             new_nick_list.sort();
 
-            _ = update_operators_file(&normalized_name);
+            let new_id = get_operator_id();
+            _ = update_operators_file(&normalized_name, &new_id);
 
             State{
                 nick_list: new_nick_list,

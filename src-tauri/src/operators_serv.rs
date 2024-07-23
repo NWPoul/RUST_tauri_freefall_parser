@@ -7,16 +7,16 @@ use toml::Value;
 
 
 use crate::utils::u_serv::normalize_name;
-use crate::file_sys_serv::{check_path, init_file};
+use crate::file_sys_serv::{check_path, init_file, read_first_non_empty_line};
 use crate::store_app::OPERATORS_LIST_FILE_NAME;
 
 
 pub const OPERATOR_ID_FILENAME: &str = "operator_id.txt";
 
-#[derive(serde::Serialize)]
-struct OperatorRecord {
-    name: String,
-    values: Vec<String>,
+#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Serialize)]
+pub struct OperatorRecord {
+    pub name: String,
+    pub values: Vec<String>,
 }
 
 impl OperatorRecord {
@@ -26,6 +26,43 @@ impl OperatorRecord {
             values: values.to_vec(),
         }
     }
+}
+
+
+type IdList = Vec<String>;
+type OperatorsList = HashMap<String, IdList>;
+
+
+
+pub fn get_operator_id() -> String {
+    let now = std::time::SystemTime::now();
+    let since_the_epoch = now.duration_since(std::time::SystemTime::UNIX_EPOCH)
+        .expect("Time went backwards");
+    let timestamp_nanos = since_the_epoch.as_nanos();
+    timestamp_nanos.to_string()
+}
+
+
+fn find_by_nick(operators_list: &OperatorsList, nick: &str) -> Option<IdList> {
+    operators_list.get(nick).map(|list| list.clone())
+}
+
+pub fn find_operator_by_id_inhash(operators_list: &OperatorsList, id: &str) -> Option<(String, IdList)> {
+    for (nickname, ids) in operators_list.iter() {
+        if ids.contains(&id.to_string()) {
+            return Some((nickname.to_string(), ids.to_owned()));
+        }
+    }
+    None
+}
+
+pub fn find_operator_by_id_invec(records: &[OperatorRecord], id: &str) -> Option<OperatorRecord> {
+    for record in records {
+        if record.values.contains(&id.to_string()) {
+            return Some(record.clone());
+        }
+    }
+    None
 }
 
 
@@ -58,15 +95,33 @@ pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String
     Ok(table)
 }
 
-pub fn update_operators_file(new_nick: &str) -> std::io::Result<()> {
+pub fn update_operators_file(new_nick: &str, new_id: &str) -> std::io::Result<()> {
     let normalized_nick = normalize_name(new_nick);
+    let new_id: &str = if new_id.is_empty() {
+        &get_operator_id()
+    } else { new_id };
+
     let operators_file_path: PathBuf = OPERATORS_LIST_FILE_NAME.into();
-    let mut records = read_operators_file(OPERATORS_LIST_FILE_NAME)?;
+    let mut cur_records = read_operators_file(OPERATORS_LIST_FILE_NAME)?;
 
-    let new_record = OperatorRecord::new(&normalized_nick, &Vec::new());
-    records.insert(new_record.name.clone(), new_record.values);
+    if let Some(_record) = find_operator_by_id_inhash(&cur_records, new_id) {
+        return Err(io::Error::new(io::ErrorKind::AlreadyExists, "ID_EXIST ({})"));
+    }
 
-    let mut vec_of_tuples: Vec<(String, Vec<String>)> = records.into_iter().collect();
+    let updated_id_list: Vec<String> = if let Some(ref mut id_list) = find_by_nick(&cur_records, new_nick) {
+        id_list.push(new_id.to_string());
+        id_list.clone()
+    } else {
+        vec![new_id.to_string()]
+    };
+
+    let new_record = OperatorRecord::new(
+        &normalized_nick,
+        &updated_id_list
+    );
+    cur_records.insert(new_record.name.clone(), new_record.values);
+
+    let mut vec_of_tuples: Vec<(String, Vec<String>)> = cur_records.into_iter().collect();
     vec_of_tuples.sort_by_key(|k| k.0.clone());
     dbg!(&vec_of_tuples);
 
@@ -97,15 +152,44 @@ fn save_tuples_to_file(tuples: Vec<(String, Vec<String>)>, file_path: &PathBuf) 
 }
 
 
-pub fn recognize_card(drivepath_str: &PathBuf) -> io::Result<()> {
+pub fn recognize_card(drivepath_str: &PathBuf) -> io::Result<String> {
     let dcim_path  = drivepath_str.join("DCIM");
+    dbg!(&drivepath_str, &dcim_path);
     let misc_path  = drivepath_str.join("MISC");
     let card_id_path = misc_path.join("card");
     let operator_id_path = misc_path.join(OPERATOR_ID_FILENAME);
 
-    if check_path(&dcim_path) == false { return Err(io::Error::new(io::ErrorKind::NotFound, "No DCIM")); };
-    if check_path(&card_id_path) {
-        init_file(&operator_id_path);
+    if check_path(&dcim_path) == false {
+        println!("NO_DCIM");
+        return Err(io::Error::new(io::ErrorKind::NotFound, "NO_DCIM"));
     }
-    Ok(())
+
+    if check_path(&misc_path) == false {
+        let new_id = get_operator_id();
+        init_file(&operator_id_path, &new_id);
+        return Ok(new_id);
+    }
+
+    let card_serial_number: String = if check_path(&card_id_path) {
+        read_first_non_empty_line(&card_id_path).unwrap_or("".into()).into()
+    } else {"".into()};
+
+    let mut operator_id: String  = if check_path(&operator_id_path) {
+        read_first_non_empty_line(&operator_id_path).unwrap_or("".into()).into()
+    } else {"".into()};
+
+
+    if operator_id.len() > 0 {
+        return Ok(operator_id);
+    }
+
+    if card_serial_number.len() > 0 {
+        operator_id = card_serial_number;
+    } else {
+        operator_id = get_operator_id();
+    }
+
+    init_file(&operator_id_path, &operator_id);
+
+    Ok(operator_id)
 }

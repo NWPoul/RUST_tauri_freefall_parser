@@ -1,7 +1,7 @@
 use std::{
     collections::HashSet,
     fs::{ self, File },
-    io::{ self, Read, Write },
+    io::{ self, Read, Write, BufRead, },
     path::{ Path, PathBuf },
     time::SystemTime,
 };
@@ -121,6 +121,30 @@ pub fn get_output_file_path(
     output_file_path
 }
 
+pub fn read_first_non_empty_line(path: &PathBuf) -> io::Result<String> {
+    let file = File::open(path)?;
+
+    let mut lines_read = 0;
+    let mut res_data = String::new();
+
+    for line in io::BufReader::new(file).lines() {
+        let line = line?;
+        let trimmed_line = line.trim();
+        if !trimmed_line.is_empty() {
+            res_data = trimmed_line.to_string();
+            break;
+        }
+        lines_read += 1;
+    }
+
+    if lines_read == 0 {
+        return Err(io::Error::new(io::ErrorKind::Other, "No non-empty lines found"));
+    }
+
+    Ok(res_data)
+}
+
+
 
 
 #[cfg(target_os = "windows")]
@@ -152,6 +176,7 @@ pub fn get_current_drives() -> HashSet<String> {
 
 pub fn get_src_path_for_ext_drive(drivepath_str: &PathBuf) -> PathBuf {
     let dcim_path  = drivepath_str.join("DCIM");
+    dbg!(&drivepath_str, &dcim_path);
     let gopro_path = dcim_path.join("100GOPRO");
 
     let res_path = if check_path(&gopro_path) {
@@ -263,8 +288,7 @@ pub async fn watch_drives(store: &StoreType) {
                 println!("New drive detected: {}", drive);
                 match fs::read_dir(drive) {
                     Ok(_entries) => {
-                        let new_drive = get_src_path_for_ext_drive(&drive.as_str().into());
-                        store.dispatch(Action::EventNewDrive(new_drive)).await;
+                        store.dispatch(Action::EventNewDrive(drive.into())).await;
                     },
                     Err(e) => {
                         println!("Error reading drive {}: {}", drive, e);
@@ -288,14 +312,14 @@ pub async fn watch_drives(store: &StoreType) {
 
 
 
-pub fn init_file(file_path: &PathBuf) {
+pub fn init_file(file_path: &PathBuf, init_value: &str) {
     if std::path::Path::new(file_path).exists() {
         println!("{:?} file found", file_path);
         return;
     }
 
-    let default_content = "";
-    fs::write(file_path, default_content).expect("Unable to init write file");
+    fs::create_dir_all(file_path.parent().unwrap()).expect("Failed to init directories");
+    fs::write(file_path, init_value).expect("Unable to init write file");
     println!("Created {:?} file", file_path);
 }
 

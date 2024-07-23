@@ -28,7 +28,7 @@ const MIN_ACCEL_TRIGGER  :  f64 = 20.0;
 
 pub fn init_cfg_file() {
     let config_file_path: PathBuf = CONFIG_FILE_NAME.into();
-    init_file(&config_file_path);
+    init_file(&config_file_path, "");
 }
 
 
