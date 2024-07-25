@@ -43,7 +43,7 @@ pub fn generate_operator_id() -> String {
 }
 
 
-fn find_by_nick(operators_list: &OperatorsList, nick: &str) -> Option<IdList> {
+pub fn find_by_nick_inhash(operators_list: &OperatorsList, nick: &str) -> Option<IdList> {
     operators_list.get(nick).map(|list| list.clone())
 }
 
@@ -155,7 +155,7 @@ pub fn update_operators_file(new_nick: &str, new_id: &str) -> std::io::Result<()
         return Err(io::Error::new(io::ErrorKind::AlreadyExists, "ID_EXIST ({})"));
     }
 
-    let updated_id_list: Vec<String> = if let Some(ref mut id_list) = find_by_nick(&cur_records, new_nick) {
+    let updated_id_list: Vec<String> = if let Some(ref mut id_list) = find_by_nick_inhash(&cur_records, new_nick) {
         id_list.push(operator_id.to_string());
         id_list.clone()
     } else {

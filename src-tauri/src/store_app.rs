@@ -1,4 +1,5 @@
 use redux_rs::Store;
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 use crate::commands::{main_workflow_for_videofiles, tauri_show_msg};
@@ -9,7 +10,7 @@ use crate::file_sys_serv::{
 };
 
 use crate::operators_serv::{
-    find_operator_by_id_invec, generate_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
+    find_by_nick_inhash, find_operator_by_id_inhash, find_operator_by_id_invec, generate_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
 };
 
 use crate::utils::u_serv::normalize_name;
@@ -18,6 +19,15 @@ use crate::utils::u_serv::normalize_name;
 
 
 pub const OPERATORS_LIST_FILE_NAME: &str = "operators_list.toml";
+
+fn convert_to_operator_records(input_map: HashMap<String, Vec<String>>) -> Vec<OperatorRecord> {
+    input_map.into_iter().map(|(name, values)| {
+        OperatorRecord {
+            name: name.clone(),
+            values: values.clone(),
+        }
+    }).collect()
+}
 
 
 pub fn init_operators_list_file() {
@@ -38,15 +48,14 @@ pub fn update_operators_list<V: serde::Serialize>(
 }
 
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct State {
     pub cur_dir   : PathBuf,
     pub flight    : u8,
     pub add_flight: bool,
     pub cur_nick  : Option<String>,
     pub add_nick  : bool,
-    pub nick_list     : Vec<String>,
-    pub operators_list: Vec<OperatorRecord>,
+    pub operators_list: HashMap<String, Vec<String>>,
     // pub cur_date  : String,
 }
 
@@ -57,13 +66,13 @@ impl Default for State { fn default() -> Self {
         add_flight : false,
         cur_nick   : None,
         add_nick   : false,
-        nick_list     : Vec::new(),
-        operators_list: Vec::new(),
+        operators_list: HashMap::new(),
     };
 
     match read_operators_file(OPERATORS_LIST_FILE_NAME) {
-        Ok(list) => state.nick_list = list.keys().cloned().collect(),
-        Err(_) => println!("No operators"),
+        // Ok(list) => state.operators_list = convert_to_operator_records(list),
+        Ok(list) => state.operators_list = list,
+        Err(_)   => println!("No operators"),
     }
 
     state
@@ -78,7 +87,7 @@ pub enum Action {
     UpdFlight(u8),
     UpdCurNick(Option<String>),
     AddNewNick(String),
-    UpdNickList(Vec<String>),
+    UpdOperatorsList(HashMap<String, Vec<String>>),
     ToggleAddFlight(bool),
     ToggleAddNick(bool),
 }
@@ -89,16 +98,16 @@ pub type StoreType = Store<State, Action, fn(State, Action) -> State>;
 
 #[allow(non_snake_case)]
 pub mod SELECTORS {
-    use std::path::PathBuf;
+    use std::{collections::HashMap, path::PathBuf};
     use super::State;
-    use crate::create_selector;
+    use crate::create_selector;// operators_serv::OperatorRecord};
 
-    create_selector!( CurDir,      cur_dir   , PathBuf       , clone = true );
-    create_selector!( Flight,      flight    , u8 );
-    create_selector!( IsAddFlight, add_flight, bool );
-    create_selector!( CurNick,     cur_nick  , Option<String>, clone = true );
-    create_selector!( IsAddNick,   add_nick  , bool );
-    create_selector!( NickList,    nick_list , Vec<String>   , clone = true );
+    create_selector!( CurDir,        cur_dir   , PathBuf         , clone = true );
+    create_selector!( Flight,        flight    , u8   );
+    create_selector!( IsAddFlight,   add_flight, bool );
+    create_selector!( CurNick,       cur_nick  , Option<String>  , clone = true );
+    create_selector!( IsAddNick,     add_nick  , bool );
+    create_selector!( OperatorsList, operators_list, HashMap<String, Vec<String>>, clone = true );
 }
 
 
@@ -120,10 +129,10 @@ fn reducer(state: State, action: Action) -> State {
         Action::EventNewDrive(payload)   => {
             let mut new_state = state.clone();
             if let Ok(operator_id) = recognize_card(&payload) {
-                match find_operator_by_id_invec(&state.operators_list, &operator_id) {
+                match find_operator_by_id_inhash(&state.operators_list, &operator_id) {
                     Some(operator) => {
-                        tauri_show_msg("SD Card recognized!", &operator.name);
-                        new_state.cur_nick = Some(operator.name);
+                        tauri_show_msg("SD Card recognized!", &operator.0);
+                        new_state.cur_nick = Some(operator.0);
                         new_state.add_nick = true;
                     },
                     None => println!("SD Card NEW OPERATOR {}", &operator_id)//tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
@@ -135,31 +144,32 @@ fn reducer(state: State, action: Action) -> State {
             on_new_drive_event(&payload);
             new_state
         },
-        Action::UpdCurDir(payload)       => State{cur_dir   : payload, ..state},
-        Action::ToggleAddFlight(payload) => State{add_flight: payload, ..state},
-        Action::UpdFlight(payload)       => State{flight    : payload, add_flight: true, ..state},
-        Action::UpdCurNick(payload)      => {match payload {
+        Action::UpdCurDir(payload)        => State{cur_dir   : payload, ..state},
+        Action::ToggleAddFlight(payload)  => State{add_flight: payload, ..state},
+        Action::UpdFlight(payload)        => State{flight    : payload, add_flight: true, ..state},
+        Action::UpdCurNick(payload)       => {match payload {
             Some(nick) => State{ cur_nick:Some(nick), add_nick:true , ..state },
             None       => State{ cur_nick:None      , add_nick:false, ..state },
         }},
-        Action::ToggleAddNick(payload)   => State{add_nick  : payload, ..state},
-        Action::UpdNickList(payload)     => State{nick_list : payload, ..state},
-        Action::AddNewNick(payload)      => {
+        Action::ToggleAddNick(payload)    => State{add_nick  : payload, ..state},
+        Action::UpdOperatorsList(payload) => State{operators_list : payload, ..state},
+        Action::AddNewNick(payload)       => {
             let normalized_name = normalize_name(&payload);
-            if state.nick_list.contains(&normalized_name) {
+            if let Some(operator_rec) = find_by_nick_inhash(&state.operators_list, &normalized_name) {
                 println!("Nickname '{}' already exists.", normalized_name);
                 return  state;
             }
             // dbg!(&normalized_name);
-            let mut new_nick_list = state.nick_list.clone();
-            new_nick_list.extend([normalized_name.clone()]);
-            new_nick_list.sort();
-
+            let mut new_operators_list = state.operators_list.clone();
             let new_id = generate_operator_id();
+            new_operators_list.entry(normalized_name.clone())
+                .or_insert_with(Vec::new)
+                .push(new_id.clone());
+
             _ = update_operators_file(&normalized_name, &new_id);
 
             State{
-                nick_list: new_nick_list,
+                operators_list: new_operators_list,
                 cur_nick : Some(normalized_name),
                 add_nick : true,
                 ..state}
