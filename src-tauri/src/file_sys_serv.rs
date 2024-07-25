@@ -49,6 +49,18 @@ pub fn get_prefix_stripped_pathstr(path: &PathBuf) -> String {
 }
 
 
+pub fn extract_drive_path(path_buf: &PathBuf) -> Option<PathBuf> {
+    let path_string = path_buf.to_str()?;
+    
+    let colon_position = path_string.find(':');
+    match colon_position {
+        Some(idx) => Some(
+            PathBuf::from( &path_string[..idx] )
+        ),
+            None => None
+        }
+}
+
 fn convert_to_absolute_path_or_default<T: AsRef<Path>>(path: T) -> PathBuf {
     let def_path = PathBuf::from(".");
     let path     = PathBuf::from(path.as_ref());
@@ -57,6 +69,51 @@ fn convert_to_absolute_path_or_default<T: AsRef<Path>>(path: T) -> PathBuf {
     );
     canonical_path
 }
+
+
+pub fn read_first_non_empty_line(path: &PathBuf) -> io::Result<String> {
+    let file = File::open(path)?;
+
+    let mut lines_read = 0;
+    let mut res_data = String::new();
+
+    for line in io::BufReader::new(file).lines() {
+        let line = line?;
+        let trimmed_line = line.trim();
+        if !trimmed_line.is_empty() {
+            res_data = trimmed_line.to_string();
+            break;
+        }
+        lines_read += 1;
+    }
+
+    if lines_read == 0 {
+        return Err(io::Error::new(io::ErrorKind::Other, "No non-empty lines found"));
+    }
+
+    Ok(res_data)
+}
+
+pub fn init_file(file_path: &PathBuf, init_value: &str) {
+    if std::path::Path::new(file_path).exists() {
+        println!("{:?} file found", file_path);
+        return;
+    }
+
+    fs::create_dir_all(file_path.parent().unwrap()).expect("Failed to init directories");
+    fs::write(file_path, init_value).expect("Unable to init write file");
+    println!("Created {:?} file", file_path);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 pub fn get_src_file_path(srs_dir_path: &PathBuf) -> Option<PathBuf> {
@@ -120,31 +177,6 @@ pub fn get_output_file_path(
 
     output_file_path
 }
-
-pub fn read_first_non_empty_line(path: &PathBuf) -> io::Result<String> {
-    let file = File::open(path)?;
-
-    let mut lines_read = 0;
-    let mut res_data = String::new();
-
-    for line in io::BufReader::new(file).lines() {
-        let line = line?;
-        let trimmed_line = line.trim();
-        if !trimmed_line.is_empty() {
-            res_data = trimmed_line.to_string();
-            break;
-        }
-        lines_read += 1;
-    }
-
-    if lines_read == 0 {
-        return Err(io::Error::new(io::ErrorKind::Other, "No non-empty lines found"));
-    }
-
-    Ok(res_data)
-}
-
-
 
 
 #[cfg(target_os = "windows")]
@@ -311,17 +343,6 @@ pub async fn watch_drives(store: &StoreType) {
 
 
 
-
-pub fn init_file(file_path: &PathBuf, init_value: &str) {
-    if std::path::Path::new(file_path).exists() {
-        println!("{:?} file found", file_path);
-        return;
-    }
-
-    fs::create_dir_all(file_path.parent().unwrap()).expect("Failed to init directories");
-    fs::write(file_path, init_value).expect("Unable to init write file");
-    println!("Created {:?} file", file_path);
-}
 
 
 

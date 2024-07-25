@@ -9,7 +9,7 @@ use crate::file_sys_serv::{
 };
 
 use crate::operators_serv::{
-    find_operator_by_id_invec, get_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
+    find_operator_by_id_invec, generate_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
 };
 
 use crate::utils::u_serv::normalize_name;
@@ -126,10 +126,10 @@ fn reducer(state: State, action: Action) -> State {
                         new_state.cur_nick = Some(operator.name);
                         new_state.add_nick = true;
                     },
-                    None => tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
+                    None => println!("SD Card NEW OPERATOR {}", &operator_id)//tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
                 }
             } else {
-                tauri_show_msg("SD Card plugged!", "not GO PRO card");
+                // tauri_show_msg("SD Card plugged!", "not GO PRO card");
             }
 
             on_new_drive_event(&payload);
@@ -155,7 +155,7 @@ fn reducer(state: State, action: Action) -> State {
             new_nick_list.extend([normalized_name.clone()]);
             new_nick_list.sort();
 
-            let new_id = get_operator_id();
+            let new_id = generate_operator_id();
             _ = update_operators_file(&normalized_name, &new_id);
 
             State{

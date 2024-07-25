@@ -45,7 +45,7 @@ pub fn remove_symbols(input: &str, symbols: &str) -> String {
 }
 
 pub fn normalize_name(t_name: &str) -> String {
-    let lowercased = t_name.trim().to_lowercase();
+    let lowercased = t_name.trim().to_lowercase().replace(" ", "_");
     let mut chars = lowercased.chars();
     let first_char = chars.next().unwrap_or('X').to_uppercase();
     let remaining_chars: String = if lowercased.len() >= 2 {

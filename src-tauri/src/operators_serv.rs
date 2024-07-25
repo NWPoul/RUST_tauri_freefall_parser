@@ -7,7 +7,7 @@ use toml::Value;
 
 
 use crate::utils::u_serv::normalize_name;
-use crate::file_sys_serv::{check_path, init_file, read_first_non_empty_line};
+use crate::file_sys_serv::{check_path, extract_drive_path, init_file, read_first_non_empty_line};
 use crate::store_app::OPERATORS_LIST_FILE_NAME;
 
 
@@ -34,7 +34,7 @@ type OperatorsList = HashMap<String, IdList>;
 
 
 
-pub fn get_operator_id() -> String {
+pub fn generate_operator_id() -> String {
     let now = std::time::SystemTime::now();
     let since_the_epoch = now.duration_since(std::time::SystemTime::UNIX_EPOCH)
         .expect("Time went backwards");
@@ -65,6 +65,49 @@ pub fn find_operator_by_id_invec(records: &[OperatorRecord], id: &str) -> Option
     None
 }
 
+
+fn get_id_from_drive(id_path: &PathBuf) -> Option<String> {
+    let id: String  = if check_path(id_path) {
+        read_first_non_empty_line(id_path).unwrap_or("".into()).into()
+    } else {"".into()};
+    if id.len() < 10 {
+        return None
+    }
+    Some(id)
+}
+
+fn get_dcim_path(path: &PathBuf) -> Option<PathBuf> {
+    if let Some(drive_path) = extract_drive_path(path) {
+        return Some(drive_path.join("DCIM"));
+    };
+    None
+}
+
+fn get_misk_path(path: &PathBuf) -> Option<PathBuf> {
+    if let Some(drive_path) = extract_drive_path(path) {
+        return Some(drive_path.join("MISC"));
+    };
+    None
+}
+
+fn get_operator_id_path(path: &PathBuf) -> Option<PathBuf>{
+    if let Some(misc_path) = get_misk_path(path) {
+        return Some(misc_path.join(OPERATOR_ID_FILENAME));
+    };
+    None
+}
+fn get_operator_id(path: &PathBuf) -> Option<String> {
+    if let Some(operator_id_path) = get_operator_id_path(path) {
+        return get_id_from_drive(&operator_id_path);
+    };
+    None
+}
+fn get_card_id(path: &PathBuf) -> Option<String> {
+    if let Some(misc_path) = get_misk_path(path) {
+        return get_id_from_drive(&misc_path.join("card"));
+    };
+    None
+}
 
 pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String>>, io::Error> {
     let file = File::open(file_path)?;
@@ -97,22 +140,26 @@ pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String
 
 pub fn update_operators_file(new_nick: &str, new_id: &str) -> std::io::Result<()> {
     let normalized_nick = normalize_name(new_nick);
-    let new_id: &str = if new_id.is_empty() {
-        &get_operator_id()
-    } else { new_id };
+    let use_generated_id = new_id.is_empty();
+
+    let operator_id = if use_generated_id {
+        generate_operator_id()
+    } else {
+        new_id.to_string()
+    };
 
     let operators_file_path: PathBuf = OPERATORS_LIST_FILE_NAME.into();
     let mut cur_records = read_operators_file(OPERATORS_LIST_FILE_NAME)?;
 
-    if let Some(_record) = find_operator_by_id_inhash(&cur_records, new_id) {
+    if let Some(_record) = find_operator_by_id_inhash(&cur_records, &operator_id) {
         return Err(io::Error::new(io::ErrorKind::AlreadyExists, "ID_EXIST ({})"));
     }
 
     let updated_id_list: Vec<String> = if let Some(ref mut id_list) = find_by_nick(&cur_records, new_nick) {
-        id_list.push(new_id.to_string());
+        id_list.push(operator_id.to_string());
         id_list.clone()
     } else {
-        vec![new_id.to_string()]
+        vec![operator_id.to_string()]
     };
 
     let new_record = OperatorRecord::new(
@@ -152,44 +199,34 @@ fn save_tuples_to_file(tuples: Vec<(String, Vec<String>)>, file_path: &PathBuf) 
 }
 
 
-pub fn recognize_card(drivepath_str: &PathBuf) -> io::Result<String> {
-    let dcim_path  = drivepath_str.join("DCIM");
-    dbg!(&drivepath_str, &dcim_path);
-    let misc_path  = drivepath_str.join("MISC");
-    let card_id_path = misc_path.join("card");
-    let operator_id_path = misc_path.join(OPERATOR_ID_FILENAME);
-
-    if check_path(&dcim_path) == false {
+pub fn recognize_card(input_path: &PathBuf) -> io::Result<String> {
+    
+    if let None = get_dcim_path(input_path) {
         println!("NO_DCIM");
         return Err(io::Error::new(io::ErrorKind::NotFound, "NO_DCIM"));
     }
 
-    if check_path(&misc_path) == false {
-        let new_id = get_operator_id();
-        init_file(&operator_id_path, &new_id);
-        return Ok(new_id);
-    }
+    let card_serial_number = get_card_id(input_path);
 
-    let card_serial_number: String = if check_path(&card_id_path) {
-        read_first_non_empty_line(&card_id_path).unwrap_or("".into()).into()
-    } else {"".into()};
+    let operator_id = match get_operator_id(input_path) {
+        Some(id) => {
+            return Ok(id);
+        },
+        None => match card_serial_number {
+            Some(id) => id,
+            None     => generate_operator_id(),
+        },
+    };
 
-    let mut operator_id: String  = if check_path(&operator_id_path) {
-        read_first_non_empty_line(&operator_id_path).unwrap_or("".into()).into()
-    } else {"".into()};
-
-
-    if operator_id.len() > 0 {
-        return Ok(operator_id);
-    }
-
-    if card_serial_number.len() > 0 {
-        operator_id = card_serial_number;
+    if let Some(operator_id_path) = get_operator_id_path(input_path) {
+        init_file(
+            &operator_id_path,
+            &operator_id
+        )
     } else {
-        operator_id = get_operator_id();
+        return Err(io::Error::new(io::ErrorKind::InvalidInput, "NOT_DISK_DRIVE"));
     }
-
-    init_file(&operator_id_path, &operator_id);
 
     Ok(operator_id)
 }
+

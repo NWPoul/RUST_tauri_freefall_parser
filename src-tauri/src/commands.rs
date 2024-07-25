@@ -126,8 +126,7 @@ pub fn ffmpeg_ok_files(
 
 
 pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
-    let (config_values, app_values) = get_config_and_app_store_state().await;
-
+    
     let src_files_path_list = match get_src_files_path_list(dir_path) {
         None => {
             println!("NO MP4 FILES CHOSEN!");
@@ -135,7 +134,10 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
         }
         Some(path_list) => path_list,
     };
-
+    
+    let (config_values, app_values) = get_config_and_app_store_state().await;
+    dbg!(&config_values);
+    dbg!(&app_values);
     let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
 
     if config_values.no_ffmpeg_processing == false {
