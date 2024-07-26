@@ -10,20 +10,25 @@ body {
     --app-idle-color: gray;
     --body-background-color: #070707;
     --panel-active-color: rgb(0, 255, 0);
-    --panel-prime-color: #3851ff;
-    --panel-contrast-color: #00a0fd;
+    --panel-prime-color: #4b8cfd;
+    /* --panel-prime-color: #00a0fd; */
 }
 
 #BackBase {
+    box-sizing: border-box;
+    width: 97vw;
+    height: 97vh;
     padding: 1rem;
-    background-color: #00000007;
+    background-color: #ffffff2e;
     border-radius: 1rem;
+
+    box-shadow: 5px 5px 5px 5px #00000021;
     cursor: move;
-    &:hover,
+    /* &:hover,
     &:focus-within,
     &:active {
         background-color: #00000010;
-    }
+    } */
 }
 
 #AppMainPanel {
@@ -101,8 +106,8 @@ body {
 }
 
 .selectFilesBtn.quickBtn {
-    color: var(--panel-contrast-color);
-    border-color: var(--panel-contrast-color);
+    color: var(--panel-prime-color);
+    border-color: var(--panel-prime-color);
 }
 
 
@@ -123,7 +128,7 @@ body {
 }
 .nick-select--option {
     background-color: #000000;
-    color: var(--panel-contrast-color);
+    color: var(--panel-prime-color);
     &.no_nick {
         color: var(--app-idle-color);
         font-weight: bold;
