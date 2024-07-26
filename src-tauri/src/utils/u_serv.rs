@@ -45,14 +45,18 @@ pub fn remove_symbols(input: &str, symbols: &str) -> String {
 }
 
 pub fn normalize_name(t_name: &str) -> String {
+    const MAX_NAME_LENGTH: usize = 15;
     let lowercased = t_name.trim().to_lowercase().replace(" ", "_");
     let mut chars = lowercased.chars();
     let first_char = chars.next().unwrap_or('X').to_uppercase();
-    let remaining_chars: String = if lowercased.len() >= 2 {
+    let mut remaining_chars: String = if lowercased.len() >= 2 {
         chars.collect::<Vec<char>>().into_iter().collect::<String>()
     } else {
         "".to_string()
     };
+    if remaining_chars.len() > MAX_NAME_LENGTH {
+        remaining_chars = remaining_chars[..=MAX_NAME_LENGTH].into();
+    }
     let result = format!("{0}{1}", first_char, remaining_chars);
 
     result
