@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { logger } from './loggerMw'
 
 
-
+type T_OperatorsList = Record<string, string[]>
 type T_defaultAction<P> = (payload?: P) => void
 
 type T_State = {
@@ -11,7 +11,7 @@ type T_State = {
     add_flight : boolean;
     cur_nick   : string;
     add_nick   : boolean;
-    nick_list  : string[];
+    operators_list: T_OperatorsList | null;
 }
 
 type T_StateUPD = Partial<T_State>
@@ -29,14 +29,14 @@ const initialState: T_State = {
     add_flight: false,
     cur_nick  : "",
     add_nick  : false,
-    nick_list : [],
+    operators_list: null,
 }
 
 const SELECTORS = {
     allState  : (state: T_State) => state,
     cur_dir   : (state: T_State) => state.cur_dir,
     cur_nick  : (state: T_State) => state.cur_nick,
-    nick_list : (state: T_State) => state.nick_list,
+    operators_list: (state: T_State) => state.operators_list,
     isNick    : (state: T_State) => state.add_nick,
     flight    : (state: T_State) => state.flight,
     add_flight: (state: T_State) => state.add_flight,
@@ -70,6 +70,7 @@ export {
 }
 
 export type {
+    T_OperatorsList,
     T_State    as T_apiAppState,
     T_StateUPD as T_apiAppStateUPD,
     T_Actions  as T_apiAppActions,

@@ -82,6 +82,7 @@ export function MainPanel() {
     useRustConfigStateUpdateEvent()
 
     const appState    = useAppState()
+    console.log('MainPanel ~ appState:', appState)
     const configState = configStore.use()
 
     useKeys()
@@ -109,9 +110,9 @@ export function MainPanel() {
 
                 <div id = "mainBtnBlock" className="mainBtnBlock" data-tauri-drag-region>
                     <NickSelect
-                        curNick  = {appState.cur_nick}
-                        nickList = {appState.nick_list}
-                        isMuted  = {!appState.add_nick}
+                        isMuted        = {!appState.add_nick}
+                        curNick        = {appState.cur_nick}
+                        operators_list = {appState.operators_list}
                     />
                     <br />
 

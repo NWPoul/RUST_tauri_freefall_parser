@@ -51,11 +51,13 @@ pub fn get_prefix_stripped_pathstr(path: &PathBuf) -> String {
 
 pub fn extract_drive_path(path_buf: &PathBuf) -> Option<PathBuf> {
     let path_string = path_buf.to_str()?;
-    
+
     let colon_position = path_string.find(':');
     match colon_position {
         Some(idx) => Some(
-            PathBuf::from( &path_string[..idx] )
+            PathBuf::from(
+                format!("{}:\\", &path_string[..idx])
+            )
         ),
             None => None
         }
@@ -74,7 +76,6 @@ fn convert_to_absolute_path_or_default<T: AsRef<Path>>(path: T) -> PathBuf {
 pub fn read_first_non_empty_line(path: &PathBuf) -> io::Result<String> {
     let file = File::open(path)?;
 
-    let mut lines_read = 0;
     let mut res_data = String::new();
 
     for line in io::BufReader::new(file).lines() {
@@ -84,10 +85,9 @@ pub fn read_first_non_empty_line(path: &PathBuf) -> io::Result<String> {
             res_data = trimmed_line.to_string();
             break;
         }
-        lines_read += 1;
     }
 
-    if lines_read == 0 {
+    if res_data.is_empty() {
         return Err(io::Error::new(io::ErrorKind::Other, "No non-empty lines found"));
     }
 
@@ -96,7 +96,7 @@ pub fn read_first_non_empty_line(path: &PathBuf) -> io::Result<String> {
 
 pub fn init_file(file_path: &PathBuf, init_value: &str) {
     if std::path::Path::new(file_path).exists() {
-        println!("{:?} file found", file_path);
+        println!("{:?} skip init file (already exist)", file_path);
         return;
     }
 

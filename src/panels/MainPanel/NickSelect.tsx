@@ -5,11 +5,13 @@ import {
     sendControlInputCommand,
 }                                   from 'API/apiHelpers'
 
+import type { T_OperatorsList }     from 'API/apiAppStore'
+
 
 type T_NickSelectProps = {
-    curNick      : string|null
-    nickList     : string[]
-    isMuted      : boolean
+    curNick       : string|null
+    operators_list: T_OperatorsList|null
+    isMuted       : boolean
 }
 
 const apiSetCurNick = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -48,14 +50,17 @@ export function NickSelect(props:T_NickSelectProps) {
             NEW OPERATOR
         </option>
     ]
-    let nickOptions = props.nickList.map(nick => {
-        return <option key={nick}
-            value={nick}
-            className="nick-select--option"
-        >
-            {nick}
-        </option>
-    })
+
+    let nickOptions = props.operators_list === null
+        ?   null
+        :   Object.keys(props.operators_list).map(operator => {
+                return <option key={operator}
+                    value={operator}
+                    className="nick-select--option"
+                >
+                    {operator}
+                </option>
+            })
 
     const className = cx("quickBtn", "nick-btn", props.isMuted && "isMuted")
 

@@ -56,20 +56,25 @@ pub fn find_operator_by_id_inhash(operators_list: &OperatorsList, id: &str) -> O
     None
 }
 
-pub fn find_operator_by_id_invec(records: &[OperatorRecord], id: &str) -> Option<OperatorRecord> {
-    for record in records {
-        if record.values.contains(&id.to_string()) {
-            return Some(record.clone());
-        }
-    }
-    None
-}
+// fn find_operator_by_id_invec(records: &[OperatorRecord], id: &str) -> Option<OperatorRecord> {
+//     for record in records {
+//         if record.values.contains(&id.to_string()) {
+//             return Some(record.clone());
+//         }
+//     }
+//     None
+// }
 
 
 fn get_id_from_drive(id_path: &PathBuf) -> Option<String> {
     let id: String  = if check_path(id_path) {
-        read_first_non_empty_line(id_path).unwrap_or("".into()).into()
-    } else {"".into()};
+        let id_found = read_first_non_empty_line(id_path);
+        dbg!("id from drive", id_path, &id_found);
+        id_found.unwrap_or("".into()).into()
+    } else {
+        dbg!("WRONG id_path!", id_path);
+        "".into()
+    };
     if id.len() < 10 {
         return None
     }
@@ -87,6 +92,7 @@ fn get_misk_path(path: &PathBuf) -> Option<PathBuf> {
     if let Some(drive_path) = extract_drive_path(path) {
         return Some(drive_path.join("MISC"));
     };
+    dbg!("misc_path not found", path);
     None
 }
 
@@ -94,12 +100,15 @@ fn get_operator_id_path(path: &PathBuf) -> Option<PathBuf>{
     if let Some(misc_path) = get_misk_path(path) {
         return Some(misc_path.join(OPERATOR_ID_FILENAME));
     };
+    dbg!("operator_id_path not found", path);
     None
 }
-fn get_operator_id(path: &PathBuf) -> Option<String> {
+pub fn get_operator_id(path: &PathBuf) -> Option<String> {
     if let Some(operator_id_path) = get_operator_id_path(path) {
+        dbg!("operator_id_path found", path, &operator_id_path);
         return get_id_from_drive(&operator_id_path);
     };
+    dbg!("operator_id not found", path);
     None
 }
 fn get_card_id(path: &PathBuf) -> Option<String> {
@@ -138,8 +147,32 @@ pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String
     Ok(table)
 }
 
-pub fn update_operators_file(new_nick: &str, new_id: &str) -> std::io::Result<()> {
-    let normalized_nick = normalize_name(new_nick);
+pub fn delete_card_from_operators_file(card_id: &str) -> std::io::Result<()> {
+    let operators_file_path: PathBuf = OPERATORS_LIST_FILE_NAME.into();
+    let mut cur_records = read_operators_file(OPERATORS_LIST_FILE_NAME)?;
+
+    let mut target_operator_record = match find_operator_by_id_inhash(&cur_records, card_id) {
+        Some(v) => v.clone(),
+        None => {
+            return Err(io::Error::new(io::ErrorKind::NotFound, "ID_DONT_EXIST ({})"));
+        },
+    };
+
+    target_operator_record.1.retain(|s| s != card_id);
+
+    let target_id_list = cur_records.get_mut(&target_operator_record.0.clone()).unwrap();
+    *target_id_list = target_operator_record.1.clone();
+
+
+    let mut vec_of_tuples: Vec<(String, Vec<String>)> = cur_records.into_iter().collect();
+    vec_of_tuples.sort_by_key(|k| k.0.clone());
+    dbg!("DELETENG CARD", &card_id, &target_operator_record, &vec_of_tuples);
+
+    save_tuples_to_file(vec_of_tuples, &operators_file_path)
+}
+
+pub fn update_operators_file(nick: &str, new_id: &str) -> std::io::Result<()> {
+    let normalized_nick = normalize_name(nick);
     let use_generated_id = new_id.is_empty();
 
     let operator_id = if use_generated_id {
@@ -155,7 +188,7 @@ pub fn update_operators_file(new_nick: &str, new_id: &str) -> std::io::Result<()
         return Err(io::Error::new(io::ErrorKind::AlreadyExists, "ID_EXIST ({})"));
     }
 
-    let updated_id_list: Vec<String> = if let Some(ref mut id_list) = find_by_nick_inhash(&cur_records, new_nick) {
+    let updated_id_list: Vec<String> = if let Some(ref mut id_list) = find_by_nick_inhash(&cur_records, nick) {
         id_list.push(operator_id.to_string());
         id_list.clone()
     } else {
@@ -200,16 +233,18 @@ fn save_tuples_to_file(tuples: Vec<(String, Vec<String>)>, file_path: &PathBuf) 
 
 
 pub fn recognize_card(input_path: &PathBuf) -> io::Result<String> {
-    
+
     if let None = get_dcim_path(input_path) {
         println!("NO_DCIM");
         return Err(io::Error::new(io::ErrorKind::NotFound, "NO_DCIM"));
     }
 
     let card_serial_number = get_card_id(input_path);
+    dbg!(&card_serial_number);
 
     let operator_id = match get_operator_id(input_path) {
         Some(id) => {
+            dbg!(&id);
             return Ok(id);
         },
         None => match card_serial_number {

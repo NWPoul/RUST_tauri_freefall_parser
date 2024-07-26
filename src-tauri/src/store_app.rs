@@ -10,7 +10,13 @@ use crate::file_sys_serv::{
 };
 
 use crate::operators_serv::{
-    find_by_nick_inhash, find_operator_by_id_inhash, find_operator_by_id_invec, generate_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
+    find_by_nick_inhash,
+    find_operator_by_id_inhash,
+    generate_operator_id,
+    read_operators_file,
+    recognize_card,
+    update_operators_file,
+    // OperatorRecord,
 };
 
 use crate::utils::u_serv::normalize_name;
@@ -20,14 +26,14 @@ use crate::utils::u_serv::normalize_name;
 
 pub const OPERATORS_LIST_FILE_NAME: &str = "operators_list.toml";
 
-fn convert_to_operator_records(input_map: HashMap<String, Vec<String>>) -> Vec<OperatorRecord> {
-    input_map.into_iter().map(|(name, values)| {
-        OperatorRecord {
-            name: name.clone(),
-            values: values.clone(),
-        }
-    }).collect()
-}
+// fn convert_to_operator_records(input_map: HashMap<String, Vec<String>>) -> Vec<OperatorRecord> {
+//     input_map.into_iter().map(|(name, values)| {
+//         OperatorRecord {
+//             name: name.clone(),
+//             values: values.clone(),
+//         }
+//     }).collect()
+// }
 
 
 pub fn init_operators_list_file() {
@@ -135,7 +141,7 @@ fn reducer(state: State, action: Action) -> State {
                         new_state.cur_nick = Some(operator.0);
                         new_state.add_nick = true;
                     },
-                    None => println!("SD Card NEW OPERATOR {}", &operator_id)//tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
+                    None => {dbg!("SD Card NEW OPERATOR {}", &operator_id);}//tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
                 }
             } else {
                 // tauri_show_msg("SD Card plugged!", "not GO PRO card");
@@ -155,7 +161,7 @@ fn reducer(state: State, action: Action) -> State {
         Action::UpdOperatorsList(payload) => State{operators_list : payload, ..state},
         Action::AddNewNick(payload)       => {
             let normalized_name = normalize_name(&payload);
-            if let Some(operator_rec) = find_by_nick_inhash(&state.operators_list, &normalized_name) {
+            if let Some(_rec) = find_by_nick_inhash(&state.operators_list, &normalized_name) {
                 println!("Nickname '{}' already exists.", normalized_name);
                 return  state;
             }
