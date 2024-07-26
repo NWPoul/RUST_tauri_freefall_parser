@@ -2,20 +2,14 @@ use redux_rs::Store;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use crate::commands::{main_workflow_for_videofiles, tauri_show_msg};
+use crate::commands::main_workflow_for_videofiles;
 use crate::file_sys_serv::{
     init_file,
-    update_toml_field,
     get_src_path_for_ext_drive,
 };
 
 use crate::operators_serv::{
-    find_by_nick_inhash,
-    find_operator_by_id_inhash,
-    generate_operator_id,
-    read_operators_file,
-    recognize_card,
-    update_operators_file,
+    delete_card_from_operators_file, find_by_nick_inhash, find_operator_by_id_inhash, generate_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
     // OperatorRecord,
 };
 
@@ -41,18 +35,6 @@ pub fn init_operators_list_file() {
     init_file(&config_file_path, "");
 }
 
-pub fn update_operators_list<V: serde::Serialize>(
-    nick: &str,
-    field_value: V,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let config_file_path: PathBuf = OPERATORS_LIST_FILE_NAME.into();
-    update_toml_field(
-        &config_file_path,
-        nick,
-        field_value,
-    )
-}
-
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct State {
@@ -76,7 +58,6 @@ impl Default for State { fn default() -> Self {
     };
 
     match read_operators_file(OPERATORS_LIST_FILE_NAME) {
-        // Ok(list) => state.operators_list = convert_to_operator_records(list),
         Ok(list) => state.operators_list = list,
         Err(_)   => println!("No operators"),
     }
@@ -93,7 +74,8 @@ pub enum Action {
     UpdFlight(u8),
     UpdCurNick(Option<String>),
     AddNewNick(String),
-    UpdOperatorsList(HashMap<String, Vec<String>>),
+    DeleteCardIdFromList(String),
+    UpdOperatorsList(OperatorRecord),
     ToggleAddFlight(bool),
     ToggleAddNick(bool),
 }
@@ -137,16 +119,13 @@ fn reducer(state: State, action: Action) -> State {
             if let Ok(operator_id) = recognize_card(&payload) {
                 match find_operator_by_id_inhash(&state.operators_list, &operator_id) {
                     Some(operator) => {
-                        tauri_show_msg("SD Card recognized!", &operator.0);
+                        dbg!("SD Card recognized!", &operator.0);
                         new_state.cur_nick = Some(operator.0);
                         new_state.add_nick = true;
                     },
                     None => {dbg!("SD Card NEW OPERATOR {}", &operator_id);}//tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
                 }
-            } else {
-                // tauri_show_msg("SD Card plugged!", "not GO PRO card");
             }
-
             on_new_drive_event(&payload);
             new_state
         },
@@ -158,7 +137,21 @@ fn reducer(state: State, action: Action) -> State {
             None       => State{ cur_nick:None      , add_nick:false, ..state },
         }},
         Action::ToggleAddNick(payload)    => State{add_nick  : payload, ..state},
-        Action::UpdOperatorsList(payload) => State{operators_list : payload, ..state},
+        Action::DeleteCardIdFromList(payload) => {
+            let res = delete_card_from_operators_file(&payload);
+            match res {
+                Ok(new_operators_list) => State{operators_list : new_operators_list, ..state},
+                Err(_) => state
+            }
+        },
+        Action::UpdOperatorsList(payload) => {
+            let res = update_operators_file(&payload.nick, &payload.id_list[0]);
+            match res {
+                Ok(new_operators_list) => State{operators_list : new_operators_list, ..state},
+                Err(_) => state
+            }
+
+        },
         Action::AddNewNick(payload)       => {
             let normalized_name = normalize_name(&payload);
             if let Some(_rec) = find_by_nick_inhash(&state.operators_list, &normalized_name) {

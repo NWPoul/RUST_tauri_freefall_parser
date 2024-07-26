@@ -10,16 +10,13 @@ use tauri::api::dialog::MessageDialogBuilder;
 
 use crate::ffmpeg_serv::run_ffmpeg;
 use crate::file_sys_serv::get_output_file_path;
-use crate::operators_serv::delete_card_from_operators_file;
 use crate::operators_serv::find_operator_by_id_inhash;
 use crate::operators_serv::get_operator_id;
-use crate::operators_serv::update_operators_file;
+use crate::operators_serv::OperatorRecord;
 use crate::store_app;
 use crate::store_config;
 
-use crate::file_sys_serv::{
-    get_src_files_path_list,
-};
+use crate::file_sys_serv::get_src_files_path_list;
 
 use crate::telemetry_analysis::{
     FileTelemetryResult,
@@ -129,14 +126,19 @@ pub fn ffmpeg_ok_files(
 }
 
 
+enum PathRecognitionResult {
+    VOID,
+    NEW(OperatorRecord),
+    UPD(String, OperatorRecord),
+}
 
-fn re_recognize_card(app_values: &store_app::State, src_files_path_list: &Vec<PathBuf>) {
+fn recognize_src_path(app_values: &store_app::State, src_files_path_list: &Vec<PathBuf>) -> PathRecognitionResult {
     let test_path = src_files_path_list[0].clone();
     let cur_nick  = match &app_values.cur_nick {
         Some(v) => v,
         None => {
             dbg!("no curnick re_regognition inactivated");
-            return
+            return PathRecognitionResult::VOID;
         },
     };
 
@@ -144,11 +146,10 @@ fn re_recognize_card(app_values: &store_app::State, src_files_path_list: &Vec<Pa
         Some(v) => v,
         None => {
             dbg!("no cur_card_id re_regognition inactivated");
-            return
+            return PathRecognitionResult::VOID;
         },
     };
-    dbg!(cur_nick, &cur_card_id);
-
+    dbg!(&cur_nick, &cur_card_id);
 
     let cur_card_operator = find_operator_by_id_inhash(
         &app_values.operators_list,
@@ -158,20 +159,11 @@ fn re_recognize_card(app_values: &store_app::State, src_files_path_list: &Vec<Pa
     match cur_card_operator {
         Some(operator) if cur_nick == &operator.0 => {
             dbg!("nick matched = skip re_regognition");
-            return
+            PathRecognitionResult::VOID
         },
-        Some(_operator) => {
-            dbg!("RERECOGNITION change operator for card (nick not matched)");
-            let _del_res = delete_card_from_operators_file(&cur_card_id);
-            let _upd_res = update_operators_file(&cur_nick, &cur_card_id);
-            return
-       },
-        None => {
-            dbg!("RERECOGNITION new card to existing operator");
-            let _upd_res = update_operators_file(&cur_nick, &cur_card_id);
-            return
-        },
-    };
+        Some(operator) => PathRecognitionResult::UPD(operator.0, OperatorRecord::new(cur_nick, &cur_card_id)),
+        None => PathRecognitionResult::NEW(OperatorRecord::new(cur_nick, &cur_card_id)),
+    }
 }
 
 pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
@@ -183,10 +175,35 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
         Some(path_list) => path_list,
     };
 
-    let (config_values, app_values) = get_config_and_app_store_state().await;
+
+
+    let store_config_instance = STORE_CONFIG_INSTANCE.get()
+        .expect("static config store instance not init");
+    let store_app_instance = STORE_APP_INSTANCE.get()
+        .expect("static app store instance not init");
+
+    let config_values = store_config_instance.state_cloned().await;
+    let app_values    = store_app_instance.state_cloned().await;
     dbg!(&config_values, &app_values);
 
-    re_recognize_card(&app_values, &src_files_path_list);
+
+
+    match recognize_src_path(&app_values, &src_files_path_list) {
+        PathRecognitionResult::VOID => {dbg!("_");},
+        PathRecognitionResult::NEW(record) => {
+            dbg!("RERECOGNITION new card to existing operator", &record);
+            store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
+        },
+        PathRecognitionResult::UPD(card_nick, record) => {
+            dbg!("RERECOGNITION change operator for card (nick not matched)", &record);
+            tauri_show_msg(
+                "CARD ID SERV",
+                &format!("СМЕНА ВЛАДЕЛЬЦА КАРТЫ!\nprev: {}\nnew: {}", &card_nick, &record.nick)
+            );
+            store_app_instance.dispatch(store_app::Action::DeleteCardIdFromList(record.id_list[0].clone())).await;
+            store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
+        },
+    };
 
     let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
 
