@@ -40,20 +40,51 @@ pub fn abs_max(f_prev: f64, f_new: f64) -> f64 {
     f_prev.abs().max(f_new.abs())
 }
 
+
+
 pub fn remove_symbols(input: &str, symbols: &str) -> String {
     input.chars().filter(|c| !symbols.contains(*c)).collect()
 }
 
-pub fn normalize_name(t_name: &str) -> String {
-    const MAX_NAME_LENGTH: usize = 15;
-    let lowercased = t_name.trim().to_lowercase().replace(" ", "_");
-    let mut chars = lowercased.chars();
-    let first_char = chars.next().unwrap_or('X').to_uppercase();
-    let remaining_chars: String = chars
-        .take(MAX_NAME_LENGTH)
-        .collect::<Vec<char>>().into_iter().collect::<String>();
 
-    let result = format!("{0}{1}", first_char, remaining_chars);
+pub fn normalize_name(input_name: &str) -> String {
+    const MAX_NAME_LENGTH: usize = 30;
+    const TO_REPLACE: &str = "_.";
+    const SEPARATOR: char = ' ';
+
+    let result = input_name.chars()
+        .map(|c| if TO_REPLACE.contains(c) { SEPARATOR } else { c })
+        .flat_map(|c| c.to_lowercase())
+        .take(MAX_NAME_LENGTH)
+        .collect::<String>()
+        .trim()
+        .split_whitespace()
+        .map(|word| {
+            if word.is_empty() {
+                word.to_string()
+            } else {
+                let mut chars = word.chars();
+                let first_char = chars.next().unwrap_or(SEPARATOR).to_uppercase();
+                let rest_of_word = chars.collect::<String>();
+                format!("{}{}", first_char, rest_of_word)
+            }
+        })
+        .collect::<Vec<String>>()
+        .join(&SEPARATOR.to_string());
 
     result
+}
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_name() {
+        // assert_eq!(normalize_name("  Авввв_ввв     ввв664 ___6464"), "Авввв Bвв Aвв664 6464");
+        assert_eq!(normalize_name("___дДДД__ДДД   ..ддд___ jjj  1jjjj   "), "Дддд Ддд Ддд Jjj 1");
+    }
 }
