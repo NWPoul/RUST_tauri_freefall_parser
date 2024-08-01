@@ -61,7 +61,7 @@ function updFFTime(newVal: number) {
 function FreeFallSettingsBlock({ffTime}:{ffTime: number}) {
     return (
         <div id="time_freefall_settings" data-tauri-drag-region>
-            FF cut time&nbsp;
+            св. падение&nbsp;
             <IncButtonBlock
                 val    = {ffTime}
                 incVal = {10}
@@ -126,7 +126,7 @@ export function MainPanel() {
                     className = "quickBtn selectFilesBtn"
                     onClick   = {selectVideoFiles}
                 >
-                    Выбрать файлы
+                    Парсить файлы
                 </button>
             </div>
         </div>

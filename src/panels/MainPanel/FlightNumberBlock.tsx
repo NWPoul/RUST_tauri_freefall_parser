@@ -30,7 +30,7 @@ export function FlightNumberBlock({
                 className = "quickBtn api_requested-btn"
                 onClick   = {toggleFlight}
             >
-                FLIGHT
+                ВЗЛЁТ
             </button>
 
             <IncButtonBlock

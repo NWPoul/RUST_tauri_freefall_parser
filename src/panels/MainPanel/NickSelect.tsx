@@ -40,14 +40,14 @@ export function NickSelect(props:T_NickSelectProps) {
             value={""}
             className="nick-select--option no_nick"
         >
-            NO NAME
+            НЕ ВЫБРАН
         </option>,
 
         <option key="NEW_NICK"
             value={"NEW_NICK"}
             className="nick-select--option new_nick"
         >
-            NEW OPERATOR
+            ДОБАВИТЬ
         </option>
     ]
 
