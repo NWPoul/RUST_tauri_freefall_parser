@@ -123,7 +123,11 @@ fn reducer(state: State, action: Action) -> State {
                         new_state.cur_nick = Some(operator.0);
                         new_state.add_nick = true;
                     },
-                    None => {dbg!("SD Card NEW OPERATOR {}", &operator_id);}//tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
+                    None => {
+                        dbg!("SD Card NEW OPERATOR {}", &operator_id);
+                        new_state.cur_nick = None;
+                        new_state.add_nick = false;
+                    }
                 }
             }
             on_new_drive_event(&payload);
