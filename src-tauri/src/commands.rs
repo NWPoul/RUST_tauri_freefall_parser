@@ -176,7 +176,6 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
     };
 
 
-
     let store_config_instance = STORE_CONFIG_INSTANCE.get()
         .expect("static config store instance not init");
     let store_app_instance = STORE_APP_INSTANCE.get()
@@ -185,7 +184,6 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
     let config_values = store_config_instance.state_cloned().await;
     let app_values    = store_app_instance.state_cloned().await;
     dbg!(&config_values, &app_values);
-
 
 
     match recognize_src_path(&app_values, &src_files_path_list) {
@@ -208,14 +206,21 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
     let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
 
     if config_values.no_ffmpeg_processing == false {
-    let ffmpeg_results = ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
-    let report = format!(
-        "Файлы {} записаны \nОшибки: {}",
-        ffmpeg_results.0.len(),
-        ffmpeg_results.1.len(),
-    );
-    tauri_show_msg("Parsing results", &report)
-}
+        let ffmpeg_results = ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
+        let report = format!(
+            "Файлы {} записаны \nОшибки: {}",
+            ffmpeg_results.0.len(),
+            ffmpeg_results.1.len(),
+        );
+        if app_values.auto_play && ffmpeg_results.0.len() == 1 {
+            match open::that(&ffmpeg_results.0[0]) {
+                Ok(_) => println!("Video opened successfully."),
+                Err(e) => println!("Failed to open video: {}", e),
+            }
+        } else {
+            tauri_show_msg("Parsing results", &report)
+        }
+    }
 }
 
 
@@ -301,6 +306,14 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
         "newNick" => {
             app_store_instance
                 .dispatch(store_app::Action::AddNewNick(val.into()))
+                .await;
+        },
+        "toggleAutoPlay" => {
+            let new_is_autoplay = val.parse::<bool>().unwrap_or(
+                !app_store_instance.select(store_app::SELECTORS::IsAutoPlay).await
+            );
+            app_store_instance
+                .dispatch(store_app::Action::ToggleAutoPlay(new_is_autoplay))
                 .await;
         },
 

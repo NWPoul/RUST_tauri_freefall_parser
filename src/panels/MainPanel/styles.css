@@ -61,7 +61,7 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 20em;
-    padding-bottom: 8rem;
+    /* padding-bottom: 8rem; */
 }
 
 
@@ -137,5 +137,18 @@ body {
         color: yellow;
         font-weight: bold;
         font-style: italic;
+    }
+}
+
+
+.autoPlayBtn.quickBtn {
+    width: 19rem;
+    margin-top: 1rem;
+    color: var(--panel-active-color);
+    border-color: var(--panel-active-color);
+
+    &.isMuted {
+        color: var(--app-idle-color);
+        border-color: var(--app-idle-color);
     }
 }

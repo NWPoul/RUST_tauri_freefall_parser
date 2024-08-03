@@ -31,6 +31,7 @@ type T_controlInputId =
     | "toggleFlight"
     | "setCurNick"
     | "newNick"
+    | "toggleAutoPlay"
 
 type T_controlInput = {
     id : T_controlInputId;

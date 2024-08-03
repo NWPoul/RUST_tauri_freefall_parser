@@ -12,6 +12,7 @@ type T_State = {
     cur_nick   : string;
     add_nick   : boolean;
     operators_list: T_OperatorsList | null;
+    auto_play  : boolean;
 }
 
 type T_StateUPD = Partial<T_State>
@@ -30,6 +31,7 @@ const initialState: T_State = {
     cur_nick  : "",
     add_nick  : false,
     operators_list: null,
+    auto_play : true,
 }
 
 const SELECTORS = {
@@ -40,6 +42,7 @@ const SELECTORS = {
     isNick    : (state: T_State) => state.add_nick,
     flight    : (state: T_State) => state.flight,
     add_flight: (state: T_State) => state.add_flight,
+    auto_play : (state: T_State) => state.auto_play,
 }
 
 const ACTIONS = {
