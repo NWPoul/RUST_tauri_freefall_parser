@@ -87,9 +87,6 @@ fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
 
 
-
-
-
 #[tokio::main]
 async fn main() {
     tauri::async_runtime::set(tokio::runtime::Handle::current());
@@ -110,4 +107,14 @@ async fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+
+
+
+
+
+
+
+
+
 

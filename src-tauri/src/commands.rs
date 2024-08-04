@@ -2,27 +2,30 @@
 
 use std::path::PathBuf;
 
-// use redux_rs::StoreApi;
 use serde::{Serialize, Deserialize};
+
 use tauri::api::dialog::MessageDialogBuilder;
-
-
+use tauri::Manager;
 
 use crate::ffmpeg_serv::run_ffmpeg;
 use crate::file_sys_serv::get_output_file_path;
-use crate::operators_serv::find_operator_by_id_inhash;
-use crate::operators_serv::get_operator_id;
-use crate::operators_serv::OperatorRecord;
+use crate::file_sys_serv::get_src_files_path_list;
+
+use crate::operators_serv::{
+    find_operator_by_id_inhash,
+    get_operator_id,
+    OperatorRecord,
+};
 use crate::store_app;
 use crate::store_config;
 
-use crate::file_sys_serv::get_src_files_path_list;
 
 use crate::telemetry_analysis::{
     FileTelemetryResult,
     FileParsingErrData,
     FileParsingOkData,
 };
+
 use crate::{
     STORE_APP_INSTANCE,
     STORE_CONFIG_INSTANCE,
@@ -38,25 +41,27 @@ pub fn tauri_show_msg(title: &str, msg: &str) {
     builder.show(|_|println!("DIAG"));
 }
 
+pub fn emit_video_parsed_event(payload: (Vec<PathBuf>, Vec<String>)) {
+    crate::APP_HANDLE_INSTANCE.get()
+        .expect("app is not init yet")
+        .emit_all("video-parsed", payload)
+        .unwrap();
+}
+
+
 
 
 crate::create_get_store_data_command!(get_app_store_data   , STORE_APP_INSTANCE   , store_app);
 crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
-
-
-pub async fn get_config_and_app_store_state() -> (store_config::State, store_app::State) {
-    let store_config_instance = STORE_CONFIG_INSTANCE.get()
-        .expect("static config store instance not init");
-    let store_app_instance = STORE_APP_INSTANCE.get()
-        .expect("static app store instance not init");
-
-    let config_values = store_config_instance.state_cloned().await;
-    let app_values    = store_app_instance.state_cloned().await;
-
-    return (config_values, app_values);
-}
-
-
+// async fn get_config_and_app_store_state() -> (store_config::State, store_app::State) {
+//     let store_config_instance = STORE_CONFIG_INSTANCE.get()
+//         .expect("static config store instance not init");
+//     let store_app_instance = STORE_APP_INSTANCE.get()
+//         .expect("static app store instance not init");
+//     let config_values = store_config_instance.state_cloned().await;
+//     let app_values    = store_app_instance.state_cloned().await;
+//     return (config_values, app_values);
+// }
 
 
 
@@ -166,6 +171,29 @@ fn recognize_src_path(app_values: &store_app::State, src_files_path_list: &Vec<P
     }
 }
 
+async fn on_recognized_src_path_result(
+    path_recognition_result: PathRecognitionResult,
+    store_app_instance     : &store_app::StoreType,
+) {
+    match path_recognition_result {
+        PathRecognitionResult::VOID => {dbg!("_");},
+        PathRecognitionResult::NEW(record) => {
+            dbg!("RERECOGNITION new card to existing operator", &record);
+            store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
+        },
+        PathRecognitionResult::UPD(card_nick, record) => {
+            dbg!("RERECOGNITION change operator for card (nick not matched)", &record);
+            tauri_show_msg(
+                "CARD ID SERV",
+                &format!("СМЕНА ВЛАДЕЛЬЦА КАРТЫ!\nprev: {}\nnew: {}", &card_nick, &record.nick)
+            );
+            store_app_instance.dispatch(store_app::Action::DeleteCardIdFromList(record.id_list[0].clone())).await;
+            store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
+        },
+    };
+}
+
+
 pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
     let src_files_path_list = match get_src_files_path_list(dir_path) {
         None => {
@@ -185,23 +213,8 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
     let app_values    = store_app_instance.state_cloned().await;
     dbg!(&config_values, &app_values);
 
-
-    match recognize_src_path(&app_values, &src_files_path_list) {
-        PathRecognitionResult::VOID => {dbg!("_");},
-        PathRecognitionResult::NEW(record) => {
-            dbg!("RERECOGNITION new card to existing operator", &record);
-            store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
-        },
-        PathRecognitionResult::UPD(card_nick, record) => {
-            dbg!("RERECOGNITION change operator for card (nick not matched)", &record);
-            tauri_show_msg(
-                "CARD ID SERV",
-                &format!("СМЕНА ВЛАДЕЛЬЦА КАРТЫ!\nprev: {}\nnew: {}", &card_nick, &record.nick)
-            );
-            store_app_instance.dispatch(store_app::Action::DeleteCardIdFromList(record.id_list[0].clone())).await;
-            store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
-        },
-    };
+    let path_recognition_result = recognize_src_path(&app_values, &src_files_path_list);
+    on_recognized_src_path_result(path_recognition_result, store_app_instance).await;
 
     let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
 
@@ -214,15 +227,15 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
         );
         if app_values.auto_play && ffmpeg_results.0.len() == 1 {
             match open::that(&ffmpeg_results.0[0]) {
-                Ok(_) => println!("Video opened successfully."),
+                Ok(_)  => println!("Video opened successfully."),
                 Err(e) => println!("Failed to open video: {}", e),
             }
         } else {
+            emit_video_parsed_event(ffmpeg_results.clone());
             tauri_show_msg("Parsing results", &report)
         }
     }
 }
-
 
 
 
