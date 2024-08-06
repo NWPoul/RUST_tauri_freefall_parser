@@ -44,6 +44,7 @@ pub struct State {
     pub cur_nick  : Option<String>,
     pub add_nick  : bool,
     pub operators_list: HashMap<String, Vec<String>>,
+    pub auto_play : bool,
     // pub cur_date  : String,
 }
 
@@ -55,6 +56,7 @@ impl Default for State { fn default() -> Self {
         cur_nick   : None,
         add_nick   : false,
         operators_list: HashMap::new(),
+        auto_play  : true,
     };
 
     match read_operators_file(OPERATORS_LIST_FILE_NAME) {
@@ -78,6 +80,7 @@ pub enum Action {
     UpdOperatorsList(OperatorRecord),
     ToggleAddFlight(bool),
     ToggleAddNick(bool),
+    ToggleAutoPlay(bool),
 }
 
 pub type StoreType = Store<State, Action, fn(State, Action) -> State>;
@@ -96,7 +99,9 @@ pub mod SELECTORS {
     create_selector!( CurNick,       cur_nick  , Option<String>  , clone = true );
     create_selector!( IsAddNick,     add_nick  , bool );
     create_selector!( OperatorsList, operators_list, HashMap<String, Vec<String>>, clone = true );
+    create_selector!( IsAutoPlay,    auto_play , bool );
 }
+
 
 
 
@@ -123,7 +128,11 @@ fn reducer(state: State, action: Action) -> State {
                         new_state.cur_nick = Some(operator.0);
                         new_state.add_nick = true;
                     },
-                    None => {dbg!("SD Card NEW OPERATOR {}", &operator_id);}//tauri_show_msg("SD Card NEW OPERATOR", &operator_id)
+                    None => {
+                        dbg!("SD Card NEW OPERATOR {}", &operator_id);
+                        new_state.cur_nick = None;
+                        new_state.add_nick = false;
+                    }
                 }
             }
             on_new_drive_event(&payload);
@@ -173,6 +182,7 @@ fn reducer(state: State, action: Action) -> State {
                 add_nick : true,
                 ..state}
         },
+        Action::ToggleAutoPlay(payload)   => State{auto_play  : payload, ..state},
     }
 }
 

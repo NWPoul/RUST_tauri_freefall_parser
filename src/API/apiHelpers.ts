@@ -1,11 +1,8 @@
 import { useEffect, useState }      from 'react'
 import {
-    API_isFullscreen,
-    API_setFullscreen,
-    API_getWindowLabel,
+    API_EVENT_LISTENERS,
     API_togglePanel,
-
-    API_UPD_EVENT_LISTENERS,
+    API_getWindowLabel,
 
     API_getAppStoreData,
     API_sendControlInput,
@@ -13,12 +10,11 @@ import {
     API_getConfigStoreData,
     API_sendConfigInput,
 
-
     type Event,
     type EventCallback,
     type UnlistenFn,
     type WindowOptions,
-    T_controlInput,
+    type T_controlInput,
 }                                   from './api'
 
 import {
@@ -62,29 +58,11 @@ const WINDOW_CONFIG = {
 
 
 
-
-function useFullscreen() {
-    const [isFullscreen, setIsFullscreen] = useState(false)
-    useEffect(
-        () => {
-            console.log(`isFullscreen ${isFullscreen}`)
-            toggleFullscreen(isFullscreen)
-        }, [isFullscreen]
-    )
-    return [isFullscreen, setIsFullscreen] as const
-}
-async function toggleFullscreen(reqFullscreen?: boolean) {
-    reqFullscreen ??= !(await API_isFullscreen())
-    API_setFullscreen(reqFullscreen)
-}
-
 function useWindowLabel() {
     const [windowLabel, setWindowLabel] = useState("")
     API_getWindowLabel().then(setWindowLabel)
     return windowLabel
 }
-
-
 
 
 function initApiStateData() {
@@ -118,7 +96,7 @@ function useRustAppStateUpdateEvent() {
     useEffect(
         () => {
             const handler = _getAPIstateUpdateHandler<T_apiAppStateUPD>(updateApiAppState)
-            const unlisten = API_UPD_EVENT_LISTENERS.appState(handler)
+            const unlisten = API_EVENT_LISTENERS.appState(handler)
             return () => { unlisten.then(unlistenFn => unlistenFn()) }
         }, [updateApiAppState]
     )
@@ -130,9 +108,19 @@ function useRustConfigStateUpdateEvent() {
     useEffect(
         () => {
             const handler = _getAPIstateUpdateHandler<T_apiConfigStateUPD>(updateApiConfigState)
-            const unlisten = API_UPD_EVENT_LISTENERS.configState(handler)
+            const unlisten = API_EVENT_LISTENERS.configState(handler)
             return () => { unlisten.then(unlistenFn => unlistenFn()) }
         }, [updateApiConfigState]
+    )
+}
+
+function useParsedVideoEvent() {
+    const handler = (e:any) => console.log("PARSED EVENT!", e)
+    useEffect(
+        () => {
+            const unlisten = API_EVENT_LISTENERS.parsedEvent(handler)
+            return () => { unlisten.then(unlistenFn => unlistenFn()) }
+        }, [handler]
     )
 }
 
@@ -144,12 +132,10 @@ function useRustConfigStateUpdateEvent() {
 export {
     WINDOW_CONFIG,
     useWindowLabel,
-    useFullscreen,
-    toggleFullscreen,
     initApiStateData,
     useRustAppStateUpdateEvent,
-
     useRustConfigStateUpdateEvent,
+    useParsedVideoEvent,
 
     API_togglePanel      as sendTogglePanelCommand,
     API_sendControlInput as sendControlInputCommand,

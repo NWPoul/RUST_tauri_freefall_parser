@@ -31,6 +31,7 @@ type T_controlInputId =
     | "toggleFlight"
     | "setCurNick"
     | "newNick"
+    | "toggleAutoPlay"
 
 type T_controlInput = {
     id : T_controlInputId;
@@ -52,13 +53,6 @@ type T_API_config_stateUpdatePayload = T_apiConfigStateUPD
 
 
 
-async function API_isFullscreen() {
-    return await appWindow.isFullscreen()
-}
-
-function API_setFullscreen(reqFullscreen: boolean) {
-    appWindow.setFullscreen(reqFullscreen)
-}
 
 async function API_minimizeWindow() {
     try {
@@ -110,12 +104,13 @@ async function API_sendConfigInput(input: T_configInput) {
 
 
 
-function get_API_stateUpdateListener<T_Payload>(eventId: string) {
+function get_API_eventistener<T_Payload>(eventId: string) {
     return (handler: EventCallback<T_Payload>) => listen<T_Payload>(eventId, handler )
 }
-const API_UPD_EVENT_LISTENERS = {
-    appState   : get_API_stateUpdateListener<T_API_app_stateUpdatePayload>('app-state-update-event'),
-    configState: get_API_stateUpdateListener<T_API_config_stateUpdatePayload>('config-state-update-event'),
+const API_EVENT_LISTENERS = {
+    appState   : get_API_eventistener<T_API_app_stateUpdatePayload>('app-state-update-event'),
+    configState: get_API_eventistener<T_API_config_stateUpdatePayload>('config-state-update-event'),
+    parsedEvent: get_API_eventistener<any>('video-parsed'),
 }
 
 
@@ -149,13 +144,11 @@ async function API_togglePanel(label:string, config?:WindowOptions) {
 
 export {
     API_getWindowLabel,
-    API_isFullscreen,
-    API_setFullscreen,
     API_minimizeWindow,
     API_createPanel,
     API_togglePanel,
 
-    API_UPD_EVENT_LISTENERS,
+    API_EVENT_LISTENERS,
 
     API_getAppStoreData,
     API_sendControlInput,

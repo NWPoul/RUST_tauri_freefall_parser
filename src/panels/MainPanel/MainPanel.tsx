@@ -32,6 +32,7 @@ import {
 }                                   from './serv'
 import { NickSelect }               from './NickSelect'
 import { FlightNumberBlock }        from './FlightNumberBlock'
+import { AutoPlayBtn } from './AutoPlayBtn'
 
 
 
@@ -47,17 +48,13 @@ function selectVideoFiles() {
     console.log('selectVideoFilesBtn')
 }
 
-
-
-
-
-
 function updFFTime(newVal: number) {
     sendControlInputCommand({
         id: "setFreefallTime",
         val: newVal
     })
 }
+
 function FreeFallSettingsBlock({ffTime}:{ffTime: number}) {
     return (
         <div id="time_freefall_settings" data-tauri-drag-region>
@@ -119,6 +116,9 @@ export function MainPanel() {
                     <FlightNumberBlock
                         flightN = {appState.flight}
                         isMuted = {!appState.add_flight}
+                    />
+                    <AutoPlayBtn
+                        isMuted = {!appState.auto_play}
                     />
                 </div>
                 <button
