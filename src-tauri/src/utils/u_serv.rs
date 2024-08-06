@@ -1,6 +1,5 @@
 
 
-
 pub mod cli_output_format {
     pub const GREEN : &str = "\x1B[32m";
     pub const RED   : &str = "\x1B[31m";
@@ -47,28 +46,35 @@ pub fn remove_symbols(input: &str, symbols: &str) -> String {
 }
 
 
-pub fn normalize_name(input_name: &str) -> String {
+
+fn capitalize_word(input: impl AsRef<str>) -> String {
+    let mut chars = input.as_ref().chars();
+    chars.next().and_then(|first| {
+        Some(
+            first
+                .to_uppercase()
+                .chain(chars.flat_map(char::to_lowercase)),
+        )
+    })
+    .into_iter()
+    .flatten()
+    .collect()
+}
+
+
+pub fn normalize_name(input_name: impl AsRef<str>) -> String {
     const MAX_NAME_LENGTH: usize = 30;
     const TO_REPLACE: &str = "_.";
     const SEPARATOR: char = ' ';
 
-    let result = input_name.chars()
+    let result = input_name.as_ref().chars()
         .map(|c| if TO_REPLACE.contains(c) { SEPARATOR } else { c })
-        .flat_map(|c| c.to_lowercase())
+        .flat_map(char::to_lowercase)
         .take(MAX_NAME_LENGTH)
         .collect::<String>()
         .trim()
         .split_whitespace()
-        .map(|word| {
-            if word.is_empty() {
-                word.to_string()
-            } else {
-                let mut chars = word.chars();
-                let first_char = chars.next().unwrap_or(SEPARATOR).to_uppercase();
-                let rest_of_word = chars.collect::<String>();
-                format!("{}{}", first_char, rest_of_word)
-            }
-        })
+        .map(capitalize_word)
         .collect::<Vec<String>>()
         .join(&SEPARATOR.to_string());
 
@@ -84,7 +90,6 @@ mod tests {
 
     #[test]
     fn test_normalize_name() {
-        // assert_eq!(normalize_name("  Авввв_ввв     ввв664 ___6464"), "Авввв Bвв Aвв664 6464");
-        assert_eq!(normalize_name("___дДДД__ДДД   ..ддд___ jjj  1jjjj   "), "Дддд Ддд Ддд Jjj 1");
+        assert_eq!(normalize_name(" __дДДД__ДДД   ..ддд___ jjj  1jjjj   "), "Дддд Ддд Ддд Jjj 1");
     }
 }
