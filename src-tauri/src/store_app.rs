@@ -1,33 +1,37 @@
 use redux_rs::Store;
-use std::collections::HashMap;
-use std::path::PathBuf;
+
+use std::{
+    collections::HashMap,
+    path::PathBuf,
+};
+
+
+use crate::utils::u_serv::normalize_name;
 
 use crate::commands::main_workflow_for_videofiles;
+
 use crate::file_sys_serv::{
     init_file,
     get_src_path_for_ext_drive,
 };
 
 use crate::operators_serv::{
-    delete_card_from_operators_file, find_by_nick_inhash, find_operator_by_id_inhash, generate_operator_id, read_operators_file, recognize_card, update_operators_file, OperatorRecord
-    // OperatorRecord,
+    delete_card_from_operators_file,
+    find_by_nick_inhash,
+    find_operator_by_id_inhash,
+    generate_operator_id,
+    read_operators_file,
+    recognize_card,
+    update_operators_file,
+    OperatorRecord,
 };
 
-use crate::utils::u_serv::normalize_name;
 
 
 
 
 pub const OPERATORS_LIST_FILE_NAME: &str = "operators_list.toml";
 
-// fn convert_to_operator_records(input_map: HashMap<String, Vec<String>>) -> Vec<OperatorRecord> {
-//     input_map.into_iter().map(|(name, values)| {
-//         OperatorRecord {
-//             name: name.clone(),
-//             values: values.clone(),
-//         }
-//     }).collect()
-// }
 
 
 pub fn init_operators_list_file() {
@@ -43,9 +47,8 @@ pub struct State {
     pub add_flight: bool,
     pub cur_nick  : Option<String>,
     pub add_nick  : bool,
-    pub operators_list: HashMap<String, Vec<String>>,
     pub auto_play : bool,
-    // pub cur_date  : String,
+    pub operators_list: HashMap<String, Vec<String>>,
 }
 
 impl Default for State { fn default() -> Self {
@@ -55,8 +58,8 @@ impl Default for State { fn default() -> Self {
         add_flight : false,
         cur_nick   : None,
         add_nick   : false,
-        operators_list: HashMap::new(),
         auto_play  : true,
+        operators_list: HashMap::new(),
     };
 
     match read_operators_file(OPERATORS_LIST_FILE_NAME) {
@@ -98,8 +101,8 @@ pub mod SELECTORS {
     create_selector!( IsAddFlight,   add_flight, bool );
     create_selector!( CurNick,       cur_nick  , Option<String>  , clone = true );
     create_selector!( IsAddNick,     add_nick  , bool );
-    create_selector!( OperatorsList, operators_list, HashMap<String, Vec<String>>, clone = true );
     create_selector!( IsAutoPlay,    auto_play , bool );
+    create_selector!( OperatorsList, operators_list, HashMap<String, Vec<String>>, clone = true );
 }
 
 
@@ -118,8 +121,34 @@ pub fn on_new_drive_event(new_drive: &PathBuf) {
 
 fn reducer(state: State, action: Action) -> State {
     match action {
-        Action::UpdState(payload)        => payload,
-        Action::EventNewDrive(payload)   => {
+        Action::UpdState(payload) => payload,
+
+        Action::UpdCurDir(payload)       => State{cur_dir   : payload, ..state},
+        Action::ToggleAddFlight(payload) => State{add_flight: payload, ..state},
+        Action::UpdFlight(payload)       => State{flight    : payload, add_flight: true, ..state},
+        Action::ToggleAddNick(payload)   => State{add_nick  : payload, ..state},
+        Action::ToggleAutoPlay(payload)  => State{auto_play  : payload, ..state},
+
+        Action::UpdCurNick(payload) => { match payload {
+            Some(nick) => State{ cur_nick:Some(nick), add_nick:true , ..state },
+            None       => State{ cur_nick:None      , add_nick:false, ..state },
+        }},
+
+        Action::DeleteCardIdFromList(payload) => {
+            match delete_card_from_operators_file(&payload) {
+                Ok(new_operators_list) => State{operators_list : new_operators_list, ..state},
+                Err(_) => state
+            }
+        },
+
+        Action::UpdOperatorsList(payload) => {
+            match update_operators_file(&payload.nick, &payload.id_list[0]) {
+                Ok(new_operators_list) => State{operators_list : new_operators_list, ..state},
+                Err(_) => state
+            }
+        },
+
+        Action::EventNewDrive(payload) => {
             let mut new_state = state.clone();
             if let Ok(operator_id) = recognize_card(&payload) {
                 match find_operator_by_id_inhash(&state.operators_list, &operator_id) {
@@ -138,30 +167,8 @@ fn reducer(state: State, action: Action) -> State {
             on_new_drive_event(&payload);
             new_state
         },
-        Action::UpdCurDir(payload)        => State{cur_dir   : payload, ..state},
-        Action::ToggleAddFlight(payload)  => State{add_flight: payload, ..state},
-        Action::UpdFlight(payload)        => State{flight    : payload, add_flight: true, ..state},
-        Action::UpdCurNick(payload)       => {match payload {
-            Some(nick) => State{ cur_nick:Some(nick), add_nick:true , ..state },
-            None       => State{ cur_nick:None      , add_nick:false, ..state },
-        }},
-        Action::ToggleAddNick(payload)    => State{add_nick  : payload, ..state},
-        Action::DeleteCardIdFromList(payload) => {
-            let res = delete_card_from_operators_file(&payload);
-            match res {
-                Ok(new_operators_list) => State{operators_list : new_operators_list, ..state},
-                Err(_) => state
-            }
-        },
-        Action::UpdOperatorsList(payload) => {
-            let res = update_operators_file(&payload.nick, &payload.id_list[0]);
-            match res {
-                Ok(new_operators_list) => State{operators_list : new_operators_list, ..state},
-                Err(_) => state
-            }
 
-        },
-        Action::AddNewNick(payload)       => {
+        Action::AddNewNick(payload) => {
             let normalized_name = normalize_name(&payload);
             if let Some(_rec) = find_by_nick_inhash(&state.operators_list, &normalized_name) {
                 println!("Nickname '{}' already exists.", normalized_name);
@@ -182,7 +189,6 @@ fn reducer(state: State, action: Action) -> State {
                 add_nick : true,
                 ..state}
         },
-        Action::ToggleAutoPlay(payload)   => State{auto_play  : payload, ..state},
     }
 }
 

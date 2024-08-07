@@ -83,7 +83,6 @@ pub fn normalize_name(input_name: impl AsRef<str>) -> String {
 
 
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

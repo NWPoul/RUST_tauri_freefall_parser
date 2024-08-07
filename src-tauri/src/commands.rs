@@ -4,21 +4,24 @@ use std::path::PathBuf;
 
 use serde::{Serialize, Deserialize};
 
-use tauri::api::dialog::MessageDialogBuilder;
-use tauri::Manager;
+use tauri::{
+    api::dialog::MessageDialogBuilder,
+    Manager,
+};
+
 
 use crate::ffmpeg_serv::run_ffmpeg;
-use crate::file_sys_serv::get_output_file_path;
-use crate::file_sys_serv::get_src_files_path_list;
+
+use crate::file_sys_serv::{
+    get_output_file_path,
+    get_src_files_path_list,
+};
 
 use crate::operators_serv::{
     find_operator_by_id_inhash,
     get_operator_id,
     OperatorRecord,
 };
-use crate::store_app;
-use crate::store_config;
-
 
 use crate::telemetry_analysis::{
     FileTelemetryResult,
@@ -31,6 +34,11 @@ use crate::{
     STORE_CONFIG_INSTANCE,
     get_telemetry_for_files,
 };
+
+use crate::store_app;
+use crate::store_config;
+
+
 
 
 
@@ -71,10 +79,9 @@ pub fn get_ffmpeg_status_for_file(
     config_values   : &store_config::ConfigValues,
     app_values      : &store_app::State,
 ) -> Result<PathBuf, String> {
-    let flight_info = if app_values.add_flight {
-        Some(app_values.flight)
-    } else {
-        None
+    let flight_info = match app_values.add_flight {
+        true  => Some(app_values.flight),
+        false => None,
     };
 
     let output_file_path = get_output_file_path(
@@ -86,13 +93,11 @@ pub fn get_ffmpeg_status_for_file(
         app_values.cur_nick.clone(),
     );
 
-
     let ffmpeg_output = run_ffmpeg(
         (file_result_data.start_time, file_result_data.end_time),
         (&src_file_path, &output_file_path ),
         &config_values.ffmpeg_dir_path,
     );
-
 
     match ffmpeg_output {
         Ok(output_path) => {
@@ -105,6 +110,7 @@ pub fn get_ffmpeg_status_for_file(
         }
     }
 }
+
 
 pub fn ffmpeg_ok_files(
     parsing_results: &(FileParsingOkData, FileParsingErrData),

@@ -1,4 +1,3 @@
-
 #[macro_export]
 macro_rules! promptExit {
     ($msg: expr) => {
@@ -11,7 +10,11 @@ macro_rules! promptExit {
 macro_rules! promptContinue {
     ($msg: expr) => {
         let confirm = crate::utils::u_serv::prompt_to_continue($msg);
-        if confirm {continue} else {return};
+        if confirm {
+            continue;
+        } else {
+            return;
+        };
     };
 }
 // macro_rules! promptExit_Ok {
@@ -20,7 +23,6 @@ macro_rules! promptContinue {
 //         return Ok(());
 //     };
 // }
-
 
 #[macro_export]
 macro_rules! configValues {
@@ -54,30 +56,30 @@ macro_rules! configValues {
     };
 }
 
-
 #[macro_export]
 macro_rules! create_store_subscriber {
     ($name:ident, $event:expr, $state_type:ty) => {
         fn $name(state: $state_type) {
-            APP_HANDLE_INSTANCE.get()
+            APP_HANDLE_INSTANCE
+                .get()
                 .expect("app is not init yet")
                 .emit_all($event, StateUpdateEventPayload(state))
                 .unwrap();
             println!("New state: {:?}", state);
         }
-    }
+    };
 }
-
 
 #[macro_export]
 macro_rules! create_get_store_data_command {
     ($name:ident, $store_instance:ident, $store_name:ident) => {
         #[tauri::command]
         pub async fn $name() -> Result<$store_name::State, ()> {
-            let store_instance = $store_instance.get()
+            let store_instance = $store_instance
+                .get()
                 .expect("static store instance not init");
             let store_data = store_instance.state_cloned().await;
             Ok(store_data)
         }
-    }
+    };
 }

@@ -27,14 +27,11 @@ pub mod commands;
 
 
 use telemetry_analysis::{
-    // get_result_metadata_for_file,
     get_telemetry_for_files,
-    // FileTelemetryResult,
 };
 
 use file_sys_serv::{
     watch_drives,
-    // get_src_files_path_list,
 };
 
 use commands:: {
@@ -64,7 +61,7 @@ create_store_subscriber! (
 );
 
 
-fn app_handler(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+fn init_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     APP_HANDLE_INSTANCE
         .set( app.app_handle().clone() )
         .expect("APP_HANDLE_INSTANCE initialisation error");
@@ -97,7 +94,7 @@ async fn main() {
     STORE_CONFIG_INSTANCE.set(store_config::get_store()).unwrap_or(());
 
     tauri::Builder::default()
-        .setup(app_handler)
+        .setup(init_app)
         .invoke_handler(tauri::generate_handler![
             get_app_store_data,
             get_config_store_data,
