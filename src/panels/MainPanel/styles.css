@@ -5,24 +5,31 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  
+  box-sizing: border-box;
+  overflow: hidden;
 }
+
 body {
     --app-idle-color: gray;
     --body-background-color: #070707;
     --panel-active-color: rgb(0, 255, 0);
     --panel-prime-color: #4b8cfd;
+
+    box-sizing: border-box;
     /* --panel-prime-color: #00a0fd; */
 }
 
 #BackBase {
     box-sizing: border-box;
-    width: 97vw;
+    /* width: 97vw;
     height: 97vh;
+    background-color: #ffffff2e; */
     padding: 1rem;
-    background-color: #ffffff2e;
     border-radius: 1rem;
 
-    box-shadow: 5px 5px 5px 5px #00000021;
+    /* box-shadow: 5px 5px 5px 5px #00000021; */
     cursor: move;
     /* &:hover,
     &:focus-within,
@@ -41,7 +48,7 @@ body {
     background-color: var(--body-background-color);
     border-radius: 1rem;
     box-shadow: 5px 5px 5px 5px #00000057;
-    cursor: default;
+    /* cursor: default; */
 }
 
 
@@ -53,6 +60,13 @@ body {
     background-color: inherit;
     flex-direction: column;
     justify-content: space-between;
+
+    * {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+         user-select: none;
+    }
+    
 }
 
 .mainBtnBlock {

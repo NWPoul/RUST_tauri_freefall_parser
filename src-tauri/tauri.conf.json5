@@ -56,8 +56,8 @@
             "title": "NW FF parser",
             "fullscreen": false,
             "resizable": false,
-            "width": 570,
-            "height": 570,
+            "width": 390,
+            "height": 550,
             "alwaysOnTop": true,
 
             "transparent": true,
