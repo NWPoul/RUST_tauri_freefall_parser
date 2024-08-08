@@ -1,0 +1,21 @@
+
+
+body.modal-open {
+    overflow: hidden;
+}
+
+
+.modal-container {
+    width: 400px;
+    border-radius: 8px;
+    border: 1px solid #888;
+
+    ::backdrop {
+        background: rgba(0, 0, 0, 0.3);
+    }
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 20px;
+}
