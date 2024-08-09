@@ -83,14 +83,61 @@ body {
 #time_freefall_settings {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-end;
     margin-right: 0.25em;
-    font-size: 2rem;
+    font-size: 1.75rem;
     color : var(--panel-prime-color);
     button {
         border-color: var(--panel-prime-color);
     }
 }
+
+
+#nick-select {
+    font-size: 1.75rem;
+}
+
+.nick-btn.quickBtn {
+    padding: 0 1em;
+    color: var(--panel-active-color);
+    border-color: var(--panel-active-color);
+    &.isMuted {
+        color: var(--app-idle-color);
+        border-color: var(--app-idle-color);
+    }
+
+    &select {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+}
+.nick-select--option {
+    background-color: #000000;
+    color: var(--panel-prime-color);
+    font-size: 1.25rem;
+
+    &.no_nick {
+        color: var(--app-idle-color);
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    &.new_nick {
+        color: yellow;
+        font-weight: bold;
+        font-style: italic;
+        font-size: 1.5rem;
+    }
+}
+
+
+#nickSelectForm {
+    display: flex;
+    #nick {
+        font-size: 1rem;
+        width: 100%;
+    }
+}
+
 
 
 #flightNumberBlock {
@@ -119,40 +166,6 @@ body {
     }
 }
 
-.selectFilesBtn.quickBtn {
-    color: var(--panel-prime-color);
-    border-color: var(--panel-prime-color);
-}
-
-
-
-.nick-btn.quickBtn {
-    padding: 0 1em;
-    color: var(--panel-active-color);
-    border-color: var(--panel-active-color);
-    &.isMuted {
-        color: var(--app-idle-color);
-        border-color: var(--app-idle-color);
-    }
-
-    &select {
-        -webkit-appearance: none;
-        appearance: none;
-    }
-}
-.nick-select--option {
-    background-color: #000000;
-    color: var(--panel-prime-color);
-    &.no_nick {
-        color: var(--app-idle-color);
-        font-weight: bold;
-    }
-    &.new_nick {
-        color: yellow;
-        font-weight: bold;
-        font-style: italic;
-    }
-}
 
 
 .autoPlayBtn.quickBtn {
@@ -167,10 +180,10 @@ body {
     }
 }
 
-#nickSelectForm {
-    display: flex;
-    #nick {
-        font-size: 1rem;
-        width: 100%;
-    }
+
+
+.selectFilesBtn.quickBtn {
+    color: var(--panel-prime-color);
+    border-color: var(--panel-prime-color);
 }
+

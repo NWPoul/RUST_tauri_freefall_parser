@@ -49,15 +49,15 @@ const baseNickOptions = [
         value={""}
         className="nick-select--option no_nick"
     >
-        НЕ ВЫБРАН
-    </option>,
-
+        НИК НЕ ВЫБРАН
+    </option>
+    ,
     <option key="NEW_NICK"
         value={"NEW_NICK"}
         className="nick-select--option new_nick"
     >
         ДОБАВИТЬ
-    </option>
+    </option> 
 ]
 
 function getNickOptions(operators_list: T_OperatorsList | null) {
