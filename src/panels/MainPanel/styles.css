@@ -6,7 +6,6 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -16,7 +15,7 @@ body {
     --body-background-color: #070707;
     --panel-active-color: rgb(0, 255, 0);
     --panel-prime-color: #4b8cfd;
-
+    margin: 0;
     box-sizing: border-box;
     /* --panel-prime-color: #00a0fd; */
 }
@@ -46,6 +45,7 @@ body {
     height: 30rem;
     padding: 0.5rem;
     background-color: var(--body-background-color);
+    outline: outset 2px #9e9e9eb3;
     border-radius: 1rem;
     box-shadow: 5px 5px 5px 5px #00000057;
     /* cursor: default; */
@@ -164,5 +164,13 @@ body {
     &.isMuted {
         color: var(--app-idle-color);
         border-color: var(--app-idle-color);
+    }
+}
+
+#nickSelectForm {
+    display: flex;
+    #nick {
+        font-size: 1rem;
+        width: 100%;
     }
 }

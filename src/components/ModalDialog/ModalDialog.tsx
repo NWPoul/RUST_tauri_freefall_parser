@@ -9,7 +9,9 @@ type T_ModalProps = {
     isOpened    : boolean;
     onProceed   : () => void;
     onClose     : () => void;
-    children    : React.ReactNode;
+    proceedBtnText?: string;
+    closeBtnText  ?: string;
+    children      ?: React.ReactNode;
 }
 
 
@@ -32,6 +34,8 @@ export const ModalDialog = ({
     isOpened,
     onProceed,
     onClose,
+    proceedBtnText,
+    closeBtnText,
     children,
 }: T_ModalProps) => {
     const ref = useRef<HTMLDialogElement>(null)
@@ -64,8 +68,11 @@ export const ModalDialog = ({
             {children}
 
             <div className="modal-buttons">
-                <button onClick={proceedAndClose}>Proceed</button>
-                <button onClick={onClose}>Close</button>
+                { proceedBtnText
+                    ? <button className="modal-btn modal-btn--proceed" onClick={proceedAndClose}>{proceedBtnText}</button>
+                    : null
+                }
+                <button className="modal-btn modal-btn--close" onClick={onClose}>{closeBtnText ?? "Close"}</button>
             </div>
         </dialog>
     );
