@@ -30,9 +30,11 @@ import { IncButtonBlock }           from 'components/controls/buttons'
 import {
     useKeys,
 }                                   from './serv'
+
+import { AppHeader }                from './AppHeader'
 import { NickSelect }               from './NickSelect'
 import { FlightNumberBlock }        from './FlightNumberBlock'
-import { AutoPlayBtn } from './AutoPlayBtn'
+import { AutoPlayBtn }              from './AutoPlayBtn'
 
 
 
@@ -97,6 +99,8 @@ export function MainPanel() {
 
 
     return <div id = "BackBase" data-tauri-drag-region onDoubleClick={doubleClickEventHandler}>
+        <AppHeader/>
+        
         <div id = "AppMainPanel" data-tauri-drag-region
             className     = {className}
             onContextMenu = {e => e.preventDefault()}
