@@ -17,11 +17,13 @@ use rfd::FileDialog;
 
 
 
-use crate::store_app::{Action, StoreType};
+use crate::{
+    store_app::{Action, StoreType},
+    utils::error::MyResult
+};
 
 
 
-pub type MyResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 
 const VERBATIM_PREFIX: &str = r"\\?\";
@@ -73,7 +75,7 @@ fn convert_to_absolute_path_or_default<T: AsRef<Path>>(path: T) -> PathBuf {
 }
 
 
-pub fn open_directory<T: AsRef<Path>>(path: T) -> Result<(), Box<dyn std::error::Error>> {
+pub fn open_directory<T: AsRef<Path>>(path: T) -> MyResult<()> {
     let path_buf = PathBuf::from(path.as_ref());
     let dest_dir_path = get_output_abs_dir(&path_buf);
     let os = std::env::consts::OS;
@@ -295,7 +297,7 @@ pub fn get_last_file(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
 
 // pub fn open_dest_dir_last_file_selected<T: AsRef<Path>>(
 //     config_dest_dir: T
-// ) -> Result<fs::DirEntry, Box<dyn std::error::Error>>  {
+// ) -> MyResult<fs::DirEntry>  {
 //     let path = PathBuf::from(config_dest_dir.as_ref());
 //     let output_dir_path = get_output_abs_dir(&path);
 //     open_folder_last_file_selected(&output_dir_path)
@@ -349,7 +351,7 @@ pub fn update_toml_field<V: serde::Serialize>(
     file_path  : &PathBuf,
     field_name : &str,
     field_value: V,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> MyResult<()> {
     let mut file = fs::File::open(file_path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;

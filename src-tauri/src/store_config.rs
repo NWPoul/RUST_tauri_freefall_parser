@@ -2,13 +2,14 @@ use redux_rs::Store;
 use std::path::PathBuf;
 
 
-
 use config::{Config, File as CfgFile};
 
+use crate::utils::error::MyResult;
 use crate::file_sys_serv::{
     init_file,
     update_toml_field,
 };
+
 
 
 
@@ -37,7 +38,7 @@ pub fn init_cfg_file() {
 pub fn update_config_field<V: serde::Serialize>(
     field_name: &str,
     field_value: V,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> MyResult<()> {
     let config_file_path: PathBuf = CONFIG_FILE_NAME.into();
     update_toml_field(
         &config_file_path,

@@ -26,6 +26,8 @@ pub mod ffmpeg_serv;
 pub mod commands;
 
 
+use utils::error::MyResult;
+
 use telemetry_analysis::{
     get_telemetry_for_files,
 };
@@ -61,7 +63,7 @@ create_store_subscriber! (
 );
 
 
-fn init_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+fn init_app(app: &mut tauri::App) -> MyResult<()> {
     APP_HANDLE_INSTANCE
         .set( app.app_handle().clone() )
         .expect("APP_HANDLE_INSTANCE initialisation error");
