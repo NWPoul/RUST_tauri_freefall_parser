@@ -1,33 +1,50 @@
 export const IconLock = (
-    <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-lock" width={24} height={24} viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-lock" viewBox="0 0 24 24"
+        fill="none"
+        strokeWidth="2"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path stroke="none" d="M0 0h24v24H0z"></path>
         <path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"></path>
         <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"></path>
         <path d="M8 11v-4a4 4 0 1 1 8 0v4"></path>
     </svg>
 )
 
-
+const arrowPath = (
+    <path
+        fill="currentColor"
+        stroke="currentColor"
+        d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l160-160z"
+    />
+)
 export const ArrowUp = (
-    <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512">
-        <path d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l160-160z"/>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 448" >
+        {arrowPath}
+    </svg>
+)
+export const ArrowDown = (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 448">
+        <g transform="translate(0, 50) scale(1, -1)" transform-origin="center" >
+            {arrowPath}
+        </g>
     </svg>
 )
 
 export const FolderCheck = (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        fill="none"
+        stroke         = "currentColor"
+        strokeWidth    = "2"
+        strokeLinecap  = "round"
+        strokeLinejoin = "round"
+    >
         <path
-            stroke         = "currentColor"
-            strokeWidth    = "2"
-            strokeLinecap  = "round"
-            strokeLinejoin = "round"
             d="M11 19H5C3.89543 19 3 18.1046 3 17V7C3 5.89543 3.89543 5 5 5H9.58579C9.851 5 10.1054 5.10536 10.2929 5.29289L12 7H19C20.1046 7 21 7.89543 21 9V11"
         />
         <path
-            stroke         = "currentColor"
-            strokeWidth    = "2"
-            strokeLinecap  = "round"
-            strokeLinejoin = "round"
             d="M14 18L16 20L21 15"
         />
     </svg>

@@ -27,6 +27,8 @@
 .incBtn {
     position: relative;
     width: 1.5em;
+    height:1.5em;
+    line-height: 0;
     font-size: 1.75rem;
     font-weight: bold;
     border-radius: 0.25em;

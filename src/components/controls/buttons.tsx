@@ -2,17 +2,7 @@ import { ReactNode, useState }          from 'react'
 
 import { cx }            from 'helpers'
 
-// import {
-//     useRepeatableLongPress,
-//     type T_repeatableLongPressEvent,
-// }                                       from 'customHooks'
-
-// import type {
-//     LongPressResult,
-//     LongPressPointerHandlers,
-// }                                       from 'use-long-press'
-
-// import { IconLock }                     from 'assets/SVG_Icons'
+import { ArrowDown, ArrowUp }                     from 'assets/SVG_Icons'
 
 // ⮝⮟⯅⯆
 
@@ -41,7 +31,7 @@ export function IncButton({
     incHandler: () => void,
 }){
     let className = cx('incBtn', incVal>0 ? 'INC' : 'DEC')
-    let text = incVal>0 ? '⯅' : '⯆'
+    let text = incVal>0 ? ArrowUp : ArrowDown
 
     return (
         <button
