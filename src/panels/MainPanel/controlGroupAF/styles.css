@@ -5,7 +5,7 @@
 
     .quickBtn {
         min-height: 1.5em;
-        width: 9rem;
+        /* width: 9rem; */
         line-height: 0;
     
         &.isMuted {
@@ -31,10 +31,11 @@
     align-items: center;
     justify-content: center;
     gap: 0.25em;
+    width: 28rem;
     color: var(--panel-active-color);
     border-color: var(--panel-active-color);
     
-    /* svg {
-        width: 1em;
-    } */
+    svg {
+        width: 1.5em;
+    }
 }

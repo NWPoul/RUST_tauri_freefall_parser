@@ -97,6 +97,7 @@ body {
 .mainPanel-controlsWrapper {
     display: flex;
     height: 29rem;
+    padding-top: 0.25rem;
     /* width: 20rem; */
     background-color: inherit;
     flex-direction: column;
@@ -202,7 +203,7 @@ body {
 
     .quickBtn {
         margin: 0;
-        width: 5.5em;
+        width: 5.40em;
         border-right: none;
         color: inherit;
         border-color: inherit;
