@@ -1,0 +1,40 @@
+#controlGroupAF {
+    display: flex;
+    justify-content: space-between;
+    width: 20rem;
+
+    .quickBtn {
+        width: 9rem;
+        margin-top: 1rem;
+        line-height: 0;
+    
+        &.isMuted {
+            color: var(--app-idle-color);
+            border-color: var(--app-idle-color);
+        }
+    }
+}
+
+#openParsedFolderBtn {
+    color: var(--panel-prime-color);
+    border-color: var(--panel-prime-color);
+    /* line-height: 0; */
+
+    svg {
+        width: 1.5em;
+    }
+}
+
+
+.autoPlayBtn.quickBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25em;
+    color: var(--panel-active-color);
+    border-color: var(--panel-active-color);
+    
+    /* svg {
+        width: 1em;
+    } */
+}

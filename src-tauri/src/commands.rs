@@ -14,7 +14,7 @@ use crate::ffmpeg_serv::run_ffmpeg;
 
 use crate::file_sys_serv::{
     get_output_file_path,
-    get_src_files_path_list,
+    get_src_files_path_list, open_directory,
 };
 
 use crate::operators_serv::{
@@ -334,6 +334,10 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
             app_store_instance
                 .dispatch(store_app::Action::ToggleAutoPlay(new_is_autoplay))
                 .await;
+        },
+        "openParserFolder" => {
+            let dest_dir = config_store_instance.select(store_config::SELECTORS::DestDir).await;
+            let _ = open_directory(dest_dir);
         },
 
         _ => resp = format!("unknown command: {id} {val}"),

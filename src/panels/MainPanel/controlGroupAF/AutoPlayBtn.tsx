@@ -1,10 +1,10 @@
 
 
 import { cx }                            from "helpers"
+import { useParsedVideoEvent }           from "API/apiHelpers"
+import { EyeIcon, FolderCheck }                   from "assets/SVG_Icons"
 
-import { getControlInputEventHandler }   from "./serv"
-import { useParsedVideoEvent } from "API/apiHelpers"
-
+import { getControlInputEventHandler }   from "../serv"
 
 
 const toggleAutoPlay = getControlInputEventHandler("toggleAutoPlay")
@@ -22,13 +22,10 @@ export function AutoPlayBtn({isMuted}:{isMuted: boolean}) {
                 type      = "button"
                 onClick   = {toggleAutoPlay}
             >
-                автопросмотр
+                <span>авто</span>
+                {EyeIcon}
             </button>
     )
 }
-
-
-
-
 
 

@@ -73,6 +73,24 @@ fn convert_to_absolute_path_or_default<T: AsRef<Path>>(path: T) -> PathBuf {
 }
 
 
+pub fn open_directory<T: AsRef<Path>>(path: T) -> Result<(), Box<dyn std::error::Error>> {
+    let path_buf = PathBuf::from(path.as_ref());
+    let dest_dir_path = get_output_abs_dir(&path_buf);
+    let os = std::env::consts::OS;
+
+    let mut cmd = match os {
+        "windows" => std::process::Command::new("explorer"),
+        "darwin" => std::process::Command::new("open"),
+        "linux" | "freebsd" | "openbsd" | "netbsd" => std::process::Command::new("xdg-open"),
+        _ => return Err(format!("Unsupported OS: {}", os).into()),
+    };
+
+    cmd.arg(dest_dir_path.as_os_str());
+    cmd.spawn()?;
+
+    Ok(())
+}
+
 pub fn read_first_non_empty_line(path: &PathBuf) -> io::Result<String> {
     let file = File::open(path)?;
 
@@ -273,35 +291,15 @@ pub fn get_last_file(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
         }
 }
 
-#[cfg(target_os = "windows")]
-pub fn open_folder_last_file_selected(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
-    let latest_file      = get_last_file(folder_path)?;
-    let latest_file_name = get_prefix_stripped_pathstr(&latest_file.path());
-
-    let _ = std::process::Command::new("explorer.exe")
-        .args(&[
-            "/select,",
-            &latest_file_name.trim()
-        ])
-        .output()
-        .expect("Failed to execute command");
-    Ok(latest_file)
-}
-#[cfg(not(target_os = "windows"))]
-pub fn open_folder_last_file_selected(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
-    Err(Box::new(
-        io::Error::new(io::ErrorKind::Other, "Not implemented yet")
-    ))
-}
 
 
-pub fn open_output_folder_last_file_selected<T: AsRef<Path>>(
-    config_dest_dir: T
-) -> Result<fs::DirEntry, Box<dyn std::error::Error>>  {
-    let path = PathBuf::from(config_dest_dir.as_ref());
-    let output_dir_path = get_output_abs_dir(&path);
-    open_folder_last_file_selected(&output_dir_path)
-}
+// pub fn open_dest_dir_last_file_selected<T: AsRef<Path>>(
+//     config_dest_dir: T
+// ) -> Result<fs::DirEntry, Box<dyn std::error::Error>>  {
+//     let path = PathBuf::from(config_dest_dir.as_ref());
+//     let output_dir_path = get_output_abs_dir(&path);
+//     open_folder_last_file_selected(&output_dir_path)
+// }
 
 
 

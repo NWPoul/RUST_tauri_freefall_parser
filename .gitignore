@@ -26,3 +26,4 @@ dist-ssr
 *.sw?
 src-tauri/operators_list.toml
 src-tauri/config.toml
+config.toml

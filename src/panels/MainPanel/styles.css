@@ -35,7 +35,7 @@ body {
     justify-content: space-between;
     box-sizing: border-box;
     width: 21rem;
-    padding: 0.5em;
+    padding: 0.25em 0.5em;
     font-size: 1.5rem;
     border-radius: 1rem;
     border-bottom-right-radius: 0;
@@ -43,16 +43,18 @@ body {
     border: outset 2px #9e9e9eb3;
     border-bottom: none;
     box-shadow: 5px 5px 5px 5px #00000057;
-    color: var(--panel-prime-color);
-    background-color: var(--body-background-color);
+    color: white;
+    background-color: #4000ffcf;
     cursor: move;
 
     #appHeaderMinimizeBtn {
+        width: 3rem;
+        height: 1.75rem;
+        padding: 0 0.5em;
         background-color: inherit;
         color: inherit;
         outline: none;
         border: none;
-        padding: 0 0.5em;
         line-height: 0;
         font-size: 1.5rem;
         font-weight: bold;
@@ -66,8 +68,8 @@ body {
     }
 
     span {
-        color: var(--panel-prime-color);
-        font-style: italic;
+        color: #f0ffffd9;
+        /* font-style: italic; */
     }
 }
 
@@ -203,20 +205,6 @@ body {
         border-right: none;
         color: inherit;
         border-color: inherit;
-    }
-}
-
-
-
-.autoPlayBtn.quickBtn {
-    width: 19rem;
-    margin-top: 1rem;
-    color: var(--panel-active-color);
-    border-color: var(--panel-active-color);
-
-    &.isMuted {
-        color: var(--app-idle-color);
-        border-color: var(--app-idle-color);
     }
 }
 

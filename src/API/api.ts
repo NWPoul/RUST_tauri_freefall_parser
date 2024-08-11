@@ -32,6 +32,7 @@ type T_controlInputId =
     | "setCurNick"
     | "newNick"
     | "toggleAutoPlay"
+    | "openParserFolder"
 
 type T_controlInput = {
     id : T_controlInputId;

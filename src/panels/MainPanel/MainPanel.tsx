@@ -34,7 +34,7 @@ import {
 import { AppHeader }                from './AppHeader'
 import { NickSelect }               from './NickSelect'
 import { FlightNumberBlock }        from './FlightNumberBlock'
-import { AutoPlayBtn }              from './AutoPlayBtn'
+import { ControlGroupAF }           from './controlGroupAF'
 
 
 
@@ -121,8 +121,8 @@ export function MainPanel() {
                         flightN = {appState.flight}
                         isMuted = {!appState.add_flight}
                     />
-                    <AutoPlayBtn
-                        isMuted = {!appState.auto_play}
+                    <ControlGroupAF
+                        isAutoPlayMuted = {!appState.auto_play}
                     />
                 </div>
                 <button
