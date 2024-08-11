@@ -4,8 +4,8 @@
     width: 20rem;
 
     .quickBtn {
+        min-height: 1.5em;
         width: 9rem;
-        margin-top: 1rem;
         line-height: 0;
     
         &.isMuted {

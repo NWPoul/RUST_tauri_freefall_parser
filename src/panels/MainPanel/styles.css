@@ -96,7 +96,6 @@ body {
 
 .mainPanel-controlsWrapper {
     display: flex;
-    padding-top: 1rem;
     height: 29rem;
     /* width: 20rem; */
     background-color: inherit;
@@ -116,6 +115,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
     width: 20em;
     padding-bottom: 3rem;
 }
@@ -130,6 +130,7 @@ body {
     font-size: 1.75rem;
     color : var(--panel-prime-color);
     button {
+        font-size: 1.5rem;
         border-color: var(--panel-prime-color);
     }
 }

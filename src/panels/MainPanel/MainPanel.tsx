@@ -115,7 +115,6 @@ export function MainPanel() {
                         curNick        = {appState.cur_nick}
                         operators_list = {appState.operators_list}
                     />
-                    <br />
 
                     <FlightNumberBlock
                         flightN = {appState.flight}
