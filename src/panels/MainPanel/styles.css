@@ -47,6 +47,21 @@ body {
     background-color: #4000ffcf;
     cursor: move;
 
+    #appHeader-left {
+        display: flex;
+    }
+
+    #appHeaderIconDiv {
+        position: relative;
+        width: 1.75em;
+        height: 1em;
+        #headDownIcon {
+            position: absolute;
+            width: 3rem;
+        }
+    }
+    
+
     #appHeaderMinimizeBtn {
         width: 3rem;
         height: 1.75rem;
@@ -135,6 +150,29 @@ body {
         border-color: var(--panel-prime-color);
     }
 }
+
+#timeSetIconGroup {
+    position: relative;
+    display: flex;
+    width: 4rem;
+    height: 2rem;
+
+    #fallIconDiv {
+        position: absolute;
+        top: -10px;
+        width: 3rem;
+    }
+    #stopWatchDiv {
+        position: absolute;
+        top: -6px;
+        left: 32px;
+        width: 1.5rem;
+        color: #b0ccff;
+    }
+}
+
+
+
 
 
 #nick-select {

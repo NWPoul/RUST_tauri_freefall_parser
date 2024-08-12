@@ -27,6 +27,7 @@ import {
 
 import { IncButtonBlock }           from 'components/controls/buttons'
 
+import { FallIcon, HeadDownIcon, StopWatchIcon }             from 'assets/SVG_Icons'
 import {
     useKeys,
 }                                   from './serv'
@@ -60,7 +61,11 @@ function updFFTime(newVal: number) {
 function FreeFallSettingsBlock({ffTime}:{ffTime: number}) {
     return (
         <div id="time_freefall_settings" data-tauri-drag-region>
-            св. падение&nbsp;
+            <div id="timeSetIconGroup">
+                <div id="fallIconDiv">{FallIcon}</div>
+                <div id="stopWatchDiv">{StopWatchIcon}</div>
+            </div>
+            &nbsp;
             <IncButtonBlock
                 val    = {ffTime}
                 incVal = {10}

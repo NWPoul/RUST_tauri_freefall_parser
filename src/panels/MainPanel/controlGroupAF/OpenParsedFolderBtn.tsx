@@ -1,7 +1,7 @@
 
 
 import { cx }                            from "helpers"
-import { FolderCheck }                   from "assets/SVG_Icons"
+import { FolderCheck, FolderVideoIcon }                   from "assets/SVG_Icons"
 
 import { getControlInputEventHandler }   from "../serv"
 
@@ -21,7 +21,7 @@ export function OpenParsedFolderBtn() {
                 type      = "button"
                 onClick   = {openParserFolder}
             >
-                {FolderCheck}
+                {FolderVideoIcon}
             </button>
     )
 }
