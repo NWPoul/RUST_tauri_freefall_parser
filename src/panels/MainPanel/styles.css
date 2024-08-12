@@ -57,7 +57,9 @@ body {
         height: 1em;
         #headDownIcon {
             position: absolute;
-            width: 3rem;
+            top: -9px;
+            left: -22px;
+            width: 5rem;
         }
     }
     
