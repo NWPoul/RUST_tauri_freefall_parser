@@ -39,9 +39,6 @@ pub fn parse<T: Read + Seek>(stream: &mut T, _size: usize) -> Result<Vec<SampleI
                 first_timestamp = ts;
             }
             last_timestamp = ts;
-            // if ts > 20.0 {
-            //     dbg!(&map);
-            // }
 
             crate::try_block!({
                 accl.push(TimeVector3 {

@@ -228,7 +228,6 @@ pub fn get_current_drives() -> HashSet<String> {
 
 pub fn get_src_path_for_ext_drive(drivepath_str: &PathBuf) -> PathBuf {
     let dcim_path  = drivepath_str.join("DCIM");
-    dbg!(&drivepath_str, &dcim_path);
     let gopro_path = dcim_path.join("100GOPRO");
 
     let res_path = if check_path(&gopro_path) {

@@ -544,7 +544,6 @@ pub fn normalized_imu_interpolated(input: &crate::Input, orientation: Option<Str
             if let Some((k2, v2)) = map.range(ts..).next() {
                 let time_delta = (k2 - k1) as f64;
                 let fract = (ts - k1) as f64 / time_delta;
-                // dbg!(&fract);
                 return Some([
                     v1.x * (1.0 - fract) + (v2.x * fract),
                     v1.y * (1.0 - fract) + (v2.y * fract),

@@ -88,7 +88,6 @@ fn get_misk_path(path: &PathBuf) -> Option<PathBuf> {
     if let Some(drive_path) = extract_drive_path(path) {
         return Some(drive_path.join("MISC"));
     };
-    dbg!("misc_path not found", path);
     None
 }
 
@@ -96,16 +95,13 @@ fn get_operator_id_path(path: &PathBuf) -> Option<PathBuf>{
     if let Some(misc_path) = get_misk_path(path) {
         return Some(misc_path.join(OPERATOR_ID_FILENAME));
     };
-    dbg!("operator_id_path not found", path);
     None
 }
 
 pub fn get_operator_id(path: &PathBuf) -> Option<String> {
     if let Some(operator_id_path) = get_operator_id_path(path) {
-        dbg!("operator_id_path found", path, &operator_id_path);
         return get_id_from_drive(&operator_id_path);
     };
-    dbg!("operator_id not found", path);
     None
 }
 
@@ -149,7 +145,6 @@ pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String
 fn save_hashmap_to_file_sorted(hash_map: HashMap<String, Vec<String>>, file_path: &PathBuf) -> std::io::Result<()> {
     let mut vec_of_tuples: Vec<(String, Vec<String>)> = hash_map.into_iter().collect();
     vec_of_tuples.sort_by_key(|k| k.0.clone());
-    // dbg!(&vec_of_tuples);
     save_tuples_to_file(vec_of_tuples, file_path)
 }
 
@@ -207,7 +202,6 @@ pub fn update_operators_file(nick: &str, new_id: &str) -> std::io::Result<HashMa
 
     let mut id_list = find_by_nick_inhash(&cur_records, &normalized_nick).unwrap_or_default();
     id_list.push(operator_id.clone());
-    // dbg!(&normalized_nick, &operator_id, &id_list);
     cur_records.insert(normalized_nick.clone(), id_list);
 
     save_hashmap_to_file_sorted(cur_records.clone(), &operators_file_path)?;
@@ -223,7 +217,6 @@ pub fn recognize_card(input_path: &PathBuf) -> io::Result<String> {
     }
 
     let card_serial_number = get_card_id(input_path);
-    dbg!(&card_serial_number);
 
     let operator_id = match get_operator_id(input_path) {
         Some(id) => {

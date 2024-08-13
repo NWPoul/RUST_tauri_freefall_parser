@@ -47,8 +47,7 @@ macro_rules! configValues {
                     .unwrap_or($default);
                 println!(concat!(stringify!($var), ": {:?}"), $var);
             )*
-            println!();
-
+            
             ConfigValues {
                 $($var),*
             }

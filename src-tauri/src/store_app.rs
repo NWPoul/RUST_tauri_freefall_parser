@@ -64,7 +64,7 @@ impl Default for State { fn default() -> Self {
 
     match read_operators_file(OPERATORS_LIST_FILE_NAME) {
         Ok(list) => state.operators_list = list,
-        Err(_)   => println!("No operators"),
+        Err(_)   => (),
     }
 
     state
@@ -171,10 +171,8 @@ fn reducer(state: State, action: Action) -> State {
         Action::AddNewNick(payload) => {
             let normalized_name = normalize_name(&payload);
             if let Some(_rec) = find_by_nick_inhash(&state.operators_list, &normalized_name) {
-                println!("Nickname '{}' already exists.", normalized_name);
                 return  state;
             }
-            // dbg!(&normalized_name);
             let mut new_operators_list = state.operators_list.clone();
             let new_id = generate_operator_id();
             new_operators_list.entry(normalized_name.clone())

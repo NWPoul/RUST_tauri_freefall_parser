@@ -108,7 +108,6 @@ impl Cooke {
                         },
                         Some("rt.temporal.lens.gyro.raw") => {
                             if let Some(vals) = Self::get_datavals(&data) {
-                                //dbg!(&vals);
                                 let mut gyro = Vec::with_capacity(vals.len());
                                 let num_vals = vals.len() as f64;
                                 let timestamp_frac = (timestamp[1] as f64 - prev_absolute_timestamp[1] as f64) / num_vals;

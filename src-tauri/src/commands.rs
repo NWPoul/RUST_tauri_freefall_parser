@@ -147,20 +147,13 @@ fn recognize_src_path(app_values: &store_app::State, src_files_path_list: &Vec<P
     let test_path = src_files_path_list[0].clone();
     let cur_nick  = match &app_values.cur_nick {
         Some(v) => v,
-        None => {
-            dbg!("no curnick re_regognition inactivated");
-            return PathRecognitionResult::VOID;
-        },
+        None    => return PathRecognitionResult::VOID,
     };
 
     let cur_card_id = match get_operator_id(&test_path) {
         Some(v) => v,
-        None => {
-            dbg!("no cur_card_id re_regognition inactivated");
-            return PathRecognitionResult::VOID;
-        },
+        None    => return PathRecognitionResult::VOID,
     };
-    dbg!(&cur_nick, &cur_card_id);
 
     let cur_card_operator = find_operator_by_id_inhash(
         &app_values.operators_list,
@@ -168,10 +161,7 @@ fn recognize_src_path(app_values: &store_app::State, src_files_path_list: &Vec<P
     );
 
     match cur_card_operator {
-        Some(operator) if cur_nick == &operator.0 => {
-            dbg!("nick matched = skip re_regognition");
-            PathRecognitionResult::VOID
-        },
+        Some(operator) if cur_nick == &operator.0 => PathRecognitionResult::VOID,
         Some(operator) => PathRecognitionResult::UPD(operator.0, OperatorRecord::new(cur_nick, &cur_card_id)),
         None => PathRecognitionResult::NEW(OperatorRecord::new(cur_nick, &cur_card_id)),
     }
@@ -182,13 +172,11 @@ async fn on_recognized_src_path_result(
     store_app_instance     : &store_app::StoreType,
 ) {
     match path_recognition_result {
-        PathRecognitionResult::VOID => {dbg!("_");},
+        PathRecognitionResult::VOID => (),
         PathRecognitionResult::NEW(record) => {
-            dbg!("RERECOGNITION new card to existing operator", &record);
             store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
         },
         PathRecognitionResult::UPD(card_nick, record) => {
-            dbg!("RERECOGNITION change operator for card (nick not matched)", &record);
             tauri_show_msg(
                 "CARD ID SERV",
                 &format!("СМЕНА ВЛАДЕЛЬЦА КАРТЫ!\nprev: {}\nnew: {}", &card_nick, &record.nick)
@@ -217,7 +205,6 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
 
     let config_values = store_config_instance.state_cloned().await;
     let app_values    = store_app_instance.state_cloned().await;
-    dbg!(&config_values, &app_values);
 
     let path_recognition_result = recognize_src_path(&app_values, &src_files_path_list);
     on_recognized_src_path_result(path_recognition_result, store_app_instance).await;
@@ -285,8 +272,6 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
 
     let mut resp = format!("ok {id} command, val {val}:");
 
-    dbg!(&resp);
-
     match id {
         "selectVideoFiles" => {
             let src_dir = if val.is_empty() {
@@ -343,7 +328,6 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
         _ => resp = format!("unknown command: {id} {val}"),
     };
 
-    dbg!(&resp);
     Ok(format!("API response: {resp}"))
 }
 
