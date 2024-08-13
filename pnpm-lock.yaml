@@ -29,7 +29,7 @@ dependencies:
 
 devDependencies:
   '@tauri-apps/cli':
-    specifier: ^1.5.11
+    specifier: ^1.6.0
     version: 1.6.0
   '@types/node':
     specifier: ^20.12.7
