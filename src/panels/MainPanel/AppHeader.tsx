@@ -7,8 +7,8 @@ const AppHeader = () => {
     return (
         <div id="appHeader" data-tauri-drag-region>
             <div id="appHeader-left">
-                <div id="appHeaderIconDiv">{HeadDownIcon}</div>
-                <span>NW FF parser</span>
+                <div id="appHeaderIconDiv" data-tauri-drag-region>{HeadDownIcon}</div>
+                <span data-tauri-drag-region>NW FF parser</span>
             </div>
             <div className="appHeader-controls">
                 <button id="appHeaderMinimizeBtn"

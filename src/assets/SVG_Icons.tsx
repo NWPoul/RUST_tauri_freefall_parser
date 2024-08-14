@@ -162,6 +162,7 @@ export const HeadDownIcon = (
     <svg xmlns="http://www.w3.org/2000/svg" id="headDownIcon"
         viewBox="0 0 604.000000 366.000000"
         preserveAspectRatio="xMidYMid meet"
+        data-tauri-drag-region
     >
         <g transform="translate(0.000000,366.000000) scale(0.100000,-0.100000)"
             fill="currentColor"
