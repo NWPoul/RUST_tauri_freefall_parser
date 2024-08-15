@@ -7,8 +7,6 @@ import { API_minimizeWindow }       from 'API/api'
 
 import {
     // useWindowLabel,
-    // useFullscreen,
-    // toggleFullscreen,
     // createMiniPanel,
     sendControlInputCommand,
     // useRustSystemStateUpdateEvent,
