@@ -62,13 +62,13 @@ async function API_minimizeWindow() {
         console.error('Error minimizing  window:', error)
     }
 }
-async function API_maximizeWindow() {
-    try {
-        await appWindow.maximize()
-    } catch (error) {
-        console.error('Failed to maximize the window', error)
-    }
-}
+// async function API_maximizeWindow() {
+//     try {
+//         await appWindow.maximize()
+//     } catch (error) {
+//         console.error('Failed to maximize the window', error)
+//     }
+// }
 
 
 async function API_getWindowLabel() {
@@ -154,7 +154,6 @@ async function API_togglePanel(label:string, config?:WindowOptions) {
 export {
     API_getWindowLabel,
     API_minimizeWindow,
-    API_maximizeWindow,
     API_createPanel,
     API_togglePanel,
 

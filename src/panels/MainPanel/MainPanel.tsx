@@ -1,34 +1,21 @@
-import { useEffect} from 'react'
 
 import { cx }                       from 'helpers'
-
 
 import { API_minimizeWindow }       from 'API/api'
 
 import {
-    // useWindowLabel,
-    // createMiniPanel,
     sendControlInputCommand,
-    // useRustSystemStateUpdateEvent,
     useRustAppStateUpdateEvent,
     useRustConfigStateUpdateEvent,
 }                                   from 'API/apiHelpers'
 
-
-import {
-    useAppState,
-}                                   from 'API/apiAppStore'
-import {
-    configStore,
-}                                   from 'API/apiConfigStore'
-
+import { useAppState }              from 'API/apiAppStore'
+import { configStore }              from 'API/apiConfigStore'
 
 import { IncButtonBlock }           from 'components/controls/buttons'
 
-import { FallIcon, HeadDownIcon, StopWatchIcon }             from 'assets/SVG_Icons'
-import {
-    useKeys,
-}                                   from './serv'
+import { FallIcon, StopWatchIcon }  from 'assets/SVG_Icons'
+import { useKeys }                  from './serv'
 
 import { AppHeader }                from './AppHeader'
 import { NickSelect }               from './NickSelect'
@@ -140,17 +127,3 @@ export function MainPanel() {
 }
 
 export default MainPanel
-
-// {
-//             <button type="button" onClick={() => toggleFullscreen(isFullscreen, setIsFullscreen)}>
-//                 {` TURN FULLSCREEN ${isFullscreen ? "OFF" : "ON"}`}
-//             </button>
-//             <br />
-            // <button type="button" onClick={API_toggleApp}>
-            //     TOGGLE APP
-            // </button>
-            // <br />
-            // <button type="button" onClick={API_RestartTimeblock}>
-            //     RESET TIMEBLOCK
-            // </button>
-// }

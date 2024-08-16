@@ -1,4 +1,3 @@
-#![allow(unused_braces)]
 
 use std::path::PathBuf;
 
@@ -27,20 +26,35 @@ use crate::telemetry_analysis::{
     FileTelemetryResult,
     FileParsingErrData,
     FileParsingOkData,
-};
-
-use crate::{
-    STORE_APP_INSTANCE,
-    STORE_CONFIG_INSTANCE,
     get_telemetry_for_files,
 };
 
-use crate::store_app;
-use crate::store_config;
+use crate::{
+    store_app,
+    store_config,
+    STORE_APP_INSTANCE,
+    STORE_CONFIG_INSTANCE,
+};
 
 
 
 
+enum PathRecognitionResult {
+    VOID,
+    NEW(OperatorRecord),
+    UPD(String, OperatorRecord),
+}
+
+
+
+crate::create_get_store_data_command!(get_app_store_data   , STORE_APP_INSTANCE   , store_app);
+crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
+
+fn get_app_and_config_store_instances() -> (&'static store_app::StoreType, &'static store_config::StoreType) {
+    let store_app_instance    = STORE_APP_INSTANCE.get().expect("app+_tore instance n/a");
+    let store_config_instance = STORE_CONFIG_INSTANCE.get().expect("config_store instance n/a");
+    (store_app_instance, store_config_instance)
+}
 
 
 
@@ -50,26 +64,18 @@ pub fn tauri_show_msg(title: &str, msg: &str) {
 }
 
 pub fn emit_video_parsed_event(payload: (Vec<PathBuf>, Vec<String>)) {
-    crate::APP_HANDLE_INSTANCE.get()
+    let _ = crate::APP_HANDLE_INSTANCE.get()
         .expect("app is not init yet")
-        .emit_all("video-parsed", payload)
-        .unwrap();
+        .emit_all("video-parsed", payload);
 }
 
-
-
-
-crate::create_get_store_data_command!(get_app_store_data   , STORE_APP_INSTANCE   , store_app);
-crate::create_get_store_data_command!(get_config_store_data, STORE_CONFIG_INSTANCE, store_config);
-// async fn get_config_and_app_store_state() -> (store_config::State, store_app::State) {
-//     let store_config_instance = STORE_CONFIG_INSTANCE.get()
-//         .expect("static config store instance not init");
-//     let store_app_instance = STORE_APP_INSTANCE.get()
-//         .expect("static app store instance not init");
-//     let config_values = store_config_instance.state_cloned().await;
-//     let app_values    = store_app_instance.state_cloned().await;
-//     return (config_values, app_values);
-// }
+pub fn maximize_window() {
+    let _ = crate::APP_HANDLE_INSTANCE.get()
+        .expect("app is not init yet")
+        .get_window("MAIN")
+        .expect("fail to get 'MAIN' window!")
+        .maximize();
+}
 
 
 
@@ -100,14 +106,8 @@ pub fn get_ffmpeg_status_for_file(
     );
 
     match ffmpeg_output {
-        Ok(output_path) => {
-            println!("\nFFMPEG OK:");// {:?}", _output.stderr);
-            Ok(output_path)
-        },
-        Err(err) => {
-            println!("\nFFMPEG ERR: {:?}", err.to_string());
-            Err(err.to_string())
-        }
+        Ok(output_path) => Ok(output_path),
+        Err(err)        => Err(err.to_string()),
     }
 }
 
@@ -136,12 +136,6 @@ pub fn ffmpeg_ok_files(
     (ok_list, err_list)
 }
 
-
-enum PathRecognitionResult {
-    VOID,
-    NEW(OperatorRecord),
-    UPD(String, OperatorRecord),
-}
 
 fn recognize_src_path(app_values: &store_app::State, src_files_path_list: &Vec<PathBuf>) -> PathRecognitionResult {
     let test_path = src_files_path_list[0].clone();
@@ -190,19 +184,11 @@ async fn on_recognized_src_path_result(
 
 pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
     let src_files_path_list = match get_src_files_path_list(dir_path) {
-        None => {
-            println!("NO MP4 FILES CHOSEN!");
-            return;
-        }
+        None            => return,
         Some(path_list) => path_list,
     };
 
-
-    let store_config_instance = STORE_CONFIG_INSTANCE.get()
-        .expect("static config store instance not init");
-    let store_app_instance = STORE_APP_INSTANCE.get()
-        .expect("static app store instance not init");
-
+    let (store_app_instance, store_config_instance) = get_app_and_config_store_instances();
     let config_values = store_config_instance.state_cloned().await;
     let app_values    = store_app_instance.state_cloned().await;
 
@@ -220,8 +206,8 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
         );
         if app_values.auto_play && ffmpeg_results.0.len() == 1 {
             match open::that(&ffmpeg_results.0[0]) {
-                Ok(_)  => println!("Video opened successfully."),
-                Err(e) => println!("Failed to open video: {}", e),
+                Ok(_)  => (),
+                Err(e) => tauri_show_msg("Failed to auto play video", &e.to_string()),
             }
         } else {
             emit_video_parsed_event(ffmpeg_results.clone());
@@ -262,10 +248,7 @@ pub struct FrontInputEventMixPayload {
 #[tauri::command]
 pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<String, ()> {
     dbg!("FRONT: control_input: ", &input);
-    let app_store_instance = STORE_APP_INSTANCE.get()
-        .expect("static app store instance not init");
-    let config_store_instance = STORE_CONFIG_INSTANCE.get()
-        .expect("static config store instance not init");
+    let (app_store_instance, config_store_instance) = get_app_and_config_store_instances();
 
     let id: &str  = &input.id;
     let val: &str = &input.val;

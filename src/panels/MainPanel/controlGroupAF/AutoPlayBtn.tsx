@@ -2,7 +2,7 @@
 
 import { cx }                            from "helpers"
 import { useParsedVideoEvent }           from "API/apiHelpers"
-import { EyeIcon, FolderCheck, PlayBtnIcon }                   from "assets/SVG_Icons"
+import { PlayBtnIcon }                   from "assets/SVG_Icons"
 
 import { getControlInputEventHandler }   from "../serv"
 

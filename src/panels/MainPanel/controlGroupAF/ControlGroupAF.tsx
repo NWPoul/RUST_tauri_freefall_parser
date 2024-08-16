@@ -2,7 +2,6 @@
 
 import { cx }                            from "helpers"
 import { useParsedVideoEvent }           from "API/apiHelpers"
-import { FolderCheck }                   from "assets/SVG_Icons"
 import { AutoPlayBtn }                   from "./AutoPlayBtn"
 import { OpenParsedFolderBtn }           from "./OpenParsedFolderBtn"
 

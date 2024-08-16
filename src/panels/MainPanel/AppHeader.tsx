@@ -1,5 +1,5 @@
 import { API_minimizeWindow }                from 'API/api'
-import { HeadDownIcon } from 'assets/SVG_Icons'
+import { HeadDownIcon }                      from 'assets/SVG_Icons'
 
 
 

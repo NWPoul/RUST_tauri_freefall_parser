@@ -1,7 +1,7 @@
 
 
 import { cx }                            from "helpers"
-import { FolderCheck, FolderVideoIcon }                   from "assets/SVG_Icons"
+import { FolderVideoIcon }                   from "assets/SVG_Icons"
 
 import { getControlInputEventHandler }   from "../serv"
 

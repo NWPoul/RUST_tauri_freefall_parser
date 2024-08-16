@@ -28,9 +28,6 @@ pub mod commands;
 
 use utils::error::MyResult;
 
-use telemetry_analysis::{
-    get_telemetry_for_files,
-};
 
 use file_sys_serv::{
     watch_drives,
