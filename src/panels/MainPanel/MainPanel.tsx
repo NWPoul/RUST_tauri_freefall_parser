@@ -21,6 +21,7 @@ import { AppHeader }                from './AppHeader'
 import { NickSelect }               from './NickSelect'
 import { FlightNumberBlock }        from './FlightNumberBlock'
 import { ControlGroupAF }           from './controlGroupAF'
+import { BackendNotification }      from './BackendNotification'
 
 
 
@@ -123,6 +124,7 @@ export function MainPanel() {
                 </button>
             </div>
         </div>
+        <BackendNotification/>
     </div>
 }
 

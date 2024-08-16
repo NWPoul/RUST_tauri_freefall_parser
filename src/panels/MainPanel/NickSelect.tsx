@@ -1,3 +1,4 @@
+import { useState }                 from 'react'
 
 import { cx }                       from 'helpers'
 
@@ -5,12 +6,9 @@ import {
     sendControlInputCommand,
 }                                   from 'API/apiHelpers'
 
-import ModalDialog                  from 'components/ModalDialog/ModalDialog'
+import { ModalDialog }              from 'components/ModalDialog'
 
 import type { T_OperatorsList }     from 'API/apiAppStore'
-import { useState } from 'react'
-import { configStore } from 'API/apiConfigStore'
-
 
 
 type T_NickSelectProps = {
@@ -18,29 +16,6 @@ type T_NickSelectProps = {
     operators_list: T_OperatorsList|null
     isMuted       : boolean
 }
-
-const apiSetCurNick = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const nickOption = e.currentTarget.value
-    const payload = {
-        id : 'setCurNick',
-        val: nickOption,
-    } as const
-
-    if (nickOption === 'NEW_NICK') {
-        let newNick = prompt("Введите ник")
-        if (!newNick || newNick === 'NEW_NICK') return
-        let payload = {
-            id : 'newNick',
-            val: newNick,
-        }  as const
-        sendControlInputCommand(payload)
-        return
-    }
-
-    sendControlInputCommand(payload);
-}
-
-
 
 
 
@@ -92,14 +67,9 @@ function getNickChangeHandler(setIsOpened: any, onProceed?: any) {
 
 function useNewNickDialog() {
     const [isOpened, setIsOpened] = useState<boolean>(false)
-    const onProceed = () => {
-        console.log('onProceed ')
-        alert("onProceed! ")
-        setIsOpened(false)
-    }
 
     return [
-        isOpened, setIsOpened, onProceed,
+        isOpened, setIsOpened,
         getNickChangeHandler(setIsOpened),
     ] as const
 }
@@ -138,7 +108,7 @@ function NickInputForm({setIsOpened}:{setIsOpened: React.Dispatch<React.SetState
 
 
 export function NickSelect(props:T_NickSelectProps) {
-    const [isOpened, setIsOpened, onProceed, nickChangeHandler] = useNewNickDialog()
+    const [isOpened, setIsOpened, nickChangeHandler] = useNewNickDialog()
 
     const nickOptions = getNickOptions(props.operators_list)
 
@@ -149,7 +119,6 @@ export function NickSelect(props:T_NickSelectProps) {
             title        = {'Добавить оператора:'}
             isOpened     = {isOpened}
             closeBtnText = "Отмена"
-            onProceed    = {onProceed }
             onClose      = {() => setIsOpened(false)}
         >
             <NickInputForm setIsOpened = {setIsOpened}/>

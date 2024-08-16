@@ -62,11 +62,11 @@ async function API_minimizeWindow() {
         console.error('Error minimizing  window:', error)
     }
 }
-// async function API_maximizeWindow() {
+// async function API_unminimizeWindow() {
 //     try {
-//         await appWindow.maximize()
+//         await appWindow.unminimize()
 //     } catch (error) {
-//         console.error('Failed to maximize the window', error)
+//         console.error('Failed to unminimize the window', error)
 //     }
 // }
 
@@ -119,7 +119,7 @@ function get_API_eventistener<T_Payload>(eventId: string) {
 const API_EVENT_LISTENERS = {
     appState   : get_API_eventistener<T_API_app_stateUpdatePayload>('app-state-update-event'),
     configState: get_API_eventistener<T_API_config_stateUpdatePayload>('config-state-update-event'),
-    parsedEvent: get_API_eventistener<any>('video-parsed'),
+    backendNotification: get_API_eventistener<[string, string]>('backend-notification'),
 }
 
 

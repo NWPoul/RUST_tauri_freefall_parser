@@ -57,7 +57,9 @@
             "fullscreen": false,
             "resizable": false,
             "width": 380,
+            "maxWidth": 400,
             "height": 600,
+            "maxHeight": 700,
             "alwaysOnTop": true,
 
             "transparent": true,

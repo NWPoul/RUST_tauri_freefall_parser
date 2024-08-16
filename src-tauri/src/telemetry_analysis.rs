@@ -13,16 +13,20 @@ pub type FileParsingOkData  = Vec<(PathBuf, FileTelemetryResult)>;
 pub type FileParsingErrData = Vec<(PathBuf, String)>;
 
 
+#[derive(Debug)]
 pub struct MaxAccData {
     acc : f64,
     time: f64,
 }
+
+#[derive(Debug)]
 pub struct FileTelemetryResult {
     pub device_name : String,
     pub start_time  : f64,
     pub end_time    : f64,
     pub max_acc_data: MaxAccData,
 }
+
 impl FileTelemetryResult {
     pub fn get_description(&self) -> String {
         format!(

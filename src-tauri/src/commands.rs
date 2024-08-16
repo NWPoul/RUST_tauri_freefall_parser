@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use serde::{Serialize, Deserialize};
 
 use tauri::{
-    api::dialog::MessageDialogBuilder,
+    // api::dialog::MessageDialogBuilder,
     Manager,
 };
 
@@ -58,23 +58,19 @@ fn get_app_and_config_store_instances() -> (&'static store_app::StoreType, &'sta
 
 
 
-pub fn tauri_show_msg(title: &str, msg: &str) {
-    let builder = MessageDialogBuilder::new(title, msg);
-    builder.show(|_|println!("DIAG"));
-}
-
-pub fn emit_video_parsed_event(payload: (Vec<PathBuf>, Vec<String>)) {
+pub fn emit_notification_event(title: &str, msg: &str) {
+    unminimize_window();
     let _ = crate::APP_HANDLE_INSTANCE.get()
         .expect("app is not init yet")
-        .emit_all("video-parsed", payload);
+        .emit_all("backend-notification", [title, msg]);
 }
 
-pub fn maximize_window() {
+pub fn unminimize_window() {
     let _ = crate::APP_HANDLE_INSTANCE.get()
         .expect("app is not init yet")
         .get_window("MAIN")
         .expect("fail to get 'MAIN' window!")
-        .maximize();
+        .unminimize();
 }
 
 
@@ -171,7 +167,7 @@ async fn on_recognized_src_path_result(
             store_app_instance.dispatch(store_app::Action::UpdOperatorsList(record)).await
         },
         PathRecognitionResult::UPD(card_nick, record) => {
-            tauri_show_msg(
+            emit_notification_event(
                 "CARD ID SERV",
                 &format!("СМЕНА ВЛАДЕЛЬЦА КАРТЫ!\nprev: {}\nnew: {}", &card_nick, &record.nick)
             );
@@ -197,22 +193,41 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
 
     let parsing_results = get_telemetry_for_files(&src_files_path_list, &config_values);
 
-    if config_values.no_ffmpeg_processing == false {
-        let ffmpeg_results = ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
-        let report = format!(
-            "Файлы {} записаны \nОшибки: {}",
-            ffmpeg_results.0.len(),
-            ffmpeg_results.1.len(),
+    if config_values.no_ffmpeg_processing {
+        emit_notification_event(
+            "Внимание!",
+            &format!("FFmpeg откдючен в конфиге\nParsing results:\n{:?}", &parsing_results)
         );
-        if app_values.auto_play && ffmpeg_results.0.len() == 1 {
-            match open::that(&ffmpeg_results.0[0]) {
-                Ok(_)  => (),
-                Err(e) => tauri_show_msg("Failed to auto play video", &e.to_string()),
-            }
-        } else {
-            emit_video_parsed_event(ffmpeg_results.clone());
-            tauri_show_msg("Parsing results", &report)
+        return
+    }
+    
+    let ffmpeg_results = ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
+
+    let mut report = format!(
+        "Успешно аписано файлов: {}",
+        ffmpeg_results.0.len()
+    );
+    let errors_cnt = ffmpeg_results.1.len() + parsing_results.1.len();
+    if errors_cnt > 0 { report.push_str( &format!(
+        "\nОшибки: {}\n{:?}\n{:?}",
+        errors_cnt,
+        &parsing_results.1,
+        &ffmpeg_results.1
+    ))};
+
+    if app_values.auto_play && ffmpeg_results.0.len() == 1 {
+        match open::that(&ffmpeg_results.0[0]) {
+            Ok(_)  => (),
+            Err(e) => emit_notification_event(
+                "Внимание!",
+                &format!("Failed to auto play video\n{}", &e.to_string())
+            ),
         }
+    } else {
+        emit_notification_event(
+            "Parsing results:",
+            &format!("{}", &report)
+        )
     }
 }
 
@@ -299,6 +314,7 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
             let new_is_autoplay = val.parse::<bool>().unwrap_or(
                 !app_store_instance.select(store_app::SELECTORS::IsAutoPlay).await
             );
+            // emit_notification_event("Тестовое","toggleAutoPlay");
             app_store_instance
                 .dispatch(store_app::Action::ToggleAutoPlay(new_is_autoplay))
                 .await;

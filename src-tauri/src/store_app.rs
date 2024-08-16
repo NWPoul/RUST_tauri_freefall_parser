@@ -111,7 +111,7 @@ pub mod SELECTORS {
 pub fn on_new_drive_event(new_drive: &PathBuf) {
     println!("\nNEW DRIVE PLUGGED IN: {:?}", new_drive);
     let src_path = get_src_path_for_ext_drive(&new_drive);
-    crate::commands::maximize_window();
+    crate::commands::unminimize_window();
     let rt = tokio::runtime::Runtime::new().unwrap();
     std::thread::spawn(move || {
         rt.block_on(main_workflow_for_videofiles(&src_path));

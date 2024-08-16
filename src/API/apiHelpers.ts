@@ -70,7 +70,6 @@ function initApiStateData() {
     API_getAppStoreData().then(
         appState.stateUPD
     )
-
     API_getConfigStoreData().then(
         configStore.set
     )
@@ -102,7 +101,6 @@ function useRustAppStateUpdateEvent() {
     )
 }
 
-
 function useRustConfigStateUpdateEvent() {
     const updateApiConfigState = configStore.updState
     useEffect(
@@ -114,11 +112,14 @@ function useRustConfigStateUpdateEvent() {
     )
 }
 
-function useParsedVideoEvent() {
-    const handler = (e:any) => console.log("PARSED EVENT!", e)
+function useBackendNotification(cb:(pyaload: [string, string]) => void) {
+    const handler = (e:Event<[string, string]>) => {
+        console.log("NOTIFICATION EVENT!", e)
+        cb(e.payload)
+    }
     useEffect(
         () => {
-            const unlisten = API_EVENT_LISTENERS.parsedEvent(handler)
+            const unlisten = API_EVENT_LISTENERS.backendNotification(handler)
             return () => { unlisten.then(unlistenFn => unlistenFn()) }
         }, [handler]
     )
@@ -133,7 +134,7 @@ export {
     initApiStateData,
     useRustAppStateUpdateEvent,
     useRustConfigStateUpdateEvent,
-    useParsedVideoEvent,
+    useBackendNotification,
 
     API_togglePanel      as sendTogglePanelCommand,
     API_sendControlInput as sendControlInputCommand,

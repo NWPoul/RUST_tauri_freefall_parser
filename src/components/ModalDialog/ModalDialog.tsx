@@ -1,14 +1,12 @@
-import { MouseEvent, useEffect, useRef } from "react"
-
-import "./styles-modal.css"
+import { MouseEvent, useEffect, useRef }         from 'react'
 
 
 
-type T_ModalProps = {
+export type T_ModalProps = {
     title       : string;
     isOpened    : boolean;
-    onProceed   : () => void;
     onClose     : () => void;
+    onProceed     ?: () => void;
     proceedBtnText?: string;
     closeBtnText  ?: string;
     children      ?: React.ReactNode;
@@ -24,7 +22,6 @@ const isClickInsideRectangle = (e: MouseEvent, element: HTMLElement) => {
         e.clientY > r.top &&
         e.clientY < r.bottom
     )
-    // console.log('CLICK ' + (res ? 'inside' : 'outside') + 'DIALOG', e)
     return res
 }
 
@@ -32,8 +29,8 @@ const isClickInsideRectangle = (e: MouseEvent, element: HTMLElement) => {
 export const ModalDialog = ({
     title,
     isOpened,
-    onProceed,
     onClose,
+    onProceed,
     proceedBtnText,
     closeBtnText,
     children,
@@ -51,7 +48,7 @@ export const ModalDialog = ({
     }, [isOpened])
 
     const proceedAndClose = () => {
-        onProceed()
+        onProceed?.()
         onClose()
     }
 
