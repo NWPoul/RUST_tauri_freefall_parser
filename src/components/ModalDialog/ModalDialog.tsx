@@ -39,6 +39,7 @@ export const ModalDialog = ({
 
     useEffect(() => {
         if (isOpened) {
+            console.log("OPENING_MODAL: ", ref.current)
             ref.current?.showModal()
             document.body.classList.add("modal-open")
         } else {
