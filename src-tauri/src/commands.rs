@@ -204,7 +204,7 @@ pub async fn main_workflow_for_videofiles(dir_path: &PathBuf) {
     let ffmpeg_results = ffmpeg_ok_files(&parsing_results, &config_values, &app_values);
 
     let mut report = format!(
-        "Успешно аписано файлов: {}",
+        "Успешно записано файлов: {}",
         ffmpeg_results.0.len()
     );
     let errors_cnt = ffmpeg_results.1.len() + parsing_results.1.len();
