@@ -156,7 +156,6 @@ pub fn get_src_file_path(srs_dir_path: &PathBuf) -> Option<PathBuf> {
     }
 }
 
-
 pub fn get_src_files_path_list<T: AsRef<Path>>(srs_dir_path: T) -> Option<Vec<PathBuf>> {
     let src_files_path_list = FileDialog::new()
         .add_filter("mp4_files", &["mp4", "MP4"])
@@ -197,6 +196,7 @@ pub fn get_output_file_path(
 
     output_file_path
 }
+
 
 
 #[cfg(target_os = "windows")]
