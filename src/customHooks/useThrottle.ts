@@ -82,7 +82,7 @@ export function useThrottle<T extends (...args: never[]) => unknown>(
 
             return timeoutId.current
         },
-        [waitMs]
+        [leading, trailing, waitMs]
     )
     return execThrottled
 }

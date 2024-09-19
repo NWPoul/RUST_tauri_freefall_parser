@@ -20,10 +20,10 @@ type T_StateUPD = Partial<T_State>
 
 
 const initialState: T_State = {
-    srs_dir_path        : "",
-    dest_dir_path       : "",
-    ffmpeg_dir_path     : "",
-    output_file_postfix : "",
+    srs_dir_path        : '',
+    dest_dir_path       : '',
+    ffmpeg_dir_path     : '',
+    output_file_postfix : '',
     dep_time_correction : 0,
     time_freefall       : 0,
     time_start_offset   : 0,

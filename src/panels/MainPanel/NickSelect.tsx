@@ -21,14 +21,14 @@ type T_NickSelectProps = {
 
 const baseNickOptions = [
     <option key="EMPTY"
-        value={""}
+        value={''}
         className="nick-select--option no_nick"
     >
         НИК НЕ ВЫБРАН
     </option>
     ,
     <option key="NEW_NICK"
-        value={"NEW_NICK"}
+        value={'NEW_NICK'}
         className="nick-select--option new_nick"
     >
         ДОБАВИТЬ
@@ -49,7 +49,7 @@ function getNickOptions(operators_list: T_OperatorsList | null) {
 }
 
 
-function getNickChangeHandler(setIsOpened: any, onProceed?: any) {
+function getNickChangeHandler(setIsOpened: React.Dispatch<React.SetStateAction<boolean>>, _onProceed?: unknown) {
     return (e: React.ChangeEvent<HTMLSelectElement>) => {
         const nickOption = e.currentTarget.value
         const payload = {
@@ -112,7 +112,7 @@ export function NickSelect(props:T_NickSelectProps) {
 
     const nickOptions = getNickOptions(props.operators_list)
 
-    const className = cx("quickBtn", "nick-btn", props.isMuted && "isMuted")
+    const className = cx('quickBtn', 'nick-btn', props.isMuted && 'isMuted')
 
     return <>
         <ModalDialog
@@ -126,7 +126,7 @@ export function NickSelect(props:T_NickSelectProps) {
         <select id="nick-select"
             name      = "nick"
             className = { className }
-            value     = { props.curNick || "" }
+            value     = { props.curNick || '' }
             onChange  = { nickChangeHandler }
         >
             {baseNickOptions}

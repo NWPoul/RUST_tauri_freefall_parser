@@ -1,4 +1,3 @@
-import { ReactNode, useState }          from 'react'
 
 import { cx }            from 'helpers'
 
@@ -30,8 +29,8 @@ export function IncButton({
     incVal: number,
     incHandler: () => void,
 }){
-    let className = cx('incBtn', incVal>0 ? 'INC' : 'DEC')
-    let text = incVal>0 ? ArrowUp : ArrowDown
+    const className = cx('incBtn', incVal>0 ? 'INC' : 'DEC')
+    const text = incVal>0 ? ArrowUp : ArrowDown
 
     return (
         <button
@@ -56,7 +55,7 @@ export function IncButtonBlock({
     maxVal?: number,
     valUpdateHandler: (newVal: number) => void,
 }){
-    let className = cx('incButtonBlock')
+    const className = cx('incButtonBlock')
     const incHandler = () => {
         valUpdateHandler( clampValue(val + incVal, minVal, maxVal) )
     }

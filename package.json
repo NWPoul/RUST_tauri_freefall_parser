@@ -7,6 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev-front": "vite",
     "test-front": "tsc",
+    "lint": "eslint src  --report-unused-disable-directives --max-warnings 100",
     "tauri-dev": "tauri dev",
     "tauri-build": "tauri build"
   },
@@ -20,12 +21,17 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@stylistic/eslint-plugin": "^2.8.0",
     "@tauri-apps/cli": "^1.6.0",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "cssnano": "^6.0.2",
+    "eslint": "^9.10.0",
+    "eslint-plugin-react-hooks": "5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.12",
     "postcss": "^8.4.32",
     "postcss-cli": "^10.1.0",
     "postcss-font-magician": "^3.0.0",
@@ -35,11 +41,21 @@
     "postcss-nesting": "^12.0.2",
     "postcss-plugin": "^1.0.0",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^8.6.0",
     "vite": "^4.5.1",
     "vite-tsconfig-paths": "^4.2.2"
   },
   "notUsed": {
     "build-front": "tsc && vite build",
     "preview-front": "vite preview"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss@<7.0.36": ">=7.0.36",
+      "postcss@<8.4.31": ">=8.4.31",
+      "micromatch@<4.0.8": ">=4.0.8",
+      "vite@>=4.0.0 <4.5.4": ">=4.5.4",
+      "vite@>=4.0.0 <=4.5.3": ">=4.5.4"
+    }
   }
 }

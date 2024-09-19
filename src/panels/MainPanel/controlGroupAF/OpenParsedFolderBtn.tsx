@@ -1,18 +1,18 @@
 
 
-import { cx }                            from "helpers"
-import { FolderVideoIcon }                   from "assets/SVG_Icons"
+import { cx }                            from 'helpers'
+import { FolderVideoIcon }                   from 'assets/SVG_Icons'
 
-import { getControlInputEventHandler }   from "../serv"
-
-
+import { getControlInputEventHandler }   from '../serv'
 
 
-const openParserFolder = getControlInputEventHandler("openParserFolder")
+
+
+const openParserFolder = getControlInputEventHandler('openParserFolder')
 
 export function OpenParsedFolderBtn() {
 
-    const className = cx("openParsedFolderBtn", "quickBtn")
+    const className = cx('openParsedFolderBtn', 'quickBtn')
 
     return (
             <button

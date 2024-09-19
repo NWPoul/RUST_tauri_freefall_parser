@@ -1,7 +1,12 @@
-import type { create, State, StateCreator, StoreMutatorIdentifier } from 'zustand'
+import type {
+  StateCreator,
+  StoreMutatorIdentifier,
+//   create,
+//   State,
+} from 'zustand'
 
 type Logger = <
-    T extends unknown ,
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = []
 >(
@@ -9,13 +14,13 @@ type Logger = <
   name?: string
 ) => StateCreator<T, Mps, Mcs>
 
-type LoggerImpl = <T extends unknown >(
+type LoggerImpl = <T>(
   f: StateCreator<T, [], []>,
   name?: string
 ) => StateCreator<T, [], []>
 
 const loggerImpl: LoggerImpl = (f, _) => (set, get, store) => {
-    type T = ReturnType<typeof f>
+  // type T = ReturnType<typeof f>
   const loggedSet: typeof set = (...a) => {
     set(...a)
     console.log('LOGGER_MW ', get())

@@ -12,9 +12,9 @@ import {
 
     type Event,
     type EventCallback,
-    type UnlistenFn,
     type WindowOptions,
     type T_controlInput,
+    // type UnlistenFn,
 }                                   from './api'
 
 import {
@@ -38,20 +38,20 @@ type T_StateUPDPayload =
 
 const WINDOW_CONFIG = {
     CONTROL: {
-        "label": "CONTROL",
-        "fullscreen": false,
-        "resizable": false,
-        "title": "control panel",
-        "width": 1280,
-        "height": 1024
+        'label': 'CONTROL',
+        'fullscreen': false,
+        'resizable': false,
+        'title': 'control panel',
+        'width': 1280,
+        'height': 1024
     },
     DISPLAY: {
-        "label": "DISPLAY",
-        "fullscreen": false,
-        "resizable": true,
-        "title": "display panel",
-        "width": 1300,
-        "height": 1000
+        'label': 'DISPLAY',
+        'fullscreen': false,
+        'resizable': true,
+        'title': 'display panel',
+        'width': 1300,
+        'height': 1000
     },
 } as const
 
@@ -59,7 +59,7 @@ const WINDOW_CONFIG = {
 
 
 function useWindowLabel() {
-    const [windowLabel, setWindowLabel] = useState("")
+    const [windowLabel, setWindowLabel] = useState('')
     API_getWindowLabel().then(setWindowLabel)
     return windowLabel
 }
@@ -112,17 +112,16 @@ function useRustConfigStateUpdateEvent() {
     )
 }
 
+
 function useBackendNotification(cb:(pyaload: [string, string]) => void) {
-    const handler = (e:Event<[string, string]>) => {
-        console.log("NOTIFICATION EVENT!", e)
-        cb(e.payload)
-    }
-    useEffect(
-        () => {
-            const unlisten = API_EVENT_LISTENERS.backendNotification(handler)
+    useEffect(() => {
+        const handler = (e:Event<[string, string]>) => {
+            console.log('NOTIFICATION EVENT!', e)
+            cb(e.payload)
+        }
+        const unlisten = API_EVENT_LISTENERS.backendNotification(handler)
             return () => { unlisten.then(unlistenFn => unlistenFn()) }
-        }, [handler]
-    )
+    }, [cb])
 }
 
 

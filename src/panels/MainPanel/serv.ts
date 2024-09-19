@@ -11,7 +11,7 @@ import { TogglePanelBtn }          from '../../components/controls/TogglePanelBt
 export const useKeys = () =>{
     useEffect(() => {
         const handleKeyUp = (event: KeyboardEvent) => {
-            if (event.code === 'KeyF') {}// apiRunFlasher()
+            if (event.code === 'KeyF') {console.log('Fkey')}// apiRunFlasher()
         }
         window.addEventListener('keyup', handleKeyUp)
         return () => window.removeEventListener('keyup', handleKeyUp)
@@ -19,11 +19,11 @@ export const useKeys = () =>{
 }
 
 
-export function getControlInputEventHandler(id: T_controlInput["id"]):
+export function getControlInputEventHandler(id: T_controlInput['id']):
     React.MouseEventHandler<HTMLButtonElement>
 {
     return (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        let val = e.currentTarget.value
+        const val = e.currentTarget.value
         console.log(e)
         console.log(`sendControlInputCommand: ${id} (val: ${val})`)
         if (val === undefined) return

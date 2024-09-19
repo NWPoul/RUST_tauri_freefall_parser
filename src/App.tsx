@@ -13,7 +13,7 @@ const PANEL = {
 }
 
 export function App() {
-    const windowLabel = useWindowLabel()?.split("_")?.[0]
+    const windowLabel = useWindowLabel()?.split('_')?.[0]
     const Panel = windowLabel in PANEL
         ? PANEL[windowLabel as keyof typeof PANEL]
         : null

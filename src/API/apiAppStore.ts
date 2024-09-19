@@ -25,10 +25,10 @@ interface T_Actions {
 
 
 const initialState: T_State = {
-    cur_dir   : ".",
+    cur_dir   : '.',
     flight    : 1,
     add_flight: false,
-    cur_nick  : "",
+    cur_nick  : '',
     add_nick  : false,
     operators_list: null,
     auto_play : true,

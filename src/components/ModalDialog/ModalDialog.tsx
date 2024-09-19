@@ -39,12 +39,12 @@ export const ModalDialog = ({
 
     useEffect(() => {
         if (isOpened) {
-            console.log("OPENING_MODAL: ", ref.current)
+            console.log('OPENING_MODAL: ', ref.current)
             ref.current?.showModal()
-            document.body.classList.add("modal-open")
+            document.body.classList.add('modal-open')
         } else {
-            ref.current?.close();
-            document.body.classList.remove("modal-open")
+            ref.current?.close()
+            document.body.classList.remove('modal-open')
         }
     }, [isOpened])
 
@@ -70,10 +70,10 @@ export const ModalDialog = ({
                     ? <button className="modal-btn modal-btn--proceed" onClick={proceedAndClose}>{proceedBtnText}</button>
                     : null
                 }
-                <button className="modal-btn modal-btn--close" onClick={onClose}>{closeBtnText ?? "Close"}</button>
+                <button className="modal-btn modal-btn--close" onClick={onClose}>{closeBtnText ?? 'Close'}</button>
             </div>
         </dialog>
-    );
-};
+    )
+}
 
 export default ModalDialog

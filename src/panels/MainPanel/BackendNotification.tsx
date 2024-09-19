@@ -1,11 +1,11 @@
 import { useState }                 from 'react'
 
-import { cx }                       from 'helpers'
+// import { cx }                       from 'helpers'
 import { useBackendNotification }   from 'API/apiHelpers'
 
 import {
     ModalDialog,
-    type T_ModalProps
+    // type T_ModalProps
 }                                   from 'components/ModalDialog'
 
 
@@ -22,7 +22,7 @@ import {
 
 export function BackendNotification() {
     const [isOpened, setIsOpened] = useState<boolean>(false)
-    const [payload, setPayload]   = useState<[string, string]>(["",""])
+    const [payload, setPayload]   = useState<[string, string]>(['',''])
     
     function handler([title, msg]:[string, string]) {
         setPayload([title, msg])

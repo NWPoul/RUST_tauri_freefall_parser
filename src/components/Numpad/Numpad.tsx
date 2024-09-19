@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import './numpadStyles.css';
+import './numpadStyles.css'
 
 
 
@@ -14,8 +14,8 @@ export function Numpad({updMessage, onClose}:{updMessage:(msg: string) => void, 
         e.stopPropagation()
         e.preventDefault()
         const taret = e.target as HTMLElement
-        const char = taret?.nodeName === 'BUTTON' ? taret.innerText : ""
-        setValue(value + char);
+        const char = taret?.nodeName === 'BUTTON' ? taret.innerText : ''
+        setValue(value + char)
     }
 
     const handleBackSpaceClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -27,8 +27,8 @@ export function Numpad({updMessage, onClose}:{updMessage:(msg: string) => void, 
     const handleSubmitClick = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation()
         e.preventDefault()
-        if (!!value) updMessage("dfghhef")
-        setValue("")
+        if (value) updMessage('dfghhef')
+        setValue('')
         onClose()
     }
 

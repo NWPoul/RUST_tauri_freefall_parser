@@ -22,9 +22,9 @@ export function useKeypress(key:string, action: T_keyPressAction) {
           e.preventDefault()
         }
     }
-    window.addEventListener('keyup', onKeyup);
-    return () => window.removeEventListener('keyup', onKeyup);
-  }, [action, key]);
+    window.addEventListener('keyup', onKeyup)
+    return () => window.removeEventListener('keyup', onKeyup)
+  }, [action, key])
 }
 
 export function useKeyCodemap(

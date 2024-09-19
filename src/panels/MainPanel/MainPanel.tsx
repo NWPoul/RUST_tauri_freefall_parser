@@ -27,11 +27,12 @@ import { BackendNotification }      from './BackendNotification'
 
 
 
+
 function selectVideoFiles() {
     sendControlInputCommand(
         {
-            id: "selectVideoFiles",
-            val: "",
+            id: 'selectVideoFiles',
+            val: '',
         }
     )
     console.log('selectVideoFilesBtn')
@@ -39,7 +40,7 @@ function selectVideoFiles() {
 
 function updFFTime(newVal: number) {
     sendControlInputCommand({
-        id: "setFreefallTime",
+        id: 'setFreefallTime',
         val: newVal
     })
 }

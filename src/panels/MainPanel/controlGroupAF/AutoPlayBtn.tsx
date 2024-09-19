@@ -1,17 +1,17 @@
 
 
-import { cx }                            from "helpers"
-import { PlayBtnIcon }                   from "assets/SVG_Icons"
+import { cx }                            from 'helpers'
+import { PlayBtnIcon }                   from 'assets/SVG_Icons'
 
-import { getControlInputEventHandler }   from "../serv"
+import { getControlInputEventHandler }   from '../serv'
 
 
-const toggleAutoPlay = getControlInputEventHandler("toggleAutoPlay")
+const toggleAutoPlay = getControlInputEventHandler('toggleAutoPlay')
 
 
 
 export function AutoPlayBtn({isMuted}:{isMuted: boolean}) {
-    const className = cx("autoPlayBtn", "quickBtn", isMuted && "isMuted")
+    const className = cx('autoPlayBtn', 'quickBtn', isMuted && 'isMuted')
 
     return (
             <button

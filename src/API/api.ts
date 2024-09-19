@@ -1,11 +1,11 @@
-import { invoke }                from "@tauri-apps/api/tauri"
+import { invoke }                from '@tauri-apps/api/tauri'
 import {
     appWindow,
     WebviewWindow,
     WindowOptions,
 }                                from '@tauri-apps/api/window'
 import {
-    emit,
+    // emit,
     listen,
     type UnlistenFn,
     type Event,
@@ -16,23 +16,23 @@ import {
 import {
     T_apiAppState,
     T_apiAppStateUPD,
-}                                from "./apiAppStore"
+}                                from './apiAppStore'
 import {
     T_apiConfigStateUPD,
     T_apiConfigState
-}                                from "./apiConfigStore"
+}                                from './apiConfigStore'
 
 
 
 type T_controlInputId =
-    | "selectVideoFiles"
-    | "setFreefallTime"
-    | "setFlight"
-    | "toggleFlight"
-    | "setCurNick"
-    | "newNick"
-    | "toggleAutoPlay"
-    | "openParserFolder"
+    | 'selectVideoFiles'
+    | 'setFreefallTime'
+    | 'setFlight'
+    | 'toggleFlight'
+    | 'setCurNick'
+    | 'newNick'
+    | 'toggleAutoPlay'
+    | 'openParserFolder'
 
 type T_controlInput = {
     id : T_controlInputId;
@@ -41,8 +41,8 @@ type T_controlInput = {
 
 
 type T_configInputId =
-    | "ToggleFlesherMode"
-    | "SetFlesherMode"
+    | 'ToggleFlesherMode'
+    | 'SetFlesherMode'
 type T_configInput = {
     id : T_configInputId;
     val: string | number | boolean;
@@ -77,12 +77,12 @@ async function API_getWindowLabel() {
 }
 
 async function API_getAppStoreData() {
-    let resp = await invoke("get_app_store_data")
+    const resp = await invoke('get_app_store_data')
     return resp as T_apiAppState
 }
 async function API_sendControlInput(input: T_controlInput) {
-    let resp = await invoke(
-        "front_control_input",
+    const resp = await invoke(
+        'front_control_input',
         {input: {
             id : input.id,
             val: input.val.toString(),
@@ -95,12 +95,12 @@ async function API_sendControlInput(input: T_controlInput) {
 
 
 async function API_getConfigStoreData() {
-    let resp = await invoke("get_config_store_data")
+    const resp = await invoke('get_config_store_data')
     return resp as T_apiConfigState
 }
 async function API_sendConfigInput(input: T_configInput) {
-    let resp = await invoke(
-        "front_config_input",
+    const resp = await invoke(
+        'front_config_input',
         {input: {
             id : input.id,
             val: input.val.toString(),
@@ -126,12 +126,12 @@ const API_EVENT_LISTENERS = {
 
 
 function API_createPanel(label:string, config?:WindowOptions) {
-    const _defaultWindowConfig = {"title": label}
+    const _defaultWindowConfig = {'title': label}
     // const webview = new WebviewWindow('MINI_'+(Math.random()*1000).toFixed(0).toString(), {
     const webview = new WebviewWindow(label, config || _defaultWindowConfig)
 
-    webview.once('tauri://created', ( ) => {console.log("tauri://created")})
-    webview.once('tauri://error'  , (e) => {console.log("tauri://error", e)})
+    webview.once('tauri://created', ( ) => {console.log('tauri://created')})
+    webview.once('tauri://error'  , (e) => {console.log('tauri://error', e)})
     return webview
 }
 
