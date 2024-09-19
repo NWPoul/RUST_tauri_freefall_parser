@@ -48,16 +48,8 @@ pub static STORE_CONFIG_INSTANCE: OnceLock<store_config::StoreType> = OnceLock::
 
 
 
-create_store_subscriber! (
-    store_app_subscriber,
-    "app-state-update-event",
-    &store_app::State
-);
-create_store_subscriber! (
-    store_config_subscriber,
-    "config-state-update-event",
-    &store_config::State
-);
+create_store_subscriber! (store_app_subscriber,    "app-state-update-event",    &store_app::State);
+create_store_subscriber! (store_config_subscriber, "config-state-update-event", &store_config::State);
 
 
 fn init_app(app: &mut tauri::App) -> MyResult<()> {
@@ -102,14 +94,5 @@ async fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-
-
-
-
-
-
-
-
 
 
