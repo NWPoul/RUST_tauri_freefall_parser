@@ -1,7 +1,7 @@
 
 use std::path::PathBuf;
 
-use crate::telemetry_parser_serv::parse_telemetry_from_file;
+use crate::telemetry_parser_serv::{parse_telemetry_from_file, CameraInfo};
 use crate::store_config;
 
 
@@ -21,7 +21,8 @@ pub struct MaxAccData {
 
 #[derive(Debug)]
 pub struct FileTelemetryResult {
-    pub device_name : String,
+    pub file_name   : String,
+    pub cam_info    : CameraInfo,
     pub start_time  : f64,
     pub end_time    : f64,
     pub max_acc_data: MaxAccData,
@@ -31,7 +32,7 @@ impl FileTelemetryResult {
     pub fn get_description(&self) -> String {
         format!(
             "CAM: {} Freefall: {}s-{}s ({}s) Max Acc: {}",
-            self.device_name,
+            self.cam_info.model,
             self.start_time,
             self.end_time,
             self.end_time - self.start_time,
@@ -91,7 +92,6 @@ pub fn get_result_metadata_for_file(
     config_values: &store_config::ConfigValues,
 ) -> Result<FileTelemetryResult, String> {
     let telemetry_data = parse_telemetry_from_file(input_file)?;
-    let camera_name    = format_camera_name(&telemetry_data.cam_info);
 
     let telemetry_sma_acc_data = get_sma_list(&telemetry_data.acc_data, SMA_BASE);
 
@@ -100,7 +100,7 @@ pub fn get_result_metadata_for_file(
     if max_acc_data.acc < config_values.min_accel_trigger {
         let err_msg = format!(
             "CAM: {} No deployment! (min acc required {}m/s2) detected: {}",
-            camera_name,
+            &telemetry_data.cam_info.model,
             config_values.min_accel_trigger,
             format_acc_datablock(&max_acc_data)
         );
@@ -112,7 +112,8 @@ pub fn get_result_metadata_for_file(
     let target_end_time   = deployment_time           + config_values.time_end_offset;
 
     Ok(FileTelemetryResult{
-        device_name : camera_name,
+        file_name   : telemetry_data.file_name,
+        cam_info    : telemetry_data.cam_info,
         start_time  : target_start_time,
         end_time    : target_end_time,
         max_acc_data: max_acc_data,

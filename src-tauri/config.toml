@@ -1,4 +1,4 @@
-dest_dir_path = 'D:\DEV\VIDEO_TEMP\PARSED_VIDEO'
+dest_dir_path = 'E:\DEV_VIDEO\DEV_PARSED'
 no_ffmpeg_processing = false
 time_freefall = '70.0'
 

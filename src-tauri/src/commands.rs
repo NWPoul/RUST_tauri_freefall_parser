@@ -90,7 +90,7 @@ pub fn get_ffmpeg_status_for_file(
         src_file_path,
         &(&config_values.dest_dir_path).into(),
         &config_values.output_file_postfix,
-        &file_result_data.device_name,
+        &file_result_data.cam_info.model,
         flight_info,
         app_values.cur_nick.clone(),
     );

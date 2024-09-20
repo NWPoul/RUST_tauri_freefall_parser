@@ -2,64 +2,62 @@
 
 use std::sync::{ Arc, atomic::AtomicBool };
 
-use telemetry_parser::*;
-use telemetry_parser::tags_impl::*;
+use telemetry_parser::Input as TpInput;
+use telemetry_parser::util as tp_util;
+
+use crate::telemetry_analysis::format_camera_name;
 
 
 
-
-struct Opts {
-    input: String,
-    dump: bool,
-    imuo: Option<String>,
+#[derive(Debug)]
+pub struct CameraInfo {
+    pub model : String,
+    pub serial: Option<String>,
 }
 
 
 pub struct TelemetryData {
-    pub cam_info: String,
-    pub acc_data: Vec<(f64, f64, f64)>,
+    pub file_name : String,
+    pub cam_info  : CameraInfo,
+    pub acc_data  : Vec<(f64, f64, f64)>,
 }
 
 
 
-fn _get_additional_metadata(samples: &[util::SampleInfo]) -> Vec<(String, String)> {
-    let mut additional_metadata: Vec<(String,String)> = vec![];
-    telemetry_parser::try_block!({
-        let map = samples.get(0)?.tag_map.as_ref()?;
-        let json = (map.get(&GroupId::Default)?.get_t(TagId::Metadata) as Option<&serde_json::Value>)?;
-        for (k, v) in json.as_object()? {
-            additional_metadata.push(
-               ( k.to_string(), v.to_string())
-            );
-        }
-    });
-    additional_metadata
-}
-
-
-fn dump_samples(samples: &[util::SampleInfo]) {
-    for info in samples {
-        if info.tag_map.is_none() { continue; }
-        let grouped_tag_map = info.tag_map.as_ref().unwrap();
-
-        for (group, map) in grouped_tag_map {
-            for (tagid, taginfo) in map {
-                println!("{: <25} {: <25} {: <50}: {}", format!("{}", group), format!("{}", tagid), taginfo.description, &taginfo.value.to_string());
+fn get_cam_serial(sample_0: &tp_util::SampleInfo) -> Option<String> {
+    if let Some(grouped_tag_map) = sample_0.tag_map.as_ref() {
+        for map in grouped_tag_map.values() {
+            if let Some(taginfo) = map.values().find(|taginfo| taginfo.description == "CASN") {
+                return Some(taginfo.value.to_string());
             }
         }
+    }
+    println!("NO CASN");
+    return None
+}
+fn get_cam_info(input: &TpInput) -> CameraInfo {
+    let mut cam_model  = "".to_string();
+    let mut cam_serial = None;
+
+    if let Some(model) = input.camera_model() {
+        cam_model = format_camera_name(model);
+    };
+    if let Some(samples) = &input.samples {
+        cam_serial = get_cam_serial(&samples[0]);
+    };
+
+    println!("Detected camera: {cam_model} {:?}", &cam_serial);
+
+    CameraInfo{
+        model : cam_model.into(),
+        serial: cam_serial,
     }
 }
 
 
 
 pub fn parse_telemetry_from_file(input_file: &str) -> Result<TelemetryData, String> {
-    let opts: Opts = Opts {
-        input: input_file.into(),
-        dump: false,
-        imuo: None,
-    };
-
-    let mut stream = match std::fs::File::open(&opts.input) {
+    let mut stream = match std::fs::File::open(input_file) {
         Ok(stream) => stream,
         Err(e) => {return Err(e.to_string());},
     };
@@ -70,32 +68,14 @@ pub fn parse_telemetry_from_file(input_file: &str) -> Result<TelemetryData, Stri
     };
 
 
-    let input = match Input::from_stream(
-        &mut stream,
-        filesize,
-        &opts.input,
-        |_|(),
-        Arc::new(AtomicBool::new(false))
-    ) {
+    let input = match TpInput::from_stream(&mut stream, filesize,input_file, |_|(), Arc::new(AtomicBool::new(false))) {
         Ok(input) => input,
         Err(e) => {return Err(format!("FAIL TO PARSE TELEMETRY! {}", e.to_string()));},
     };
 
-    let cam_info = format!("{} {}",
-        input.camera_type(),
-        input.camera_model().unwrap_or(&"".into()),
-    );
-    println!("Detected camera: {cam_info}");
+    let cam_info = get_cam_info(&input);
 
-    let samples = match input.samples.as_ref() {
-        Some(samples_ref) => samples_ref,
-        None => {return Err(format!("NO_SAMPLES!"))},
-    };
-
-
-    if opts.dump { dump_samples(samples);}
-
-    let imu_data = match util::normalized_imu(&input, opts.imuo) {
+    let imu_data = match tp_util::normalized_imu(&input, None) {
         Ok(data) => data,
         Err(e) => {return Err(format!("FAIL TO GET IMUDATA! {}", e.to_string()));},
     };
@@ -110,7 +90,8 @@ pub fn parse_telemetry_from_file(input_file: &str) -> Result<TelemetryData, Stri
     }
 
     Ok(TelemetryData {
-        cam_info: cam_info,
-        acc_data: telemetry_xyz_acc_data,
+        cam_info,
+        file_name: input_file.to_string(),
+        acc_data : telemetry_xyz_acc_data,
     })
 }
