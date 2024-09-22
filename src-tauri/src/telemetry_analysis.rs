@@ -8,18 +8,20 @@ use crate::store_config;
 
 const SMA_BASE: usize = 50;
 
-
 pub type FileParsingOkData  = Vec<(PathBuf, FileTelemetryResult)>;
 pub type FileParsingErrData = Vec<(PathBuf, String)>;
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+pub struct FileParsingResults (FileParsingOkData, FileParsingErrData);
 
-#[derive(Debug)]
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct MaxAccData {
     acc : f64,
     time: f64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct FileTelemetryResult {
     pub file_name   : String,
     pub cam_info    : CameraInfo,
@@ -124,7 +126,7 @@ pub fn get_result_metadata_for_file(
 pub fn get_telemetry_for_files(
     src_files_path_list: &[PathBuf],
     config_values      : &store_config::ConfigValues,
-) -> (FileParsingOkData, FileParsingErrData) {
+) -> FileParsingResults {
     let mut ok_list : FileParsingOkData  = vec![];
     let mut err_list: FileParsingErrData = vec![];
 
@@ -136,5 +138,5 @@ pub fn get_telemetry_for_files(
             Err(err_str) => err_list.push((src_file_path.clone(), err_str)),
         };
     };
-    (ok_list, err_list)
+    FileParsingResults(ok_list, err_list)
 }

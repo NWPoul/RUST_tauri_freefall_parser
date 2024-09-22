@@ -55,10 +55,11 @@ macro_rules! configValues {
     };
 }
 
+
 #[macro_export]
-macro_rules! create_store_subscriber {
-    ($name:ident, $event:expr, $state_type:ty) => {
-        fn $name(state: $state_type) {
+macro_rules! subscribe_apphandle_to_store { ($store:ident, $event:expr, $state_type:ty) => {
+    $store.subscribe(
+        |state: $state_type| {
             APP_HANDLE_INSTANCE
                 .get()
                 .expect("app is not init yet")
@@ -66,8 +67,9 @@ macro_rules! create_store_subscriber {
                 .unwrap();
             println!("New state: {:?}", state);
         }
-    };
-}
+    )
+}}
+
 
 #[macro_export]
 macro_rules! create_get_store_data_command {

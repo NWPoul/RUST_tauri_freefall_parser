@@ -9,7 +9,7 @@ use crate::telemetry_analysis::format_camera_name;
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct CameraInfo {
     pub model : String,
     pub serial: Option<String>,

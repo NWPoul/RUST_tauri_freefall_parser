@@ -13,6 +13,8 @@ use std::{
     }
 };
 
+use crate::{file_sys_serv::get_output_file_path, store_app, store_config, telemetry_analysis::{FileParsingErrData, FileParsingOkData, FileTelemetryResult}, telemetry_parser_serv::CameraInfo};
+
 
 
 pub const GLITCH_MARGIN: f64 = 2.0;
@@ -87,4 +89,81 @@ pub fn run_ffmpeg(
         Ok(_)      => Ok(dest_file_path.clone()),
         Err(error) => Err(error)
     }
+}
+
+
+pub fn get_output_filepath(
+    src_file_path : &PathBuf,
+    cam_info      : &CameraInfo,
+    config_values : &store_config::ConfigValues,
+    app_values    : &store_app::State,
+) -> PathBuf{
+    let flight_info = match app_values.add_flight {
+        true  => Some(app_values.flight),
+        false => None,
+    };
+
+    let output_file_path = get_output_file_path(
+        src_file_path,
+        &(&config_values.dest_dir_path).into(),
+        &config_values.output_file_postfix,
+        &cam_info.model,
+        flight_info,
+        app_values.cur_nick.clone(),
+    );
+    output_file_path
+}
+
+
+pub fn run_ffmpeg_for_file(
+    src_file_path         : &PathBuf,
+    output_file_path      : &PathBuf,
+    (start_time, end_time): (f64, f64),
+    config_values         : &store_config::ConfigValues,
+) -> Result<PathBuf, String> {
+
+    
+    let ffmpeg_output = run_ffmpeg(
+        (start_time, end_time),
+        (&src_file_path, &output_file_path ),
+        &config_values.ffmpeg_dir_path,
+    );
+
+    match ffmpeg_output {
+        Ok(output_path) => Ok(output_path),
+        Err(err)        => Err(err.to_string()),
+    }
+}
+
+
+
+pub fn ffmpeg_videofiles(
+    parsing_results: &FileParsingOkData,
+    config_values  : &store_config::ConfigValues,
+    app_values     : &store_app::State,
+) -> (Vec<PathBuf>, Vec<String>) {
+
+    let mut ok_list : Vec<PathBuf> = vec![];
+    let mut err_list: Vec<String>  = vec![];
+
+    for (file_src_path, file_res) in parsing_results {
+        let output_file_path = get_output_filepath(
+            file_src_path,
+            &file_res.cam_info,
+            config_values,
+            app_values, 
+        );
+
+        match run_ffmpeg_for_file(
+            file_src_path,
+            &output_file_path,
+            (file_res.start_time, file_res.end_time),
+            config_values,
+        ) {
+            Ok(dest_path) => ok_list.push(dest_path),
+            Err(err_str)  => err_list.push(err_str),
+        };
+    }
+
+    (ok_list, err_list)
 }

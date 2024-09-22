@@ -1,4 +1,4 @@
-use redux_rs::Store;
+use redux_rs::{Store};
 
 use std::{
     collections::HashMap,
@@ -8,7 +8,9 @@ use std::{
 
 use crate::utils::u_serv::normalize_name;
 
-use crate::commands::main_workflow_for_videofiles;
+use crate::commands::on_choose_video_for_parsing;
+
+use crate::telemetry_analysis::FileParsingResults;
 
 use crate::file_sys_serv::{
     init_file,
@@ -42,13 +44,15 @@ pub fn init_operators_list_file() {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct State {
-    pub cur_dir   : PathBuf,
-    pub flight    : u8,
-    pub add_flight: bool,
-    pub cur_nick  : Option<String>,
-    pub add_nick  : bool,
-    pub auto_play : bool,
+    pub cur_dir    : PathBuf,
+    pub flight     : u8,
+    pub add_flight : bool,
+    pub cur_nick   : Option<String>,
+    pub add_nick   : bool,
+    pub auto_play  : bool,
+    pub groups_list   : Vec<String>,
     pub operators_list: HashMap<String, Vec<String>>,
+    pub chosen_files_data: Option<FileParsingResults>,
 }
 
 impl Default for State { fn default() -> Self {
@@ -59,7 +63,9 @@ impl Default for State { fn default() -> Self {
         cur_nick   : None,
         add_nick   : false,
         auto_play  : true,
+        groups_list   : Vec::new(),
         operators_list: HashMap::new(),
+        chosen_files_data: None,
     };
 
     match read_operators_file(OPERATORS_LIST_FILE_NAME) {
@@ -69,6 +75,9 @@ impl Default for State { fn default() -> Self {
 
     state
 }}
+
+
+
 
 
 #[derive(Debug)]
@@ -84,6 +93,7 @@ pub enum Action {
     ToggleAddFlight(bool),
     ToggleAddNick(bool),
     ToggleAutoPlay(bool),
+    UpdChosenFilesData(Option<FileParsingResults>),
 }
 
 pub type StoreType = Store<State, Action, fn(State, Action) -> State>;
@@ -93,28 +103,45 @@ pub type StoreType = Store<State, Action, fn(State, Action) -> State>;
 #[allow(non_snake_case)]
 pub mod SELECTORS {
     use std::{collections::HashMap, path::PathBuf};
-    use super::State;
-    use crate::create_selector;// operators_serv::OperatorRecord};
+    use super::{State, FileParsingResults};
+    use crate::{create_selector};// operators_serv::OperatorRecord};
 
-    create_selector!( CurDir,        cur_dir   , PathBuf         , clone = true );
-    create_selector!( Flight,        flight    , u8   );
-    create_selector!( IsAddFlight,   add_flight, bool );
-    create_selector!( CurNick,       cur_nick  , Option<String>  , clone = true );
-    create_selector!( IsAddNick,     add_nick  , bool );
-    create_selector!( IsAutoPlay,    auto_play , bool );
-    create_selector!( OperatorsList, operators_list, HashMap<String, Vec<String>>, clone = true );
+    create_selector!( CurDir,        cur_dir    , PathBuf       , clone = true );
+    create_selector!( Flight,        flight     , u8   );
+    create_selector!( IsAddFlight,   add_flight , bool );
+    create_selector!( CurNick,       cur_nick   , Option<String>, clone = true );
+    create_selector!( IsAddNick,     add_nick   , bool );
+    create_selector!( IsAutoPlay,    auto_play  , bool );
+    create_selector!( GroupsList,    groups_list, Vec<String>   , clone = true );
+    create_selector!( OperatorsList  , operators_list   , HashMap<String, Vec<String>>, clone = true );
+    create_selector!( ChosenFilesData, chosen_files_data, Option<FileParsingResults>  , clone = true );
 }
 
 
 
 
-pub fn on_new_drive_event(new_drive: &PathBuf) {
+pub fn on_new_drive_event(new_drive: &PathBuf, new_state: &mut State) {
+    if let Ok(operator_id) = recognize_card(new_drive) {
+        match find_operator_by_id_inhash(&new_state.operators_list, &operator_id) {
+            Some(operator) => {
+                dbg!("SD Card recognized!", &operator.0);
+                new_state.cur_nick = Some(operator.0);
+                new_state.add_nick = true;
+            },
+            None => {
+                dbg!("SD Card NEW OPERATOR {}", &operator_id);
+                new_state.cur_nick = None;
+                new_state.add_nick = false;
+            }
+        }
+    }
+
     println!("\nNEW DRIVE PLUGGED IN: {:?}", new_drive);
     let src_path = get_src_path_for_ext_drive(&new_drive);
     crate::commands::unminimize_window();
     let rt = tokio::runtime::Runtime::new().unwrap();
     std::thread::spawn(move || {
-        rt.block_on(main_workflow_for_videofiles(&src_path));
+        rt.block_on(on_choose_video_for_parsing(&src_path));
     });
 }
 
@@ -127,7 +154,7 @@ fn reducer(state: State, action: Action) -> State {
         Action::ToggleAddFlight(payload) => State{add_flight: payload, ..state},
         Action::UpdFlight(payload)       => State{flight    : payload, add_flight: true, ..state},
         Action::ToggleAddNick(payload)   => State{add_nick  : payload, ..state},
-        Action::ToggleAutoPlay(payload)  => State{auto_play  : payload, ..state},
+        Action::ToggleAutoPlay(payload)  => State{auto_play : payload, ..state},
 
         Action::UpdCurNick(payload) => { match payload {
             Some(nick) => State{ cur_nick:Some(nick), add_nick:true , ..state },
@@ -150,27 +177,13 @@ fn reducer(state: State, action: Action) -> State {
 
         Action::EventNewDrive(payload) => {
             let mut new_state = state.clone();
-            if let Ok(operator_id) = recognize_card(&payload) {
-                match find_operator_by_id_inhash(&state.operators_list, &operator_id) {
-                    Some(operator) => {
-                        dbg!("SD Card recognized!", &operator.0);
-                        new_state.cur_nick = Some(operator.0);
-                        new_state.add_nick = true;
-                    },
-                    None => {
-                        dbg!("SD Card NEW OPERATOR {}", &operator_id);
-                        new_state.cur_nick = None;
-                        new_state.add_nick = false;
-                    }
-                }
-            }
-            on_new_drive_event(&payload);
+            on_new_drive_event(&payload, &mut new_state);
             new_state
         },
 
         Action::AddNewNick(payload) => {
             let normalized_name = normalize_name(&payload);
-            if let Some(_rec) = find_by_nick_inhash(&state.operators_list, &normalized_name) {
+            if find_by_nick_inhash(&state.operators_list, &normalized_name).is_some() {
                 return  state;
             }
             let mut new_operators_list = state.operators_list.clone();
@@ -178,30 +191,26 @@ fn reducer(state: State, action: Action) -> State {
             new_operators_list.entry(normalized_name.clone())
                 .or_insert_with(Vec::new)
                 .push(new_id.clone());
-
             _ = update_operators_file(&normalized_name, &new_id);
-
             State{
                 operators_list: new_operators_list,
                 cur_nick : Some(normalized_name),
                 add_nick : true,
-                ..state}
+                ..state
+            }
         },
+
+        Action::UpdChosenFilesData(payload) => State{chosen_files_data: payload, ..state},
     }
 }
+
+
+
 
 
 pub fn get_store() -> Store<State, Action, fn(State, Action) -> State> {
     let initial_state = State::default();
     Store::new_with_state(reducer, initial_state)
 }
-
-
-
-
-
-
-
-
 
 

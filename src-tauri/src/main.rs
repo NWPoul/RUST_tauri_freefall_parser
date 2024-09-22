@@ -48,8 +48,6 @@ pub static STORE_CONFIG_INSTANCE: OnceLock<store_config::StoreType> = OnceLock::
 
 
 
-create_store_subscriber! (store_app_subscriber,    "app-state-update-event",    &store_app::State);
-create_store_subscriber! (store_config_subscriber, "config-state-update-event", &store_config::State);
 
 
 fn init_app(app: &mut tauri::App) -> MyResult<()> {
@@ -58,13 +56,11 @@ fn init_app(app: &mut tauri::App) -> MyResult<()> {
         .expect("APP_HANDLE_INSTANCE initialisation error");
 
     tokio::spawn(async {
-        let store_app_instance = STORE_APP_INSTANCE.get()
-            .expect("static app store instance not init");
-        store_app_instance.subscribe(store_app_subscriber).await;
+        let store_app_instance    = STORE_APP_INSTANCE.get().expect("static app store instance not init");
+        let store_config_instance = STORE_CONFIG_INSTANCE.get().expect("static config store instance not init");
 
-        let store_config_instance = STORE_CONFIG_INSTANCE.get()
-            .expect("static config store instance not init");
-        store_config_instance.subscribe(store_config_subscriber).await;
+        subscribe_apphandle_to_store!(store_app_instance, "app-state-update-event", &store_app::State).await;
+        subscribe_apphandle_to_store!(store_config_instance, "config-state-update-event", &store_config::State).await;
 
         watch_drives(store_app_instance).await;
     });
