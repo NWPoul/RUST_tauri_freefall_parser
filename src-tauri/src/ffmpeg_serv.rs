@@ -52,20 +52,17 @@ fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> Result<PathBuf, IOError> {
 
 
 pub fn run_ffmpeg(
-    target_start_end_time: (f64, f64),
-    src_dest_files_path  : (&PathBuf, &PathBuf),
-    ffmpeg_dir_path      : &PathBuf,
+   (start_time, end_time)         : (f64, f64),
+   (src_file_path, dest_file_path): (&PathBuf, &PathBuf),
+    ffmpeg_dir_path               : &PathBuf,
 ) -> Result<PathBuf, IOError> {
-    let (mut start_time, end_time) = target_start_end_time;
-    let (src_file_path, dest_file_path) = src_dest_files_path;
-
     let glitch_margin:f64 = if start_time >= GLITCH_MARGIN {
         GLITCH_MARGIN
     } else {
         start_time
     };
 
-    start_time -= glitch_margin;
+    let start_time = start_time - glitch_margin;
 
     let ffmpeg_path = check_get_ffmpeg(ffmpeg_dir_path)?
         .display().to_string();
@@ -115,25 +112,6 @@ pub fn get_output_filepath(
 }
 
 
-pub fn run_ffmpeg_for_file(
-    src_file_path         : &PathBuf,
-    output_file_path      : &PathBuf,
-    (start_time, end_time): (f64, f64),
-    config_values         : &store_config::ConfigValues,
-) -> Result<PathBuf, String> {
-
-    
-    let ffmpeg_output = run_ffmpeg(
-        (start_time, end_time),
-        (&src_file_path, &output_file_path ),
-        &config_values.ffmpeg_dir_path,
-    );
-
-    match ffmpeg_output {
-        Ok(output_path) => Ok(output_path),
-        Err(err)        => Err(err.to_string()),
-    }
-}
 
 
 
@@ -154,14 +132,13 @@ pub fn ffmpeg_videofiles(
             app_values, 
         );
 
-        match run_ffmpeg_for_file(
-            file_src_path,
-            &output_file_path,
+        match run_ffmpeg(
             (file_res.start_time, file_res.end_time),
-            config_values,
+            (file_src_path, &output_file_path ),
+            &config_values.ffmpeg_dir_path,
         ) {
             Ok(dest_path) => ok_list.push(dest_path),
-            Err(err_str)  => err_list.push(err_str),
+            Err(err)      => err_list.push(err.to_string()),
         };
     }
 
