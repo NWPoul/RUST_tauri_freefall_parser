@@ -135,7 +135,6 @@ pub fn on_new_drive_event(new_drive: &PathBuf, new_state: &mut State) {
             }
         }
     }
-
     println!("\nNEW DRIVE PLUGGED IN: {:?}", new_drive);
     let src_path = get_src_path_for_ext_drive(&new_drive);
     crate::commands::unminimize_window();

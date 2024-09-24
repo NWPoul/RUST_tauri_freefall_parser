@@ -113,18 +113,16 @@ pub fn get_output_filepath(
 
 
 
-
-
 pub fn ffmpeg_videofiles(
-    parsing_results: &FileParsingOkData,
-    config_values  : &store_config::ConfigValues,
-    app_values     : &store_app::State,
+    files_data   : &FileParsingOkData,
+    config_values: &store_config::ConfigValues,
+    app_values   : &store_app::State,
 ) -> (Vec<PathBuf>, Vec<String>) {
 
     let mut ok_list : Vec<PathBuf> = vec![];
     let mut err_list: Vec<String>  = vec![];
 
-    for (file_src_path, file_res) in parsing_results {
+    for (file_src_path, file_res) in files_data {
         let output_file_path = get_output_filepath(
             file_src_path,
             &file_res.cam_info,

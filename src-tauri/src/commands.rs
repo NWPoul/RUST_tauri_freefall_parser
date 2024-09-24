@@ -65,12 +65,16 @@ pub fn unminimize_window() {
 
 
 
-fn on_ffmpeg_videofiles(
+async fn on_ffmpeg_videofiles(
     parsing_results: &FileParsingOkData,
-    config_values  : &store_config::ConfigValues,
-    app_values     : &store_app::State,
 ) {
-    let (ok_list, err_list) = ffmpeg_videofiles( parsing_results, config_values, app_values);
+    let store_app_instance    = STORE_APP_INSTANCE.get().expect("app_store instance n/a");
+    let store_config_instance = STORE_CONFIG_INSTANCE.get().expect("config_store instance n/a");
+    
+    let config_values = store_config_instance.state_cloned().await;
+    let app_values    = store_app_instance.state_cloned().await;
+
+    let (ok_list, err_list) = ffmpeg_videofiles( parsing_results, &config_values, &app_values);
     let mut report = format!(
         "Успешно записано файлов: {}",
         ok_list.len()
