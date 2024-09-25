@@ -32,7 +32,7 @@ macro_rules! configValues {
             $(pub $var:$type),*
         }
 
-        pub fn get_config_values() -> ConfigValues {
+        fn get_init_config_values() -> ConfigValues {
             let mut settings = Config::default();
 
             if let Err(e) = settings.merge(CfgFile::with_name("config.toml")) {

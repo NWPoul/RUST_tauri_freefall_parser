@@ -1,6 +1,7 @@
 
 use std::{
     io::{
+        Result    as IOResult,
         Error     as IOError,
         ErrorKind as IOErrorKind,
     },
@@ -13,15 +14,24 @@ use std::{
     }
 };
 
-use crate::{file_sys_serv::get_output_file_path, store_app, store_config, telemetry_analysis::{FileParsingErrData, FileParsingOkData, FileTelemetryResult}, telemetry_parser_serv::CameraInfo};
+use crate::{
+    file_sys_serv::get_output_file_path,
+    store_app,
+    store_config,
+    telemetry_analysis::FileParsingOkData,
+    telemetry_parser_serv::CameraInfo,
+};
 
 
 
 pub const GLITCH_MARGIN: f64 = 2.0;
 
 
-
-fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> Result<PathBuf, IOError> {
+fn get_ffmpeg() -> IOResult<PathBuf> {
+    let config_ffmpeg_path = store_config::FFMPEG_DIR_PATH.get().unwrap();
+    check_get_ffmpeg(config_ffmpeg_path)
+}
+fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> IOResult<PathBuf> {
     let ffmpeg_path = ffmpeg_dir_path.join("ffmpeg.exe");
     if ffmpeg_path.exists() {
         return Ok(ffmpeg_path);
@@ -54,7 +64,6 @@ fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> Result<PathBuf, IOError> {
 pub fn run_ffmpeg(
    (start_time, end_time)         : (f64, f64),
    (src_file_path, dest_file_path): (&PathBuf, &PathBuf),
-    ffmpeg_dir_path               : &PathBuf,
 ) -> Result<PathBuf, IOError> {
     let glitch_margin:f64 = if start_time >= GLITCH_MARGIN {
         GLITCH_MARGIN
@@ -64,7 +73,7 @@ pub fn run_ffmpeg(
 
     let start_time = start_time - glitch_margin;
 
-    let ffmpeg_path = check_get_ffmpeg(ffmpeg_dir_path)?
+    let ffmpeg_path = get_ffmpeg()?
         .display().to_string();
 
     let mut ffmpeg_status = Command::new(&ffmpeg_path)
@@ -133,10 +142,9 @@ pub fn ffmpeg_videofiles(
         match run_ffmpeg(
             (file_res.start_time, file_res.end_time),
             (file_src_path, &output_file_path ),
-            &config_values.ffmpeg_dir_path,
         ) {
-            Ok(dest_path) => ok_list.push(dest_path),
-            Err(err)      => err_list.push(err.to_string()),
+            Ok(path) => ok_list.push(path),
+            Err(err) => err_list.push(err.to_string()),
         };
     }
 

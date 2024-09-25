@@ -1,5 +1,6 @@
 use redux_rs::Store;
 use std::path::PathBuf;
+use std::sync::OnceLock;
 
 
 use config::{Config, File as CfgFile};
@@ -17,7 +18,7 @@ use crate::file_sys_serv::{
 
 const CONFIG_FILE_NAME   : &str = "config.toml";
 
-const DEF_DIR            : &str = ".";
+pub const DEF_DIR        : &str = ".";
 const DEF_POSTFIX        : &str = "_FFCUT";
 const DEP_TIME_CORRECTION:  f64 = 2.0;
 const TIME_FREEFALL      :  f64 = 60.0;
@@ -25,6 +26,7 @@ const TIME_START_OFFSET  :  f64 = 0.0;
 const TIME_END_OFFSET    :  f64 = 3.0;
 const MIN_ACCEL_TRIGGER  :  f64 = 20.0;
 
+pub static FFMPEG_DIR_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 
 pub fn init_cfg_file() {
@@ -73,7 +75,6 @@ pub type State = ConfigValues;
 pub enum Action {
     UpdSrcDir(PathBuf),
     UpdDestDir(PathBuf),
-    UpdFfmpegDir(PathBuf),
     UpdOutputFilePostfix(String),
     UpdDepTimeCorrection(f64),
     UpdTimeFreefall(f64),
@@ -110,7 +111,6 @@ fn reducer(state: State, action: Action) -> State {
     match action {
         Action::UpdSrcDir(payload)            => State{srs_dir_path        : payload, ..state},
         Action::UpdDestDir(payload)           => State{dest_dir_path       : payload, ..state},
-        Action::UpdFfmpegDir(payload)         => State{ffmpeg_dir_path     : payload, ..state},
         Action::UpdOutputFilePostfix(payload) => State{output_file_postfix : payload, ..state},
         Action::UpdDepTimeCorrection(payload) => State{dep_time_correction : payload, ..state},
         Action::UpdTimeFreefall(payload)      => {
@@ -126,6 +126,7 @@ fn reducer(state: State, action: Action) -> State {
 
 
 pub fn get_store() -> Store<State, Action, fn(State, Action) -> State> {
-    let initial_state = get_config_values();
+    let initial_state = get_init_config_values();
+    FFMPEG_DIR_PATH.set(initial_state.ffmpeg_dir_path.clone()).unwrap_or(());
     Store::new_with_state(reducer, initial_state)
 }
