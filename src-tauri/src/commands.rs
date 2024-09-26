@@ -5,7 +5,7 @@ use serde::{Serialize, Deserialize};
 
 use tauri::{
     // api::dialog::MessageDialogBuilder,
-    Manager,
+    Manager
 };
 
 
@@ -63,6 +63,18 @@ pub fn unminimize_window() {
         .unminimize();
 }
 
+pub fn set_window_width(w: Option<u32>, h: Option<u32>) {
+    let window = crate::APP_HANDLE_INSTANCE.get().expect("app is not init yet")
+    .get_window("MAIN").expect("fail to get 'MAIN' window!");
+    
+    let cur_size = window.outer_size().unwrap();
+    let new_size = tauri::PhysicalSize::new(
+        w.unwrap_or(cur_size.width),
+        h.unwrap_or(cur_size.height)
+    );
+    let _ = window.set_size(new_size);
+}
+
 
 
 async fn on_ffmpeg_videofiles(
@@ -112,12 +124,17 @@ pub async fn on_choose_video_for_parsing(dir_path: &PathBuf) {
     let config_values = store_config_instance.state_cloned().await;
     // let app_values    = store_app_instance.state_cloned().await;
 
+
     match get_src_files_path_list(dir_path) {
         Some(path_list) => {
             let parsing_results = get_telemetry_for_files(&path_list, &config_values);
-            store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(Some(parsing_results))).await;
+            store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(Some(parsing_results.clone()))).await;
+            set_window_width(Some(800), None);
         },
-        None => store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(None)).await,
+        None => {
+            store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(None)).await;
+            set_window_width(Some(380), None);
+        },
     };
     // on_parsing_result(&parsing_results, &config_values, &app_values);
 }

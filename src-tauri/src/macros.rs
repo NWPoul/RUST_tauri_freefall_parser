@@ -25,33 +25,34 @@ macro_rules! promptContinue {
 // }
 
 #[macro_export]
-macro_rules! configValues {
+macro_rules! BuildConfigValues {
     ($(($var:ident, $type:ty, $default:expr)),*) => {
         #[derive(Debug, Clone, PartialEq, PartialOrd, serde::Serialize)]
         pub struct ConfigValues {
             $(pub $var:$type),*
         }
 
-        fn get_init_config_values() -> ConfigValues {
-            let mut settings = Config::default();
+        impl ConfigValues {
+            fn init() -> Self {
+                let mut settings = Config::default();
 
-            if let Err(e) = settings.merge(CfgFile::with_name("config.toml")) {
-                println!("Failed to load configuration file: {}", e);
-                println!("default configuration used");
-            }
-            println!("Config loaded from file");
+                if let Err(e) = settings.merge(CfgFile::with_name("config.toml")) {
+                    println!("Failed to load configuration file: {}", e);
+                    println!("default configuration used");
+                }
+                println!("Config loaded from file");
 
-            $(
-                let $var = settings
-                    .get::<$type>(stringify!($var))
-                    .unwrap_or($default);
-                println!(concat!(stringify!($var), ": {:?}"), $var);
-            )*
-            
-            ConfigValues {
-                $($var),*
-            }
-        }
+                $(
+                    let $var = settings
+                        .get::<$type>(stringify!($var))
+                        .unwrap_or($default);
+                    println!(concat!(stringify!($var), ": {:?}"), $var);
+                )*
+                
+                Self {
+                    $($var),*
+                }
+        }}
     };
 }
 

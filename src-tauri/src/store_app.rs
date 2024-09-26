@@ -207,9 +207,12 @@ fn reducer(state: State, action: Action) -> State {
 
 
 
-pub fn get_store() -> Store<State, Action, fn(State, Action) -> State> {
-    let initial_state = State::default();
-    Store::new_with_state(reducer, initial_state)
-}
 
+pub fn init_store(static_store_cell: &std::sync::OnceLock<StoreType>) {
+    init_operators_list_file();
+    let initial_state = State::default();
+
+    let store:StoreType = Store::new_with_state(reducer, initial_state);
+    static_store_cell.set(store).unwrap_or_else(|_|panic!("Fail to init APP STORE"));
+}
 

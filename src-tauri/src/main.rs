@@ -74,11 +74,10 @@ fn init_app(app: &mut tauri::App) -> MyResult<()> {
 async fn main() {
     tauri::async_runtime::set(tokio::runtime::Handle::current());
 
-    store_config::init_cfg_file();
-    store_app::init_operators_list_file();
 
-    STORE_APP_INSTANCE.set(store_app::get_store()).unwrap_or(());
-    STORE_CONFIG_INSTANCE.set(store_config::get_store()).unwrap_or(());
+    store_config::init_store(&STORE_CONFIG_INSTANCE);
+    store_app::init_store(&STORE_APP_INSTANCE);
+
 
     tauri::Builder::default()
         .setup(init_app)

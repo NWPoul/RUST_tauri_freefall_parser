@@ -22,6 +22,7 @@ import { NickSelect }               from './NickSelect'
 import { FlightNumberBlock }        from './FlightNumberBlock'
 import { ControlGroupAF }           from './controlGroupAF'
 import { BackendNotification }      from './BackendNotification'
+import { ParsingFiles } from 'components/ParsingFiles'
 
 
 
@@ -73,8 +74,8 @@ export function MainPanel() {
     useRustConfigStateUpdateEvent()
 
     const appState    = useAppState()
-    console.log('MainPanel ~ appState:', appState)
     const configState = configStore.use()
+    console.log('MainPanel ~ appState:', appState)
 
     useKeys()
 
@@ -123,6 +124,10 @@ export function MainPanel() {
                 >
                     Парсить файлы
                 </button>
+
+                {/* chosen_files_data */}
+                <ParsingFiles chosenFiles={appState.chosen_files_data} />
+
             </div>
         </div>
         <BackendNotification/>

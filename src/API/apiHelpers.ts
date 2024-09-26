@@ -113,7 +113,7 @@ function useRustConfigStateUpdateEvent() {
 }
 
 
-function useBackendNotification(cb:(pyaload: [string, string]) => void) {
+function useBackendNotificationEvent(cb:(pyaload: [string, string]) => void) {
     useEffect(() => {
         const handler = (e:Event<[string, string]>) => {
             console.log('NOTIFICATION EVENT!', e)
@@ -133,7 +133,7 @@ export {
     initApiStateData,
     useRustAppStateUpdateEvent,
     useRustConfigStateUpdateEvent,
-    useBackendNotification,
+    useBackendNotificationEvent as useBackendNotification,
 
     API_togglePanel      as sendTogglePanelCommand,
     API_sendControlInput as sendControlInputCommand,

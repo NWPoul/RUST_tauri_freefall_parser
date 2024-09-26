@@ -15,7 +15,6 @@ use crate::file_sys_serv::{
 
 
 
-
 const CONFIG_FILE_NAME   : &str = "config.toml";
 
 pub const DEF_DIR        : &str = ".";
@@ -29,15 +28,19 @@ const MIN_ACCEL_TRIGGER  :  f64 = 20.0;
 pub static FFMPEG_DIR_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 
-pub fn init_cfg_file() {
+
+
+pub type State = ConfigValues;
+pub type StoreType = Store<State, Action, fn(State, Action) -> State>;
+
+
+
+fn init_cfg_file() {
     let config_file_path: PathBuf = CONFIG_FILE_NAME.into();
     init_file(&config_file_path, "");
 }
 
-
-
-
-pub fn update_config_field<V: serde::Serialize>(
+fn update_config_field<V: serde::Serialize>(
     field_name: &str,
     field_value: V,
 ) -> MyResult<()> {
@@ -53,7 +56,7 @@ pub fn update_config_field<V: serde::Serialize>(
 
 
 
-crate::configValues!(
+crate::BuildConfigValues!(
     ( srs_dir_path       , PathBuf, DEF_DIR.into() ),
     ( dest_dir_path      , PathBuf, DEF_DIR.into() ),
     ( ffmpeg_dir_path    , PathBuf, DEF_DIR.into() ),
@@ -68,8 +71,6 @@ crate::configValues!(
 );
 
 
-pub type State = ConfigValues;
-
 
 #[derive(Debug)]
 pub enum Action {
@@ -83,9 +84,6 @@ pub enum Action {
     UpdMinAccelTrigger(f64),
     UpdNoFfmpegProcess(bool),
 }
-
-pub type StoreType = Store<State, Action, fn(State, Action) -> State>;
-
 
 
 #[allow(non_snake_case)]
@@ -125,8 +123,11 @@ fn reducer(state: State, action: Action) -> State {
 }
 
 
-pub fn get_store() -> Store<State, Action, fn(State, Action) -> State> {
-    let initial_state = get_init_config_values();
-    FFMPEG_DIR_PATH.set(initial_state.ffmpeg_dir_path.clone()).unwrap_or(());
-    Store::new_with_state(reducer, initial_state)
+
+pub fn init_store(static_store_cell: &OnceLock<StoreType>) {
+    init_cfg_file();
+    let initial_state = ConfigValues::init();
+    FFMPEG_DIR_PATH.set(initial_state.ffmpeg_dir_path.clone()).expect("Fail to init FFMPEG_DIR_PATH");
+    let store:StoreType = Store::new_with_state(reducer, initial_state);
+    static_store_cell.set(store).unwrap_or_else(|_|panic!("Fail to init CONFIG STORE"));
 }
