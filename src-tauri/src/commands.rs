@@ -129,7 +129,7 @@ pub async fn on_choose_video_for_parsing(dir_path: &PathBuf) {
         Some(path_list) => {
             let parsing_results = get_telemetry_for_files(&path_list, &config_values);
             store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(Some(parsing_results.clone()))).await;
-            set_window_width(Some(800), None);
+            set_window_width(Some(1000), None);
         },
         None => {
             store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(None)).await;
@@ -234,6 +234,10 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
             app_store_instance.dispatch(store_app::Action::ToggleAutoPlay(new_is_autoplay)).await;
         },
         "openParserFolder" => {
+            let dest_dir = config_store_instance.select(store_config::SELECTORS::DestDir).await;
+            let _ = open_directory(dest_dir);
+        },
+        "updateChosenFiles" => {
             let dest_dir = config_store_instance.select(store_config::SELECTORS::DestDir).await;
             let _ = open_directory(dest_dir);
         },

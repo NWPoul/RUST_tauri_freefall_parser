@@ -4,6 +4,7 @@ import type { T_ChosenFiles, T_FileOkRec, T_FileErrRec }       from 'API/apiAppS
 
 import './styles.css'
 import { FileRow } from './FileRow'
+import { PsControls } from './psControls'
 
 
 
@@ -19,14 +20,15 @@ export function ParsingFiles({chosenFiles}:{chosenFiles: T_ChosenFiles | null}) 
         ([fileName, fileData]) => <FileRow key={fileName}
             fileName={fileName}
             fileData={fileData}
-            // operator  ?: string
             flight={1}
+            // operator  ?: string
         />
     )
 
     return (
         <div className='ParsingFiles'>
             {GoodJSX}
+            <PsControls/>
         </div>
     )
 }
