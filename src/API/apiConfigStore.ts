@@ -1,6 +1,6 @@
 import { store }                from '@davstack/store'
 
-
+type T_apiConfigState = T_State
 
 type T_State = {
     srs_dir_path        : string,
@@ -60,6 +60,6 @@ export {
 }
 
 export type {
-    T_State    as T_apiConfigState,
+    T_apiConfigState,
     T_StateUPD as T_apiConfigStateUPD,
 }

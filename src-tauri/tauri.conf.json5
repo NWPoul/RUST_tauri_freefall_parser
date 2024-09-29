@@ -55,13 +55,12 @@
             "label": "MAIN",
             "title": "NW FF parser",
             "fullscreen": false,
-            "resizable": true,
-            "width": 1000,
-            "maxWidth": 1000,
+            "resizable": false,
+            "width": 380,
             "height": 600,
-            "maxHeight": 700,
+            // "maxWidth": 1000,
+            // "maxHeight": 700,
             "alwaysOnTop": true,
-
             "transparent": true,
             "decorations": false
 

@@ -62,8 +62,8 @@ fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> IOResult<PathBuf> {
 
 
 pub fn run_ffmpeg(
-   (start_time, end_time)         : (f64, f64),
    (src_file_path, dest_file_path): (&PathBuf, &PathBuf),
+   (start_time, end_time)         : (f64, f64),
 ) -> Result<PathBuf, IOError> {
     let glitch_margin:f64 = if start_time >= GLITCH_MARGIN {
         GLITCH_MARGIN
@@ -122,7 +122,7 @@ pub fn get_output_filepath(
 
 
 
-pub fn ffmpeg_videofiles(
+pub fn ffmpeg_videofiles_backend(
     files_data   : &FileParsingOkData,
     config_values: &store_config::ConfigValues,
     app_values   : &store_app::State,
@@ -140,8 +140,28 @@ pub fn ffmpeg_videofiles(
         );
 
         match run_ffmpeg(
-            (file_res.start_time, file_res.end_time),
             (file_src_path, &output_file_path ),
+            (file_res.start_time, file_res.end_time),
+        ) {
+            Ok(path) => ok_list.push(path),
+            Err(err) => err_list.push(err.to_string()),
+        };
+    }
+
+    (ok_list, err_list)
+}
+
+pub fn ffmpeg_videofiles_frontend(
+    files_data   : &[(&PathBuf, &PathBuf, f64, f64)]
+) -> (Vec<PathBuf>, Vec<String>) {
+
+    let mut ok_list : Vec<PathBuf> = vec![];
+    let mut err_list: Vec<String>  = vec![];
+
+    for (src_path, output_path, start_time, end_time) in files_data {
+        match run_ffmpeg(
+            (src_path, output_path ),
+            (*start_time, *end_time),
         ) {
             Ok(path) => ok_list.push(path),
             Err(err) => err_list.push(err.to_string()),

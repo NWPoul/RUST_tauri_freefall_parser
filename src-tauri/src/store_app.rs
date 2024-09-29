@@ -8,8 +8,6 @@ use std::{
 
 use crate::utils::u_serv::normalize_name;
 
-use crate::commands::on_choose_video_for_parsing;
-
 use crate::telemetry_analysis::FileParsingResults;
 
 use crate::file_sys_serv::{
@@ -26,6 +24,13 @@ use crate::operators_serv::{
     recognize_card,
     update_operators_file,
     OperatorRecord,
+};
+
+use crate::commands::{
+    DEF_WINDOW_WIDTH,
+    LARGE_WINDOW_WIDTH,
+    on_choose_video_for_parsing,
+    set_window_width,
 };
 
 
@@ -199,7 +204,15 @@ fn reducer(state: State, action: Action) -> State {
             }
         },
 
-        Action::UpdChosenFilesData(payload) => State{chosen_files_data: payload, ..state},
+        Action::UpdChosenFilesData(payload) => {
+            let width = if payload.is_none() {
+                DEF_WINDOW_WIDTH                
+            } else {
+                LARGE_WINDOW_WIDTH
+            };
+            set_window_width(Some(width), None);
+            State{chosen_files_data: payload, ..state}
+        },
     }
 }
 

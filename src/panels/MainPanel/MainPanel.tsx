@@ -126,7 +126,7 @@ export function MainPanel() {
                 </button>
 
                 {/* chosen_files_data */}
-                <ParsingFiles chosenFiles={appState.chosen_files_data} />
+                <ParsingFiles appState={appState} />
 
             </div>
         </div>

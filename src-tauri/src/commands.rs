@@ -1,7 +1,7 @@
 
 use std::path::PathBuf;
 
-use serde::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize, Deserializer};
 
 use tauri::{
     // api::dialog::MessageDialogBuilder,
@@ -10,7 +10,7 @@ use tauri::{
 
 
 use crate::ffmpeg_serv::{
-    ffmpeg_videofiles,
+    ffmpeg_videofiles_backend,
     run_ffmpeg,
 };
 
@@ -28,7 +28,7 @@ use crate::operators_serv::{
 use crate::telemetry_analysis::{
     get_telemetry_for_files,
     FileParsingOkData,
-    FileParsingResults,
+    // FileParsingResults,
     // FileParsingErrData,
     // FileTelemetryResult,
 };
@@ -40,6 +40,11 @@ use crate::{
     STORE_CONFIG_INSTANCE,
 };
 
+
+
+
+pub const DEF_WINDOW_WIDTH  : u32 = 380;
+pub const LARGE_WINDOW_WIDTH: u32 = 1000;
 
 
 
@@ -69,7 +74,7 @@ pub fn unminimize_window() {
 
 pub fn set_window_width(w: Option<u32>, h: Option<u32>) {
     let window = crate::APP_HANDLE_INSTANCE.get().expect("app is not init yet")
-    .get_window("MAIN").expect("fail to get 'MAIN' window!");
+        .get_window("MAIN").expect("fail to get 'MAIN' window!");
     
     let cur_size = window.outer_size().unwrap();
     let new_size = tauri::PhysicalSize::new(
@@ -90,7 +95,7 @@ async fn on_ffmpeg_videofiles(
     let config_values = store_config_instance.state_cloned().await;
     let app_values    = store_app_instance.state_cloned().await;
 
-    let (ok_list, err_list) = ffmpeg_videofiles( parsing_results, &config_values, &app_values);
+    let (ok_list, err_list) = ffmpeg_videofiles_backend( parsing_results, &config_values, &app_values);
     let mut report = format!(
         "Успешно записано файлов: {}",
         ok_list.len()
@@ -128,20 +133,15 @@ pub async fn on_choose_video_for_parsing(dir_path: &PathBuf) {
     let config_values = store_config_instance.state_cloned().await;
     // let app_values    = store_app_instance.state_cloned().await;
 
-
-    match get_src_files_path_list(dir_path) {
-        Some(path_list) => {
-            let parsing_results = get_telemetry_for_files(&path_list, &config_values);
-            store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(Some(parsing_results.clone()))).await;
-            set_window_width(Some(1000), None);
-        },
-        None => {
-            store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(None)).await;
-            set_window_width(Some(380), None);
-        },
+    let chosen_files = match get_src_files_path_list(dir_path) {
+        Some(files) => Some(get_telemetry_for_files(&files, &config_values)),
+        None        => None,
     };
+
+    store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(chosen_files)).await;
     // on_parsing_result(&parsing_results, &config_values, &app_values);
 }
+
 
 
 // enum PathRecognitionResult {
@@ -169,9 +169,6 @@ pub async fn on_choose_video_for_parsing(dir_path: &PathBuf) {
 
 
 
-
-
-
 #[derive(Clone, Serialize)]
 pub struct StateUpdateEventPayload<P: Serialize>(pub P);
 
@@ -180,14 +177,18 @@ pub struct FrontInputEventStringPayload {
     pub id : String,
     pub val: String,
 }
+
+
+
 #[derive(Debug, Clone, Deserialize)]
-pub enum FrontInputMixVal {
-    Text(String),
+enum FrontInputMixVal {
+    Str(String),
     Bool(bool),
-    Array16(Vec<i16>),
+    Arr16i(Vec<i16>),
+    ArrStr(Vec<String>),
 }
 #[derive(Debug, Clone, Deserialize)]
-pub struct FrontInputEventMixPayload {
+struct FrontInputEventMixPayload {
     pub id : String,
     pub val: FrontInputMixVal,
 }
@@ -203,7 +204,7 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
     let app_store_instance    = STORE_APP_INSTANCE.get().expect("app_store instance n/a");
     let config_store_instance = STORE_CONFIG_INSTANCE.get().expect("config_store instance n/a");
     
-    let id: &str  = &input.id;
+    let id : &str = &input.id;
     let val: &str = &input.val;
     
     let mut resp = format!("ok {id} command, val {val}:");
@@ -244,9 +245,13 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
             let dest_dir = config_store_instance.select(store_config::SELECTORS::DestDir).await;
             let _ = open_directory(dest_dir);
         },
-        "updateChosenFiles" => {
-            let dest_dir = config_store_instance.select(store_config::SELECTORS::DestDir).await;
-            let _ = open_directory(dest_dir);
+        "clearChosenFiles" => {
+            app_store_instance.dispatch(store_app::Action::UpdChosenFilesData(None)).await;
+        },
+        "ffmpegChosenFiles" => {
+            let files_to_ffmpeg = deserialize_unknown_string(val);
+            dbg!(files_to_ffmpeg);
+            // app_store_instance.dispatch(store_app::Action::UpdChosenFilesData(None)).await;
         },
         
         _ => resp = format!("unknown command: {id} {val}"),
@@ -256,3 +261,24 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
 }
 
 
+
+
+
+fn deserialize_unknown_string(json_string: &str) -> Vec<FileToFfmpegData> {
+    let value = serde_json::from_str(json_string);
+    match value {
+        Ok(val) => serde_json::from_value(val).unwrap_or_else(
+            |e| Vec::<FileToFfmpegData>::new()//FileToFfmpegData::default()
+            // |e| vec![format!("FAILED PARSE JSON {}",e)]
+        ),
+        Err(e) => Vec::<FileToFfmpegData>::new()//vec![format!("FAILED PARSE TO JSON {}",e)],
+    }
+}
+
+#[derive(Debug, Default, Clone, Deserialize)]
+pub struct FileToFfmpegData{
+    pub scr_path: String,
+    pub out_path: String,
+    pub st_time : f64,
+    pub end_time: f64,
+}

@@ -33,6 +33,9 @@ type T_controlInputId =
     | 'newNick'
     | 'toggleAutoPlay'
     | 'openParserFolder'
+    | 'toggleAutoPlay'
+    | 'clearChosenFiles'
+    | 'ffmpegChosenFiles'
 
 type T_controlInput = {
     id : T_controlInputId;
