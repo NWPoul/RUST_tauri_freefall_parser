@@ -40,7 +40,7 @@ fn init_cfg_file() {
     init_file(&config_file_path, "");
 }
 
-fn update_config_field<V: serde::Serialize>(
+fn _update_config_field<V: serde::Serialize>(
     field_name: &str,
     field_value: V,
 ) -> MyResult<()> {
@@ -111,10 +111,7 @@ fn reducer(state: State, action: Action) -> State {
         Action::UpdDestDir(payload)           => State{dest_dir_path       : payload, ..state},
         Action::UpdOutputFilePostfix(payload) => State{output_file_postfix : payload, ..state},
         Action::UpdDepTimeCorrection(payload) => State{dep_time_correction : payload, ..state},
-        Action::UpdTimeFreefall(payload)      => {
-            _ = update_config_field("time_freefall", payload);
-            State{time_freefall       : payload, ..state}
-        },
+        Action::UpdTimeFreefall(payload)      => State{time_freefall       : payload, ..state},
         Action::UpdTimeStartOffset(payload)   => State{time_start_offset   : payload, ..state},
         Action::UpdTimeEndOffset(payload)     => State{time_end_offset     : payload, ..state},
         Action::UpdMinAccelTrigger(payload)   => State{min_accel_trigger   : payload, ..state},

@@ -9,7 +9,10 @@ use tauri::{
 };
 
 
-use crate::ffmpeg_serv::{ffmpeg_videofiles, run_ffmpeg};
+use crate::ffmpeg_serv::{
+    ffmpeg_videofiles,
+    run_ffmpeg,
+};
 
 use crate::file_sys_serv::{
     get_output_file_path,
@@ -23,10 +26,11 @@ use crate::operators_serv::{
 };
 
 use crate::telemetry_analysis::{
-    FileTelemetryResult,
-    FileParsingErrData,
-    FileParsingOkData,
     get_telemetry_for_files,
+    FileParsingOkData,
+    FileParsingResults,
+    // FileParsingErrData,
+    // FileTelemetryResult,
 };
 
 use crate::{
@@ -190,17 +194,20 @@ pub struct FrontInputEventMixPayload {
 
 
 
+
+
+
 #[tauri::command]
 pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<String, ()> {
     dbg!("FRONT: control_input: ", &input);
     let app_store_instance    = STORE_APP_INSTANCE.get().expect("app_store instance n/a");
     let config_store_instance = STORE_CONFIG_INSTANCE.get().expect("config_store instance n/a");
-
+    
     let id: &str  = &input.id;
     let val: &str = &input.val;
-
+    
     let mut resp = format!("ok {id} command, val {val}:");
-
+    
     match id {
         "selectVideoFiles" => {
             let src_dir = if val.is_empty() {
@@ -241,10 +248,10 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
             let dest_dir = config_store_instance.select(store_config::SELECTORS::DestDir).await;
             let _ = open_directory(dest_dir);
         },
-
+        
         _ => resp = format!("unknown command: {id} {val}"),
     };
-
+    
     Ok(format!("API response: {resp}"))
 }
 
