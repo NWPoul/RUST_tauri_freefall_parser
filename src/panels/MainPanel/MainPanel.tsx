@@ -70,9 +70,6 @@ function FreeFallSettingsBlock({ffTime}:{ffTime: number}) {
 
 
 export function MainPanel() {
-    useRustAppStateUpdateEvent()
-    useRustConfigStateUpdateEvent()
-
     const appState    = useAppState()
     const configState = configStore.use()
     console.log('MainPanel ~ appState:', appState)
