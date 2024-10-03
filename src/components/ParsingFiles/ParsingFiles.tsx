@@ -107,7 +107,7 @@ export function ParsingFiles({appState}:{appState: T_apiAppState}) {
 
     const internalFilesData = getInternalFileData(appState)
 
-    const GoodJSX = internalFilesData?.map(
+    const goodJSX = internalFilesData?.map(
         fileData => <FileRow key={fileData.scrPath}
             {...fileData}
         />
@@ -121,7 +121,7 @@ export function ParsingFiles({appState}:{appState: T_apiAppState}) {
 
     return (
         <div className='ParsingFiles'>
-            {GoodJSX}
+            {goodJSX}
             <PsControls/>
             <button
                 value={JSON.stringify(testVal)}

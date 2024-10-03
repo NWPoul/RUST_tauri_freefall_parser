@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! promptExit {
     ($msg: expr) => {
-        crate::utils::u_serv::prompt_to_exit($msg);
+        $crate::utils::u_serv::prompt_to_exit($msg);
         return;
     };
 }
@@ -9,7 +9,7 @@ macro_rules! promptExit {
 #[macro_export]
 macro_rules! promptContinue {
     ($msg: expr) => {
-        let confirm = crate::utils::u_serv::prompt_to_continue($msg);
+        let confirm = $crate::utils::u_serv::prompt_to_continue($msg);
         if confirm {
             continue;
         } else {
@@ -19,7 +19,7 @@ macro_rules! promptContinue {
 }
 // macro_rules! promptExit_Ok {
 //     ($msg: expr) => {
-//         crate::utils::u_serv::prompt_to_exit($msg);
+//         $crate::utils::u_serv::prompt_to_exit($msg);
 //         return Ok(());
 //     };
 // }

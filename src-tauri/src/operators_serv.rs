@@ -48,7 +48,7 @@ pub fn generate_operator_id() -> String {
 
 
 pub fn find_by_nick_inhash(operators_list: &OperatorsList, nick: &str) -> Option<IdList> {
-    operators_list.get(nick).map(|list| list.clone())
+    operators_list.get(nick).cloned()
 }
 
 pub fn find_operator_by_id_inhash(operators_list: &OperatorsList, id: &str) -> Option<(String, IdList)> {
@@ -66,7 +66,7 @@ fn get_id_from_drive(id_path: &PathBuf) -> Option<String> {
     let id: String  = if check_path(id_path) {
         let id_found = read_first_non_empty_line(id_path);
         dbg!("id from drive", id_path, &id_found);
-        id_found.unwrap_or("".into()).into()
+        id_found.unwrap_or("".into())
     } else {
         dbg!("WRONG id_path!", id_path);
         "".into()
@@ -130,7 +130,7 @@ pub fn read_operators_file(file_path: &str) -> Result<HashMap<String, Vec<String
                         .filter_map(|v| v.as_str().map(String::from))
                         .collect::<Vec<String>>();
                     table.insert(
-                        normalize_name(&key.clone()),
+                        normalize_name(key.clone()),
                         values
                     );
                 }
@@ -161,7 +161,7 @@ fn save_tuples_to_file(tuples: Vec<(String, Vec<String>)>, file_path: &PathBuf) 
             Value::Array(Vec::new())
         };
 
-        toml_content.push_str(&format!("\"{}\" = {}\n", key, array_value.to_string()));
+        toml_content.push_str(&format!("\"{}\" = {}\n", key, array_value));
     }
     let mut file = File::create(file_path)?;
 
@@ -211,7 +211,7 @@ pub fn update_operators_file(nick: &str, new_id: &str) -> std::io::Result<HashMa
 
 
 pub fn recognize_card(input_path: &PathBuf) -> io::Result<String> {
-    if let None = get_dcim_path(input_path) {
+    if get_dcim_path(input_path).is_none() {
         println!("NO_DCIM");
         return Err(io::Error::new(io::ErrorKind::NotFound, "NO_DCIM"));
     }

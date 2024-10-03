@@ -33,7 +33,7 @@ fn get_cam_serial(sample_0: &tp_util::SampleInfo) -> Option<String> {
         }
     }
     println!("NO CASN");
-    return None
+    None
 }
 fn get_cam_info(input: &TpInput) -> CameraInfo {
     let mut cam_model  = "".to_string();
@@ -49,7 +49,7 @@ fn get_cam_info(input: &TpInput) -> CameraInfo {
     println!("Detected camera: {cam_model} {:?}", &cam_serial);
 
     CameraInfo{
-        model : cam_model.into(),
+        model : cam_model,
         serial: cam_serial,
     }
 }
@@ -70,14 +70,14 @@ pub fn parse_telemetry_from_file(input_file: &str) -> Result<TelemetryData, Stri
 
     let input = match TpInput::from_stream(&mut stream, filesize,input_file, |_|(), Arc::new(AtomicBool::new(false))) {
         Ok(input) => input,
-        Err(e) => {return Err(format!("FAIL TO PARSE TELEMETRY! {}", e.to_string()));},
+        Err(e) => {return Err(format!("FAIL TO PARSE TELEMETRY! {}", e));},
     };
 
     let cam_info = get_cam_info(&input);
 
     let imu_data = match tp_util::normalized_imu(&input, None) {
         Ok(data) => data,
-        Err(e) => {return Err(format!("FAIL TO GET IMUDATA! {}", e.to_string()));},
+        Err(e) => {return Err(format!("FAIL TO GET IMUDATA! {}", e));},
     };
 
     let mut telemetry_xyz_acc_data: Vec<(f64, f64, f64)> = Vec::new();

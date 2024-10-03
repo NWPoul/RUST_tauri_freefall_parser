@@ -35,7 +35,7 @@ fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> IOResult<PathBuf> {
     let ffmpeg_path = ffmpeg_dir_path.join("ffmpeg.exe");
     if ffmpeg_path.exists() {
         return Ok(ffmpeg_path);
-    }
+    };
 
     eprintln!("\nffmpeg not found at {:?}... trying sys PATH", &ffmpeg_path);
     let output = Command::new("ffmpeg")
@@ -46,15 +46,11 @@ fn check_get_ffmpeg(ffmpeg_dir_path: &PathBuf) -> IOResult<PathBuf> {
     match output {
         Ok(_) => {
             println!("OK ffmpeg is in the system PATH");
-            return Ok(PathBuf::from("ffmpeg"));
+            Ok(PathBuf::from("ffmpeg"))
         },
         Err(_) => {
             println!("FAIL ffmpeg not in the system PATH");
-            let error = IOError::new(
-                IOErrorKind::NotFound,
-                "ffmpeg not found!"
-            );
-            return Err(error);
+            Err(IOError::new(IOErrorKind::NotFound, "ffmpeg not found!"))
         }
     }
 }

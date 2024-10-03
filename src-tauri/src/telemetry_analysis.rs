@@ -133,7 +133,7 @@ pub fn get_telemetry_for_files(
     for src_file_path in src_files_path_list {
         let input_file = src_file_path.to_string_lossy();
 
-        match get_result_metadata_for_file(&input_file, &config_values) {
+        match get_result_metadata_for_file(&input_file, config_values) {
             Ok(data)     => ok_list.push((src_file_path.clone(), data)),
             Err(err_str) => err_list.push((src_file_path.clone(), err_str)),
         };

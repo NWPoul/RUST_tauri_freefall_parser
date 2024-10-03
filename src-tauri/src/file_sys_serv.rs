@@ -55,23 +55,17 @@ pub fn extract_drive_path(path_buf: &PathBuf) -> Option<PathBuf> {
     let path_string = path_buf.to_str()?;
 
     let colon_position = path_string.find(':');
-    match colon_position {
-        Some(idx) => Some(
-            PathBuf::from(
-                format!("{}:\\", &path_string[..idx])
-            )
-        ),
-            None => None
-        }
+    colon_position.map(|idx| PathBuf::from(
+        format!("{}:\\", &path_string[..idx])
+    ))
 }
 
 fn convert_to_absolute_path_or_default<T: AsRef<Path>>(path: T) -> PathBuf {
     let def_path = PathBuf::from(".");
     let path     = PathBuf::from(path.as_ref());
-    let canonical_path = fs::canonicalize(path).unwrap_or(
+    fs::canonicalize(path).unwrap_or(
         fs::canonicalize(def_path).unwrap()
-    );
-    canonical_path
+    )
 }
 
 
@@ -140,12 +134,10 @@ pub fn get_src_file_path(srs_dir_path: &PathBuf) -> Option<PathBuf> {
     let paths = fs::read_dir(srs_dir_path)
         .expect("Failed to read directory")
         .filter_map(Result::ok)
-        .filter(|entry| {
-            let path = entry.path();
-            path.extension()
-                .and_then(|ext| ext.to_str().map(|s| s.to_lowercase() == "mp4"))
-                .unwrap_or(false)
-        })
+        .filter(|entry| entry.path().extension()
+            .and_then(|ext| ext.to_str().map(|s| s.to_lowercase() == "mp4"))
+            .unwrap_or(false)
+        )
         .map(|entry| entry.path())
         .collect::<Vec<_>>();
 
@@ -157,13 +149,12 @@ pub fn get_src_file_path(srs_dir_path: &PathBuf) -> Option<PathBuf> {
 }
 
 pub fn get_src_files_path_list<T: AsRef<Path>>(srs_dir_path: T) -> Option<Vec<PathBuf>> {
-    let src_files_path_list = FileDialog::new()
+    FileDialog::new()
         .set_title("FF PARSER Выбор файлов")
         .add_filter("mp4_files", &["mp4", "MP4"])
         .set_directory(srs_dir_path)
         .set_can_create_directories(true)
-        .pick_files();
-    src_files_path_list
+        .pick_files()
 }
 
 
@@ -193,7 +184,7 @@ pub fn get_output_file_path(
         output_file_postfix
     );
 
-    let output_file_path = dest_dir_path.join(&output_file_name.trim());
+    let output_file_path = dest_dir_path.join(output_file_name.trim());
 
     output_file_path
 }
@@ -285,11 +276,11 @@ pub fn get_last_file(folder_path: &PathBuf) -> MyResult<fs::DirEntry> {
             }
         });
         match last_modified_file {
-            Some(dir_entry) => return Ok(dir_entry),
-            None => return Err(Box::new(io::Error::new(
-                io::ErrorKind::NotFound,
-                "No  correct files found in the directory",
-            ))),
+            Some(dir_entry) => Ok(dir_entry),
+            None            => Err(Box::new(io::Error::new(
+                                io::ErrorKind::NotFound,
+                                "No  correct files found in the directory",
+                            ))),
         }
 }
 

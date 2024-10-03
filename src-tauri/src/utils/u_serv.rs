@@ -49,13 +49,10 @@ pub fn remove_symbols(input: &str, symbols: &str) -> String {
 
 fn capitalize_word(input: impl AsRef<str>) -> String {
     let mut chars = input.as_ref().chars();
-    chars.next().and_then(|first| {
-        Some(
-            first
-                .to_uppercase()
-                .chain(chars.flat_map(char::to_lowercase)),
-        )
-    })
+    chars.next().map(|first| first
+        .to_uppercase()
+        .chain(chars.flat_map(char::to_lowercase))
+    )
     .into_iter()
     .flatten()
     .collect()
@@ -72,7 +69,6 @@ pub fn normalize_name(input_name: impl AsRef<str>) -> String {
         .flat_map(char::to_lowercase)
         .take(MAX_NAME_LENGTH)
         .collect::<String>()
-        .trim()
         .split_whitespace()
         .map(capitalize_word)
         .collect::<Vec<String>>()

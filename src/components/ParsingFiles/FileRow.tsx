@@ -7,7 +7,7 @@ export function FileRow(props: T_InternalFileData) {
     const operator = props.operator || 'NOT SET'
     const flight   = props.flight || 'NOT SET'
     const fileName = props.scrPath.substr(props.scrPath.lastIndexOf('\\')+1)
-
+cl
     return <div className="FileRow">
         <div className="FileRow-cell operator">
             {operator}

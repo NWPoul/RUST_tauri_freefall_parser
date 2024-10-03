@@ -133,10 +133,9 @@ pub async fn on_choose_video_for_parsing(dir_path: &PathBuf) {
     let config_values = store_config_instance.state_cloned().await;
     // let app_values    = store_app_instance.state_cloned().await;
 
-    let chosen_files = match get_src_files_path_list(dir_path) {
-        Some(files) => Some(get_telemetry_for_files(&files, &config_values)),
-        None        => None,
-    };
+    let chosen_files = get_src_files_path_list(dir_path).map(
+        |files| get_telemetry_for_files(&files, &config_values)
+    );
 
     store_app_instance.dispatch(store_app::Action::UpdChosenFilesData(chosen_files)).await;
     // on_parsing_result(&parsing_results, &config_values, &app_values);
@@ -264,16 +263,11 @@ pub async fn front_control_input(input: FrontInputEventStringPayload) -> Result<
 
 
 
-fn deserialize_unknown_string(json_string: &str) -> Vec<FileToFfmpegData> {
-    let value = serde_json::from_str(json_string);
-    match value {
-        Ok(val) => serde_json::from_value(val).unwrap_or_else(
-            |e| Vec::<FileToFfmpegData>::new()//FileToFfmpegData::default()
-            // |e| vec![format!("FAILED PARSE JSON {}",e)]
-        ),
-        Err(e) => Vec::<FileToFfmpegData>::new()//vec![format!("FAILED PARSE TO JSON {}",e)],
-    }
+fn deserialize_unknown_string(json_string: &str) -> Result<Vec<FileToFfmpegData>, serde_json::Error> {
+    let value = serde_json::from_str(json_string)?;
+    serde_json::from_value(value)
 }
+
 
 #[derive(Debug, Default, Clone, Deserialize)]
 pub struct FileToFfmpegData{

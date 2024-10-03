@@ -73,9 +73,8 @@ impl Default for State { fn default() -> Self {
         chosen_files_data: None,
     };
 
-    match read_operators_file(OPERATORS_LIST_FILE_NAME) {
-        Ok(list) => state.operators_list = list,
-        Err(_)   => (),
+    if let Ok(list) = read_operators_file(OPERATORS_LIST_FILE_NAME) {
+        state.operators_list = list
     }
 
     state
@@ -141,7 +140,7 @@ pub fn on_new_drive_event(new_drive: &PathBuf, new_state: &mut State) {
         }
     }
     println!("\nNEW DRIVE PLUGGED IN: {:?}", new_drive);
-    let src_path = get_src_path_for_ext_drive(&new_drive);
+    let src_path = get_src_path_for_ext_drive(new_drive);
     crate::commands::unminimize_window();
     let rt = tokio::runtime::Runtime::new().unwrap();
     std::thread::spawn(move || {
