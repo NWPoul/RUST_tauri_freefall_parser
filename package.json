@@ -56,6 +56,9 @@
       "micromatch@<4.0.8": ">=4.0.8",
       "vite@>=4.0.0 <4.5.4": ">=4.5.4",
       "vite@>=4.0.0 <=4.5.3": ">=4.5.4"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
